@@ -16,20 +16,37 @@
                 <span class="text-3xl font-bold tracking-tight text-gray-900">{{ $stats['total_orders'] }}</span>
             </p>
         </div>
+        
+        <!-- Order Statuses -->
         <div class="bg-white p-6 sm:p-8">
-            <p class="text-sm font-medium leading-6 text-gray-500">Products in Stock</p>
+            <p class="text-sm font-medium leading-6 text-gray-500">Pending</p>
             <p class="mt-2 flex items-baseline gap-x-2">
-                <span class="text-3xl font-bold tracking-tight text-gray-900">{{ $stats['total_products'] }}</span>
+                <span class="text-3xl font-bold tracking-tight text-yellow-600">{{ $stats['pending_orders'] }}</span>
             </p>
         </div>
         <div class="bg-white p-6 sm:p-8">
-            <p class="text-sm font-medium leading-6 text-gray-500">Low Stock Alerts</p>
-            <div class="mt-2 flex items-baseline gap-x-2">
-                <span class="text-3xl font-bold tracking-tight text-gray-900">{{ $stats['low_stock'] }}</span>
-                @if($stats['low_stock'] > 0)
-                    <span class="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">Attention</span>
-                @endif
-            </div>
+            <p class="text-sm font-medium leading-6 text-gray-500">Processing</p>
+            <p class="mt-2 flex items-baseline gap-x-2">
+                <span class="text-3xl font-bold tracking-tight text-blue-600">{{ $stats['processing_orders'] }}</span>
+            </p>
+        </div>
+        <div class="bg-white p-6 sm:p-8">
+            <p class="text-sm font-medium leading-6 text-gray-500">Shipped</p>
+            <p class="mt-2 flex items-baseline gap-x-2">
+                <span class="text-3xl font-bold tracking-tight text-purple-600">{{ $stats['shipped_orders'] }}</span>
+            </p>
+        </div>
+        <div class="bg-white p-6 sm:p-8">
+            <p class="text-sm font-medium leading-6 text-gray-500">Delivered</p>
+            <p class="mt-2 flex items-baseline gap-x-2">
+                <span class="text-3xl font-bold tracking-tight text-green-600">{{ $stats['delivered_orders'] }}</span>
+            </p>
+        </div>
+        <div class="bg-white p-6 sm:p-8 lg:col-span-2">
+            <p class="text-sm font-medium leading-6 text-gray-500">Cancelled</p>
+            <p class="mt-2 flex items-baseline gap-x-2">
+                <span class="text-3xl font-bold tracking-tight text-red-600">{{ $stats['cancelled_orders'] }}</span>
+            </p>
         </div>
     </div>
 

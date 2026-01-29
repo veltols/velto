@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Banner;
 
 class HomeController extends Controller
 {
@@ -24,6 +25,8 @@ class HomeController extends Controller
 
         $categories = Category::withCount('products')->where('is_active', true)->orderBy('display_order')->take(6)->get();
 
-        return view('home', compact('featured', 'newArrivals', 'categories'));
+        $banner = Banner::where('is_active', true)->first();
+
+        return view('home', compact('featured', 'newArrivals', 'categories', 'banner'));
     }
 }

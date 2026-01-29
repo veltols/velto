@@ -46,8 +46,8 @@
     <!-- Top Utility Bar -->
     <div class="bg-black text-white py-2 px-4 text-xs font-medium tracking-wide">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 flex justify-center items-center">
-             <div class="hidden sm:block">
-                 <span class="text-gray-400">Welcome to Velto Leather Shoes</span>
+             <div>
+                 <span class="text-white">Welcome to Velto Leather Shoes</span>
              </div>
         </div>
     </div>

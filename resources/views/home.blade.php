@@ -55,8 +55,8 @@
                         }
 
                         // Handle Category Image
-                        if ($category->image_path) {
-                            $imageUrl = asset('storage/' . $category->image_path);
+                        if ($category->image) {
+                            $imageUrl = asset('storage/' . $category->image);
                         } else {
                             // Fallback based on index for variety
                             if ($loop->index == 0) {
@@ -149,6 +149,20 @@
     </section>
 
     <!-- Mid-page Banner -->
+    @if($banner)
+    <section class="relative w-full bg-center bg-cover bg-no-repeat flex items-center justify-center" style="height: 600px; min-height: 600px; background-image: url('{{ $banner->image_path ? Storage::url($banner->image_path) : 'https://placehold.co/1920x800/000000/ffffff?text=' . urlencode($banner->title) }}');">
+        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            @if($banner->text)
+            <span class="block text-sm md:text-base font-bold uppercase tracking-[0.3em] mb-4 text-white/70 animate-fade-in">{{ $banner->text }}</span>
+            @endif
+            <h2 class="text-4xl md:text-6xl font-serif font-bold mb-8 text-white leading-tight">{{ $banner->title }}</h2>
+            <a href="{{ $banner->button_link }}" class="inline-block bg-black text-white px-10 py-4 text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-black transition duration-300 transform hover:-translate-y-1">
+                {{ $banner->button_text }}
+            </a>
+        </div>
+    </section>
+    @else
     <section class="relative w-full bg-center bg-cover bg-no-repeat flex items-center justify-center" style="height: 800px; min-height: 800px; background-image: url('https://placehold.co/1920x800/000000/ffffff?text=Velto+Luxury+Collection');">
         <div class="absolute inset-0 bg-black/60"></div>
         <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
@@ -162,6 +176,7 @@
             </a>
         </div>
     </section>
+    @endif
 
     <!-- New Arrivals -->
     <section id="new-arrivals" class="py-24 bg-gray-50">

@@ -76,7 +76,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{{ route('admin.products.edit', $product) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                            <a href="{{ route('admin.products.edit', $product) }}" class="text-black hover:text-gray-600 mr-3">Edit</a>
                             <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure? This will delete all variants and images.')">
                                 @csrf
                                 @method('DELETE')

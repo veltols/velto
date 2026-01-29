@@ -48,7 +48,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{{ route('admin.categories.edit', $category) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                            <a href="{{ route('admin.categories.edit', $category) }}" class="text-black hover:text-gray-600 mr-3">Edit</a>
                             <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure?')">
                                 @csrf
                                 @method('DELETE')
