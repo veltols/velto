@@ -1,26 +1,45 @@
 <?php
-// storage_link.php
+/**
+ * storage_link.php
+ * Hostinger-friendly version: copies storage files instead of symlink
+ */
 
-// Absolute paths (adjust according to your Hostinger account)
-$target = __DIR__ . '/../storage/app/public';  // Path to your storage folder
-$link   = __DIR__ . '/storage';                // Path where link should be created in public folder
+// ----- CONFIG -----
+$storagePath = '/home/u494123079/storage/app/public'; // <-- Replace 'username' with your Hostinger username
+$publicPath  = __DIR__ . '/storage';               // Will create storage inside public_html/dev
 
-// Check if link already exists
-if (file_exists($link)) {
-    echo "Storage link already exists or a folder named 'storage' exists.";
+// ----- FUNCTION TO COPY FOLDER -----
+function copyFolder($src, $dst) {
+    if (!is_dir($src)) {
+        echo "❌ Storage source folder does not exist: $src";
+        exit;
+    }
+
+    @mkdir($dst, 0755, true); // create destination folder
+
+    $dir = opendir($src);
+    while(false !== ($file = readdir($dir))) {
+        if ($file != '.' && $file != '..') {
+            $srcFile = $src . '/' . $file;
+            $dstFile = $dst . '/' . $file;
+            if (is_dir($srcFile)) {
+                copyFolder($srcFile, $dstFile);
+            } else {
+                copy($srcFile, $dstFile);
+            }
+        }
+    }
+    closedir($dir);
+}
+
+// ----- CHECK IF ALREADY EXISTS -----
+if (file_exists($publicPath)) {
+    echo "⚠️ Storage folder already exists at: $publicPath<br>";
+    echo "Delete the folder first if you want to copy fresh files.";
     exit;
 }
 
-// Try creating symlink
-if (function_exists('symlink')) {
-    try {
-        symlink($target, $link);
-        echo "✅ Storage link created successfully!";
-    } catch (Exception $e) {
-        echo "❌ Failed to create symlink: " . $e->getMessage();
-    }
-} else {
-    echo "❌ Symlink function is disabled on this hosting plan.";
-    echo "<br>Fallback: You can manually copy contents of 'storage/app/public' to 'public/storage'";
-}
+// ----- COPY FILES -----
+copyFolder($storagePath, $publicPath);
+echo "✅ Storage files copied successfully to: $publicPath";
 ?>
