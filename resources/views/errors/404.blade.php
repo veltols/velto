@@ -1,4 +1,6 @@
 <x-app-layout>
+    @section('title', 'Page Not Found')
+
     <div class="bg-white min-h-[85vh] flex flex-col items-center justify-center px-6 py-20">
         <div class="max-w-4xl w-full text-center">
             <!-- Content Area with precise vertical gaps -->
