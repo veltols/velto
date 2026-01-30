@@ -72,29 +72,14 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Temporary route to create storage link (Run once then remove)
-Route::get('/storage-link', function () {
-    $target = storage_path('app/public');
-    $link = public_path('storage');
-
-    echo "Target: " . $target . "<br>";
-    echo "Link: " . $link . "<br>";
-
-    if (file_exists($link)) {
-        return 'Link already exists (or a file/folder with "storage" name exists in public).';
+// Fallback route for storage files (since symlink is disabled)
+Route::get('storage/{filename}', function ($filename) {
+    $path = storage_path('app/public/' . $filename);
+    if (!file_exists($path)) {
+        abort(404);
     }
-
-    if (!function_exists('symlink')) {
-        return 'Error: The "symlink" function is disabled on this server. Please contact your hosting provider.';
-    }
-
-    try {
-        symlink($target, $link);
-        return 'Storage link created successfully!';
-    } catch (\Throwable $e) {
-        return 'Exception: ' . $e->getMessage();
-    }
-});
+    return response()->file($path);
+})->where('filename', '.*');
 
 
 Route::fallback(function () {
