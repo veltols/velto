@@ -72,6 +72,13 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+// Temporary route to create storage link (Run once then remove)
+Route::get('/storage-link', function () {
+    \Illuminate\Support\Facades\Artisan::call('storage:link');
+    return 'Storage link created successfully!';
+});
+
+
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
 });
