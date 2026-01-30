@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-use Illuminate\Support\Facades\Route;
+
 
 Route::get('/storage-link', function () {
     $storagePath = storage_path('app/public'); // source
