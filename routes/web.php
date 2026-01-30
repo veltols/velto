@@ -72,14 +72,37 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Fallback route for storage files (since symlink is disabled)
-Route::get('storage/{filename}', function ($filename) {
-    $path = storage_path('app/public/' . $filename);
-    if (!file_exists($path)) {
-        abort(404);
+use Illuminate\Support\Facades\Route;
+
+Route::get('/storage-link', function () {
+    $storagePath = storage_path('app/public'); // source
+    $publicPath = public_path('storage');      // destination
+
+    if (file_exists($publicPath)) {
+        return "⚠️ Storage folder already exists. Delete it first to copy fresh files.";
     }
-    return response()->file($path);
-})->where('filename', '.*');
+
+    // Recursive copy function
+    $copyFolder = function($src, $dst) use (&$copyFolder) {
+        if (!is_dir($src)) return;
+        @mkdir($dst, 0755, true);
+        foreach (scandir($src) as $file) {
+            if ($file == '.' || $file == '..') continue;
+            $srcFile = $src . '/' . $file;
+            $dstFile = $dst . '/' . $file;
+            if (is_dir($srcFile)) {
+                $copyFolder($srcFile, $dstFile);
+            } else {
+                copy($srcFile, $dstFile);
+            }
+        }
+    };
+
+    $copyFolder($storagePath, $publicPath);
+
+    return "✅ Storage files copied successfully!";
+});
+
 
 
 Route::fallback(function () {
