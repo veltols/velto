@@ -74,8 +74,26 @@ require __DIR__.'/auth.php';
 
 // Temporary route to create storage link (Run once then remove)
 Route::get('/storage-link', function () {
-    \Illuminate\Support\Facades\Artisan::call('storage:link');
-    return 'Storage link created successfully!';
+    $target = storage_path('app/public');
+    $link = public_path('storage');
+
+    echo "Target: " . $target . "<br>";
+    echo "Link: " . $link . "<br>";
+
+    if (file_exists($link)) {
+        return 'Link already exists (or a file/folder with "storage" name exists in public).';
+    }
+
+    if (!function_exists('symlink')) {
+        return 'Error: The "symlink" function is disabled on this server. Please contact your hosting provider.';
+    }
+
+    try {
+        symlink($target, $link);
+        return 'Storage link created successfully!';
+    } catch (\Throwable $e) {
+        return 'Exception: ' . $e->getMessage();
+    }
 });
 
 
