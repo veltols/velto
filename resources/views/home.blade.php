@@ -11,7 +11,7 @@
     <!-- Hero Section -->
     <section class="relative w-full overflow-hidden" style="height: 800px; min-height: 800px;">
         <div class="absolute inset-0">
-            <img src="https://placehold.co/1920x800/000000/ffffff?text=Velto+Artisan+Heritage" alt="Velto Luxury Collection" class="w-full h-full object-cover object-center transform scale-105">
+            <img src="{{ asset('images/hero_banner.png') }}" alt="Velto Luxury Collection" class="w-full h-full object-cover object-center transform scale-105">
             <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
         </div>
         <div class="relative h-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center">
