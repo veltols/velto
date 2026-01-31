@@ -64,6 +64,14 @@ class ReportController extends Controller
         $totalRevenue = $salesData->sum('revenue');
         $totalOrders = $salesData->sum('orders');
 
-        return view('admin.reports.index', compact('salesData', 'topProducts', 'orderStatus', 'startDate', 'endDate', 'totalRevenue', 'totalOrders'));
+        // New Financial Metrics
+        $financialQuery = Order::query()->where('status', '!=', 'cancelled');
+        if ($startDate) $financialQuery->whereDate('created_at', '>=', $startDate);
+        if ($endDate) $financialQuery->whereDate('created_at', '<=', $endDate);
+
+        $totalFullyPaidRevenue = (clone $financialQuery)->where('payment_status', 'paid')->sum('total');
+        $totalAdvanceRevenue = (clone $financialQuery)->sum('advance_amount');
+
+        return view('admin.reports.index', compact('salesData', 'topProducts', 'orderStatus', 'startDate', 'endDate', 'totalRevenue', 'totalOrders', 'totalFullyPaidRevenue', 'totalAdvanceRevenue'));
     }
 }

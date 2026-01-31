@@ -25,6 +25,7 @@ class Order extends Model
         'status',
         'payment_method',
         'payment_status',
+        'advance_amount',
         'admin_notes',
     ];
 
@@ -32,6 +33,7 @@ class Order extends Model
         'subtotal' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
         'total' => 'decimal:2',
+        'advance_amount' => 'decimal:2',
     ];
 
     public function items()

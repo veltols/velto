@@ -11,6 +11,24 @@
             </p>
         </div>
         <div class="bg-white p-6 sm:p-8">
+            <p class="text-sm font-medium leading-6 text-gray-500">Fully Paid Revenue</p>
+            <p class="mt-2 flex items-baseline gap-x-2">
+                <span class="text-3xl font-bold tracking-tight text-gray-900">Rs. {{ number_format($stats['fully_paid_revenue']) }}</span>
+            </p>
+        </div>
+        <div class="bg-white p-6 sm:p-8">
+            <p class="text-sm font-medium leading-6 text-gray-500">Advance Received</p>
+            <p class="mt-2 flex items-baseline gap-x-2">
+                <span class="text-3xl font-bold tracking-tight text-gray-900">Rs. {{ number_format($stats['advance_revenue']) }}</span>
+            </p>
+        </div>
+        <div class="bg-white p-6 sm:p-8">
+            <p class="text-sm font-medium leading-6 text-gray-500">Total Cash Received</p>
+            <p class="mt-2 flex items-baseline gap-x-2">
+                <span class="text-3xl font-bold tracking-tight text-green-600">Rs. {{ number_format($stats['fully_paid_revenue'] + $stats['advance_revenue']) }}</span>
+            </p>
+        </div>
+        <div class="bg-white p-6 sm:p-8">
             <p class="text-sm font-medium leading-6 text-gray-500">Total Orders</p>
             <p class="mt-2 flex items-baseline gap-x-2">
                 <span class="text-3xl font-bold tracking-tight text-gray-900">{{ $stats['total_orders'] }}</span>

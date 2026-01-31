@@ -57,10 +57,21 @@
                         <td class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Subtotal</td>
                         <td class="px-6 py-3 text-sm font-medium text-gray-900">Rs. {{ number_format($order->total) }}</td> <!-- Assuming no tax/shipping split currently -->
                     </tr>
+                    @if($order->advance_amount > 0)
+                     <tr>
+                        <td class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-green-600">Advance Paid</td>
+                        <td class="px-6 py-3 text-sm font-bold text-green-600">- Rs. {{ number_format($order->advance_amount) }}</td>
+                    </tr>
+                     <tr>
+                        <td class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Remaining Amount</td>
+                        <td class="px-6 py-3 text-lg font-bold text-gray-900">Rs. {{ number_format($order->total - $order->advance_amount) }}</td>
+                    </tr>
+                    @else
                     <tr>
                         <td class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Total</td>
                         <td class="px-6 py-3 text-lg font-bold text-gray-900">Rs. {{ number_format($order->total) }}</td>
                     </tr>
+                    @endif
                 </tfoot>
             </table>
         </div>

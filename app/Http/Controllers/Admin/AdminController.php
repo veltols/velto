@@ -15,6 +15,8 @@ class AdminController extends Controller
         $stats = [
             'total_orders' => Order::count(),
             'total_revenue' => Order::where('status', '!=', 'cancelled')->sum('total'),
+            'fully_paid_revenue' => Order::where('payment_status', 'paid')->sum('total'),
+            'advance_revenue' => Order::sum('advance_amount'),
             'pending_orders' => Order::where('status', 'pending')->count(),
             'processing_orders' => Order::where('status', 'processing')->count(),
             'shipped_orders' => Order::where('status', 'shipped')->count(),

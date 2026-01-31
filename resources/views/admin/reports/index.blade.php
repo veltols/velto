@@ -31,14 +31,26 @@
                 </form>
             </div>
 
-            <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
+            <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="overflow-hidden rounded-lg bg-gray-50 px-4 py-5 shadow sm:p-6">
-                    <dt class="truncate text-sm font-medium text-gray-500">Total Revenue (Selected Period)</dt>
+                    <dt class="truncate text-sm font-medium text-gray-500">Total Revenue (Booked)</dt>
                     <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">Rs. {{ number_format($totalRevenue) }}</dd>
                 </div>
                 <div class="overflow-hidden rounded-lg bg-gray-50 px-4 py-5 shadow sm:p-6">
-                    <dt class="truncate text-sm font-medium text-gray-500">Total Orders (Selected Period)</dt>
+                    <dt class="truncate text-sm font-medium text-gray-500">Total Orders</dt>
                     <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{{ number_format($totalOrders) }}</dd>
+                </div>
+                 <div class="overflow-hidden rounded-lg bg-gray-50 px-4 py-5 shadow sm:p-6">
+                    <dt class="truncate text-sm font-medium text-gray-500">Fully Paid Revenue</dt>
+                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">Rs. {{ number_format($totalFullyPaidRevenue) }}</dd>
+                </div>
+                 <div class="overflow-hidden rounded-lg bg-gray-50 px-4 py-5 shadow sm:p-6">
+                    <dt class="truncate text-sm font-medium text-gray-500">Advance Revenue</dt>
+                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">Rs. {{ number_format($totalAdvanceRevenue) }}</dd>
+                </div>
+                 <div class="overflow-hidden rounded-lg bg-gray-50 px-4 py-5 shadow sm:p-6">
+                    <dt class="truncate text-sm font-medium text-gray-500">Total Cash Flow</dt>
+                    <dd class="mt-1 text-3xl font-semibold tracking-tight text-green-600">Rs. {{ number_format($totalFullyPaidRevenue + $totalAdvanceRevenue) }}</dd>
                 </div>
             </div>
 

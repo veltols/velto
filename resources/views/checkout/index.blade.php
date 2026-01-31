@@ -70,7 +70,7 @@
                                         @endif
                                     </div>
 
-                                        <div>
+                                    <div class="ml-6 flex-1">
                                             <div class="flex justify-between text-base font-medium text-gray-900">
                                                 <h3>{{ $item->product->name }}</h3>
                                                 <div class="flex flex-col items-end">

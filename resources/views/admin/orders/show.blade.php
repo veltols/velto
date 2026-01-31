@@ -46,6 +46,16 @@
                             <td colspan="3" class="px-6 py-3 text-right text-base font-bold text-gray-900">Total</td>
                             <td class="px-6 py-3 text-right text-base font-bold text-gray-900">Rs. {{ number_format($order->total) }}</td>
                         </tr>
+                        @if($order->advance_amount > 0)
+                        <tr>
+                            <td colspan="3" class="px-6 py-3 text-right text-sm font-medium text-green-600">Advance Paid</td>
+                            <td class="px-6 py-3 text-right text-sm font-bold text-green-600">- Rs. {{ number_format($order->advance_amount) }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="px-6 py-3 text-right text-base font-bold text-gray-900">Remaining Amount</td>
+                            <td class="px-6 py-3 text-right text-base font-bold text-gray-900">Rs. {{ number_format($order->total - $order->advance_amount) }}</td>
+                        </tr>
+                        @endif
                     </tfoot>
                 </table>
             </div>
@@ -94,6 +104,7 @@
                         <select name="payment_status" id="payment_status" class="mt-1 block w-full rounded-md shadow-sm sm:text-sm @error('payment_status') border-red-500 @else border-gray-300 focus:border-black focus:ring-black @enderror">
                             <option value="pending" {{ old('payment_status', $order->payment_status) == 'pending' ? 'selected' : '' }}>Pending</option>
                             <option value="paid" {{ old('payment_status', $order->payment_status) == 'paid' ? 'selected' : '' }}>Paid</option>
+                            <option value="partial" {{ old('payment_status', $order->payment_status) == 'partial' ? 'selected' : '' }}>Partial</option>
                             <option value="failed" {{ old('payment_status', $order->payment_status) == 'failed' ? 'selected' : '' }}>Failed</option>
                             <option value="refunded" {{ old('payment_status', $order->payment_status) == 'refunded' ? 'selected' : '' }}>Refunded</option>
                         </select>
@@ -104,6 +115,13 @@
                         <label for="admin_notes" class="block text-sm font-medium text-gray-700">Admin Notes</label>
                         <textarea name="admin_notes" id="admin_notes" rows="3" class="mt-1 block w-full rounded-md shadow-sm sm:text-sm @error('admin_notes') border-red-500 @else border-gray-300 focus:border-black focus:ring-black @enderror">{{ old('admin_notes', $order->admin_notes) }}</textarea>
                         @error('admin_notes') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="advance_amount" class="block text-sm font-medium text-gray-700">Advance Payment (Rs.)</label>
+                        <input type="number" step="0.01" name="advance_amount" id="advance_amount" value="{{ old('advance_amount', $order->advance_amount > 0 ? $order->advance_amount : '') }}" class="mt-1 block w-full rounded-md shadow-sm sm:text-sm @error('advance_amount') border-red-500 @else border-gray-300 focus:border-black focus:ring-black @enderror" placeholder="0.00">
+                        <p class="text-xs text-gray-500 mt-1">Enter amount if partial payment received.</p>
+                        @error('advance_amount') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <button type="submit" class="w-full bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Update Order</button>

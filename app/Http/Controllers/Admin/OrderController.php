@@ -39,9 +39,25 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
-            'payment_status' => 'required|in:pending,paid,failed,refunded',
+            'payment_status' => 'required|in:pending,paid,failed,refunded,partial',
             'admin_notes' => 'nullable|string',
+            'advance_amount' => 'nullable|numeric|min:0',
         ]);
+
+        if ($validated['payment_status'] === 'partial' && (empty($request->advance_amount) || $request->advance_amount <= 0)) {
+             return back()->withErrors(['advance_amount' => 'Advance amount is required for partial payment status.']);
+        }
+
+        if ($request->has('advance_amount') && $request->advance_amount > 0) {
+            $validated['payment_status'] = 'partial';
+            if ($order->status == 'pending') {
+                $validated['status'] = 'processing';
+            }
+        }
+
+        if (array_key_exists('advance_amount', $validated) && is_null($validated['advance_amount'])) {
+            $validated['advance_amount'] = 0;
+        }
 
         $order->update($validated);
 
