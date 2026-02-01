@@ -20,17 +20,14 @@
                 </div>
 
                 <!-- Sidebar Filters -->
-                <!-- Sidebar Filters -->
-                <!-- Sidebar Filters -->
-                <div class="fixed inset-0 z-40 flex md:static md:z-auto md:w-1/4" :class="filtersOpen ? 'block' : 'hidden md:block'" x-show="filtersOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                <div class="fixed inset-0 z-40 flex md:static md:z-auto md:w-1/4 md:!block" x-show="filtersOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                     
-                    <!-- Mobile Backdrop -->
-                    <div class="fixed inset-0 bg-black bg-opacity-25 md:hidden" @click="filtersOpen = false" aria-hidden="true"></div>
+
 
                     <div class="relative w-full max-w-xs h-full ml-auto md:ml-0 md:w-full bg-white p-6 shadow-xl md:shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] rounded-sm md:rounded-sm overflow-y-auto md:overflow-visible sticky-none md:sticky md:top-24">
                         
                         <!-- Mobile Close Button -->
-                        <div class="flex items-center justify-between mb-6 md:hidden">
+                        <div class="flex items-center justify-between mb-6 md:!hidden">
                             <h2 class="text-lg font-medium text-gray-900">Filters</h2>
                             <button @click="filtersOpen = false" class="-mr-2 w-10 h-10 bg-white p-2 rounded-md flex items-center justify-center text-gray-400 hover:bg-gray-50">
                                 <span class="sr-only">Close menu</span>
@@ -166,7 +163,7 @@
                     </div>
 
                     @if($products->count() > 0)
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                             @foreach($products as $product)
                                 <div class="group cursor-pointer">
                                     <div class="relative overflow-hidden bg-gray-50 aspect-[4/5] mb-4 rounded-sm">
