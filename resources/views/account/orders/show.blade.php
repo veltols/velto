@@ -13,18 +13,18 @@
             Placed on {{ $order->created_at->format('M d, Y') }}
         </p>
 
-        <div class="bg-white border border-gray-200 rounded-sm overflow-hidden mb-8">
+        <div class="bg-white border border-gray-200 rounded-sm overflow-x-auto mb-8">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @foreach($order->items as $item)
                     <tr>
-                        <td class="px-6 py-4">
+                        <td class="px-4 sm:px-6 py-4">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-16 w-16 bg-gray-100 rounded overflow-hidden">
                                     @if($item->product->primaryImage)
@@ -48,28 +48,28 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-900 font-medium">Rs. {{ number_format($item->price * $item->quantity) }}</td>
+                        <td class="px-4 sm:px-6 py-4 text-sm text-gray-900 font-medium">Rs. {{ number_format($item->price * $item->quantity) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
                 <tfoot class="bg-gray-50">
                      <tr>
-                        <td class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Subtotal</td>
-                        <td class="px-6 py-3 text-sm font-medium text-gray-900">Rs. {{ number_format($order->total) }}</td> <!-- Assuming no tax/shipping split currently -->
+                        <td class="px-4 sm:px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Subtotal</td>
+                        <td class="px-4 sm:px-6 py-3 text-sm font-medium text-gray-900">Rs. {{ number_format($order->total) }}</td> <!-- Assuming no tax/shipping split currently -->
                     </tr>
                     @if($order->advance_amount > 0)
                      <tr>
-                        <td class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-green-600">Advance Paid</td>
-                        <td class="px-6 py-3 text-sm font-bold text-green-600">- Rs. {{ number_format($order->advance_amount) }}</td>
+                        <td class="px-4 sm:px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-green-600">Advance Paid</td>
+                        <td class="px-4 sm:px-6 py-3 text-sm font-bold text-green-600">- Rs. {{ number_format($order->advance_amount) }}</td>
                     </tr>
                      <tr>
-                        <td class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Remaining Amount</td>
-                        <td class="px-6 py-3 text-lg font-bold text-gray-900">Rs. {{ number_format($order->total - $order->advance_amount) }}</td>
+                        <td class="px-4 sm:px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Remaining Amount</td>
+                        <td class="px-4 sm:px-6 py-3 text-lg font-bold text-gray-900">Rs. {{ number_format($order->total - $order->advance_amount) }}</td>
                     </tr>
                     @else
                     <tr>
-                        <td class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Total</td>
-                        <td class="px-6 py-3 text-lg font-bold text-gray-900">Rs. {{ number_format($order->total) }}</td>
+                        <td class="px-4 sm:px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Total</td>
+                        <td class="px-4 sm:px-6 py-3 text-lg font-bold text-gray-900">Rs. {{ number_format($order->total) }}</td>
                     </tr>
                     @endif
                 </tfoot>

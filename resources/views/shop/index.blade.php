@@ -10,12 +10,35 @@
     @endpush
     <div class="bg-gray-50 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row gap-8">
+            <div class="flex flex-col md:flex-row gap-8" x-data="{ filtersOpen: false }">
+                <!-- Mobile Filter Toggle -->
+                <div class="md:hidden mb-4">
+                    <button @click="filtersOpen = !filtersOpen" class="w-full flex items-center justify-center space-x-2 bg-white border border-gray-200 px-4 py-3 text-sm font-bold uppercase tracking-widest text-gray-900 shadow-sm hover:bg-gray-50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        <span>Filters</span>
+                    </button>
+                </div>
+
                 <!-- Sidebar Filters -->
                 <!-- Sidebar Filters -->
                 <!-- Sidebar Filters -->
-                <div class="w-full md:w-1/4">
-                    <div class="bg-white p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] rounded-sm sticky top-24">
+                <div class="fixed inset-0 z-40 flex md:static md:z-auto md:w-1/4" :class="filtersOpen ? 'block' : 'hidden md:block'" x-show="filtersOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                    
+                    <!-- Mobile Backdrop -->
+                    <div class="fixed inset-0 bg-black bg-opacity-25 md:hidden" @click="filtersOpen = false" aria-hidden="true"></div>
+
+                    <div class="relative w-full max-w-xs h-full ml-auto md:ml-0 md:w-full bg-white p-6 shadow-xl md:shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] rounded-sm md:rounded-sm overflow-y-auto md:overflow-visible sticky-none md:sticky md:top-24">
+                        
+                        <!-- Mobile Close Button -->
+                        <div class="flex items-center justify-between mb-6 md:hidden">
+                            <h2 class="text-lg font-medium text-gray-900">Filters</h2>
+                            <button @click="filtersOpen = false" class="-mr-2 w-10 h-10 bg-white p-2 rounded-md flex items-center justify-center text-gray-400 hover:bg-gray-50">
+                                <span class="sr-only">Close menu</span>
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
                         <form action="{{ url()->current() }}" method="GET">
                             <!-- Preserve Search -->
                             @if(request('search'))
