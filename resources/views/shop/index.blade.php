@@ -19,6 +19,33 @@
     </style>
     <div class="bg-gray-50 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Breadcrumbs -->
+            <nav class="flex mb-8" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-2">
+                    <li class="inline-flex items-center">
+                        <a href="{{ route('home') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black transition">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <span class="text-gray-300 mx-2">/</span>
+                            <a href="{{ route('shop.index') }}" class="text-xs font-bold uppercase tracking-widest {{ !isset($category) ? 'text-black' : 'text-gray-400 hover:text-black transition' }}">
+                                Shop
+                            </a>
+                        </div>
+                    </li>
+                    @if(isset($category))
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <span class="text-gray-300 mx-2">/</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-black">{{ $category->name }}</span>
+                        </div>
+                    </li>
+                    @endif
+                </ol>
+            </nav>
+
             <div class="flex flex-col lg:flex-row gap-8" x-data="{ mobileFiltersOpen: false }">
                 
                 <!-- MOBILE FILTER SECTION (Button + Drawer) -->
@@ -234,7 +261,7 @@
                     </div>
 
                     @if($products->count() > 0)
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             @foreach($products as $product)
                                 <div class="group cursor-pointer">
                                     <div class="relative overflow-hidden bg-gray-50 aspect-[4/5] mb-4 rounded-sm">

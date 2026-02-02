@@ -75,7 +75,7 @@
                              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                              onerror="this.onerror=null;this.src='https://placehold.co/800x600?text=Image+Not+Found';">
                         <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all"></div>
-                        <div style="position: absolute; bottom: 20px; left: 20px; padding: 24px; background-color: rgba(0, 0, 0, 0.6); max-width: 85%; z-index: 50; border-radius: 12px;">
+                        <div style="position: absolute; bottom: 20px; left: 20px; padding: 24px; background-color: rgba(0, 0, 0, 0.6); max-width: 85%; z-index: 10; border-radius: 12px;">
                             <h3 style="color: white; margin-bottom: 8px;" class="{{ $loop->index == 0 ? 'text-4xl' : 'text-2xl' }} font-serif font-bold">{{ $category->name }}</h3>
                             <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 16px;" class="text-sm">{{ $category->products_count }} items</p>
                             <a href="{{ route('shop.category', $category->slug) }}" class="inline-block bg-white text-black px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all duration-300 rounded-md">
