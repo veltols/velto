@@ -8,72 +8,161 @@
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:image" content="{{ asset('images/banner-shoes-wide.png') }}">
     @endpush
+    <style>
+        .desktop-filter-force { display: none; }
+        .mobile-filter-force { display: block; }
+
+        @media (min-width: 1024px) {
+            .desktop-filter-force { display: block !important; }
+            .mobile-filter-force { display: none !important; }
+        }
+    </style>
     <div class="bg-gray-50 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row gap-8" x-data="{ filtersOpen: false }">
-                <!-- Mobile Filter Toggle -->
-                <div class="md:hidden mb-4">
-                    <button @click="filtersOpen = !filtersOpen" class="w-full flex items-center justify-center space-x-2 bg-white border border-gray-200 px-4 py-3 text-sm font-bold uppercase tracking-widest text-gray-900 shadow-sm hover:bg-gray-50">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                        <span>Filters</span>
-                    </button>
+            <div class="flex flex-col lg:flex-row gap-8" x-data="{ mobileFiltersOpen: false }">
+                
+                <!-- MOBILE FILTER SECTION (Button + Drawer) -->
+                <div class="mobile-filter-force lg:hidden">
+                    <!-- Toggle Button -->
+                    <div class="mb-4">
+                        <button @click="mobileFiltersOpen = !mobileFiltersOpen" class="w-full flex items-center justify-center space-x-2 bg-white border border-gray-200 px-4 py-3 text-sm font-bold uppercase tracking-widest text-gray-900 shadow-sm hover:bg-gray-50">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                            <span>Filters</span>
+                        </button>
+                    </div>
+
+                    <!-- Slide-out Drawer -->
+                    <div class="fixed inset-0 z-50 flex" 
+                         x-show="mobileFiltersOpen" 
+                         style="display: none;"
+                         x-transition:enter="transition-opacity ease-linear duration-300" 
+                         x-transition:enter-start="opacity-0" 
+                         x-transition:enter-end="opacity-100" 
+                         x-transition:leave="transition-opacity ease-linear duration-300" 
+                         x-transition:leave-start="opacity-100" 
+                         x-transition:leave-end="opacity-0">
+                        
+                        <div class="fixed inset-0 bg-transparent" @click="mobileFiltersOpen = false" aria-hidden="true"></div>
+
+                        <div class="relative w-full max-w-xs h-full ml-auto bg-white p-6 shadow-xl overflow-y-auto transform transition ease-in-out duration-300"
+                             x-transition:enter="transition ease-in-out duration-300 transform" 
+                             x-transition:enter-start="translate-x-full" 
+                             x-transition:enter-end="translate-x-0" 
+                             x-transition:leave="transition ease-in-out duration-300 transform" 
+                             x-transition:leave-start="translate-x-0" 
+                             x-transition:leave-end="translate-x-full">
+                            
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-lg font-medium text-gray-900">Filters</h2>
+                                <button @click="mobileFiltersOpen = false" class="-mr-2 w-10 h-10 bg-white p-2 rounded-md flex items-center justify-center text-gray-400 hover:bg-gray-50">
+                                    <span class="sr-only">Close menu</span>
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Filter Form (Mobile) -->
+                            <form action="{{ url()->current() }}" method="GET">
+                                @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
+                                <div class="flex justify-between items-center mb-6">
+                                    <h2 class="font-serif text-xl font-bold text-gray-900">Filters</h2>
+                                    @if(request()->anyFilled(['min_price', 'max_price', 'sizes', 'colors', 'sort']))
+                                        <a href="{{ url()->current() }}" class="text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-black transition underline">Clear All</a>
+                                    @endif
+                                </div>
+                                <div class="mb-8">
+                                    <h3 class="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-100 pb-3 mb-4">Categories</h3>
+                                    <div class="max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                                        <ul class="space-y-4">
+                                            <li><a href="{{ route('shop.index') }}" class="flex items-center text-sm group"><span class="w-2 h-2 rounded-full {{ !isset($category) ? 'bg-black' : 'bg-transparent border border-gray-300 group-hover:border-black' }} mr-4 transition-all"></span><span class="{{ !isset($category) ? 'font-medium text-black' : 'text-gray-600 group-hover:text-black' }} transition-colors">All Products</span></a></li>
+                                            @foreach($categories as $cat)
+                                                <li><a href="{{ route('shop.category', $cat->slug) }}" class="flex items-center text-sm group"><span class="w-2 h-2 rounded-full {{ (isset($category) && $category->id == $cat->id) ? 'bg-black' : 'bg-transparent border border-gray-300 group-hover:border-black' }} mr-4 transition-all"></span><span class="{{ (isset($category) && $category->id == $cat->id) ? 'font-medium text-black' : 'text-gray-600 group-hover:text-black' }} transition-colors">{{ $cat->name }}</span></a></li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="mb-8">
+                                    <h3 class="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-100 pb-3 mb-4">Sort By</h3>
+                                    <div class="relative">
+                                        <select name="sort" onchange="this.form.submit()" class="w-full appearance-none bg-transparent border border-gray-200 rounded-sm text-sm px-4 py-3 focus:border-black focus:ring-0 cursor-pointer">
+                                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>New Arrivals</option>
+                                            <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                                            <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                                    </div>
+                                </div>
+                                <div class="mb-8">
+                                    <h3 class="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-100 pb-3 mb-4">Price Range</h3>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="relative w-full"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rs.</span><input type="number" name="min_price" value="{{ request('min_price', $minPrice) }}" class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-sm text-sm focus:border-black focus:ring-0" placeholder="Min"></div>
+                                        <span class="text-gray-300">—</span>
+                                        <div class="relative w-full"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rs.</span><input type="number" name="max_price" value="{{ request('max_price', $maxPrice) }}" class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-sm text-sm focus:border-black focus:ring-0" placeholder="Max"></div>
+                                    </div>
+                                </div>
+                                @if($sizes->count() > 0)
+                                    <div class="mb-8">
+                                        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-100 pb-3 mb-4">Size</h3>
+                                        <div class="max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                                            <div class="grid grid-cols-3 gap-3">
+                                                @foreach($sizes as $size)
+                                                    <label class="cursor-pointer">
+                                                        <input type="checkbox" name="sizes[]" value="{{ $size }}" {{ in_array($size, request('sizes', [])) ? 'checked' : '' }} class="peer sr-only">
+                                                        <div class="w-full py-3 text-xs font-bold text-center border border-gray-200 rounded-sm peer-checked:bg-black peer-checked:text-white peer-checked:border-black hover:border-black transition duration-200">{{ $size }}</div>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                @if($colors->count() > 0)
+                                    <div class="mb-8">
+                                        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-100 pb-3 mb-4">Color</h3>
+                                        <div class="max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                                            <div class="space-y-4">
+                                                @foreach($colors as $color)
+                                                    <label class="flex items-center cursor-pointer group">
+                                                        <div class="relative mr-4">
+                                                             <input type="checkbox" name="colors[]" value="{{ $color }}" {{ in_array($color, request('colors', [])) ? 'checked' : '' }} class="peer sr-only">
+                                                             <div class="w-5 h-5 border border-gray-300 rounded-sm flex items-center justify-center peer-checked:bg-black peer-checked:border-black transition"><svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
+                                                        </div>
+                                                        <span class="text-sm text-gray-600 group-hover:text-black transition uppercase tracking-wide font-medium">{{ $color }}</span>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                <button type="submit" class="w-full bg-black text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition transform active:scale-95">Apply Filter</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Sidebar Filters -->
-                <div class="fixed inset-0 z-40 flex md:static md:z-auto md:w-1/4 md:!block" x-show="filtersOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-                    
-
-
-                    <div class="relative w-full max-w-xs h-full ml-auto md:ml-0 md:w-full bg-white p-6 shadow-xl md:shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] rounded-sm md:rounded-sm overflow-y-auto md:overflow-visible sticky-none md:sticky md:top-24">
-                        
-                        <!-- Mobile Close Button -->
-                        <div class="flex items-center justify-between mb-6 md:!hidden">
-                            <h2 class="text-lg font-medium text-gray-900">Filters</h2>
-                            <button @click="filtersOpen = false" class="-mr-2 w-10 h-10 bg-white p-2 rounded-md flex items-center justify-center text-gray-400 hover:bg-gray-50">
-                                <span class="sr-only">Close menu</span>
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
+                <!-- DESKTOP FILTER SECTION (Static Sidebar) -->
+                <div class="desktop-filter-force w-1/4">
+                    <div class="bg-white p-6 shadow-sm border border-gray-100 rounded-sm sticky top-24">
                         <form action="{{ url()->current() }}" method="GET">
-                            <!-- Preserve Search -->
-                            @if(request('search'))
-                                <input type="hidden" name="search" value="{{ request('search') }}">
-                            @endif
-
+                            @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
                             <div class="flex justify-between items-center mb-6">
                                 <h2 class="font-serif text-xl font-bold text-gray-900">Filters</h2>
                                 @if(request()->anyFilled(['min_price', 'max_price', 'sizes', 'colors', 'sort']))
                                     <a href="{{ url()->current() }}" class="text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-black transition underline">Clear All</a>
                                 @endif
                             </div>
-
                             <!-- Categories -->
                             <div class="mb-8">
                                 <h3 class="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-100 pb-3 mb-4">Categories</h3>
                                 <div class="max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
                                     <ul class="space-y-4">
-                                        <li>
-                                            <a href="{{ route('shop.index') }}" class="flex items-center text-sm group">
-                                                <span class="w-2 h-2 rounded-full {{ !isset($category) ? 'bg-black' : 'bg-transparent border border-gray-300 group-hover:border-black' }} mr-4 transition-all"></span>
-                                                <span class="{{ !isset($category) ? 'font-medium text-black' : 'text-gray-600 group-hover:text-black' }} transition-colors">All Products</span>
-                                            </a>
-                                        </li>
+                                        <li><a href="{{ route('shop.index') }}" class="flex items-center text-sm group"><span class="w-2 h-2 rounded-full {{ !isset($category) ? 'bg-black' : 'bg-transparent border border-gray-300 group-hover:border-black' }} mr-4 transition-all"></span><span class="{{ !isset($category) ? 'font-medium text-black' : 'text-gray-600 group-hover:text-black' }} transition-colors">All Products</span></a></li>
                                         @foreach($categories as $cat)
-                                            <li>
-                                                <a href="{{ route('shop.category', $cat->slug) }}" class="flex items-center text-sm group">
-                                                    <span class="w-2 h-2 rounded-full {{ (isset($category) && $category->id == $cat->id) ? 'bg-black' : 'bg-transparent border border-gray-300 group-hover:border-black' }} mr-4 transition-all"></span>
-                                                    <span class="{{ (isset($category) && $category->id == $cat->id) ? 'font-medium text-black' : 'text-gray-600 group-hover:text-black' }} transition-colors">
-                                                        {{ $cat->name }}
-                                                    </span>
-                                                </a>
-                                            </li>
+                                            <li><a href="{{ route('shop.category', $cat->slug) }}" class="flex items-center text-sm group"><span class="w-2 h-2 rounded-full {{ (isset($category) && $category->id == $cat->id) ? 'bg-black' : 'bg-transparent border border-gray-300 group-hover:border-black' }} mr-4 transition-all"></span><span class="{{ (isset($category) && $category->id == $cat->id) ? 'font-medium text-black' : 'text-gray-600 group-hover:text-black' }} transition-colors">{{ $cat->name }}</span></a></li>
                                         @endforeach
                                     </ul>
                                 </div>
                             </div>
-
                             <!-- Sort By -->
                             <div class="mb-8">
                                 <h3 class="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-100 pb-3 mb-4">Sort By</h3>
@@ -83,28 +172,18 @@
                                         <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
                                         <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
                                     </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </div>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
                                 </div>
                             </div>
-
                             <!-- Price Filter -->
                             <div class="mb-8">
                                 <h3 class="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-100 pb-3 mb-4">Price Range</h3>
                                 <div class="flex items-center space-x-4">
-                                    <div class="relative w-full">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rs.</span>
-                                        <input type="number" name="min_price" value="{{ request('min_price', $minPrice) }}" class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-sm text-sm focus:border-black focus:ring-0" placeholder="Min">
-                                    </div>
+                                    <div class="relative w-full"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rs.</span><input type="number" name="min_price" value="{{ request('min_price', $minPrice) }}" class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-sm text-sm focus:border-black focus:ring-0" placeholder="Min"></div>
                                     <span class="text-gray-300">—</span>
-                                    <div class="relative w-full">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rs.</span>
-                                        <input type="number" name="max_price" value="{{ request('max_price', $maxPrice) }}" class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-sm text-sm focus:border-black focus:ring-0" placeholder="Max">
-                                    </div>
+                                    <div class="relative w-full"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rs.</span><input type="number" name="max_price" value="{{ request('max_price', $maxPrice) }}" class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-sm text-sm focus:border-black focus:ring-0" placeholder="Max"></div>
                                 </div>
                             </div>
-
                             <!-- Size Filter -->
                             @if($sizes->count() > 0)
                                 <div class="mb-8">
@@ -114,16 +193,13 @@
                                             @foreach($sizes as $size)
                                                 <label class="cursor-pointer">
                                                     <input type="checkbox" name="sizes[]" value="{{ $size }}" {{ in_array($size, request('sizes', [])) ? 'checked' : '' }} class="peer sr-only">
-                                                    <div class="w-full py-3 text-xs font-bold text-center border border-gray-200 rounded-sm peer-checked:bg-black peer-checked:text-white peer-checked:border-black hover:border-black transition duration-200">
-                                                        {{ $size }}
-                                                    </div>
+                                                    <div class="w-full py-3 text-xs font-bold text-center border border-gray-200 rounded-sm peer-checked:bg-black peer-checked:text-white peer-checked:border-black hover:border-black transition duration-200">{{ $size }}</div>
                                                 </label>
                                             @endforeach
                                         </div>
                                     </div>
                                 </div>
                             @endif
-
                             <!-- Color Filter -->
                             @if($colors->count() > 0)
                                 <div class="mb-8">
@@ -134,9 +210,7 @@
                                                 <label class="flex items-center cursor-pointer group">
                                                     <div class="relative mr-4">
                                                          <input type="checkbox" name="colors[]" value="{{ $color }}" {{ in_array($color, request('colors', [])) ? 'checked' : '' }} class="peer sr-only">
-                                                         <div class="w-5 h-5 border border-gray-300 rounded-sm flex items-center justify-center peer-checked:bg-black peer-checked:border-black transition">
-                                                             <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                                         </div>
+                                                         <div class="w-5 h-5 border border-gray-300 rounded-sm flex items-center justify-center peer-checked:bg-black peer-checked:border-black transition"><svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
                                                     </div>
                                                     <span class="text-sm text-gray-600 group-hover:text-black transition uppercase tracking-wide font-medium">{{ $color }}</span>
                                                 </label>
@@ -145,16 +219,13 @@
                                     </div>
                                 </div>
                             @endif
-
-                            <button type="submit" class="w-full bg-black text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition transform active:scale-95">
-                                Apply Filter
-                            </button>
+                            <button type="submit" class="w-full bg-black text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition transform active:scale-95">Apply Filter</button>
                         </form>
                     </div>
                 </div>
 
                 <!-- Product Grid -->
-                <div class="w-full md:w-3/4">
+                <div class="w-full lg:w-3/4">
                     <div class="mb-4 flex justify-between items-center">
                         <h1 class="text-2xl font-serif font-bold text-gray-900">
                             {{ isset($category) ? $category->name : 'All Products' }}
