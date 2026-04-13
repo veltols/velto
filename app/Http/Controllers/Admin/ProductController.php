@@ -89,13 +89,22 @@ class ProductController extends Controller
             if ($request->has('variants')) {
                 foreach ($validated['variants'] as $variantData) {
                     if ($variantData['size'] || $variantData['color']) {
+                        $baseSku = $product->sku ?: 'PRD-' . $product->id;
+                        $variantSku = $baseSku . '-' . Str::slug($variantData['size'] ?? 'default') . '-' . Str::slug($variantData['color'] ?? 'default');
+                        $originalSku = $variantSku;
+                        $counter = 1;
+                        while (\App\Models\ProductVariant::where('sku', $variantSku)->exists()) {
+                            $variantSku = $originalSku . '-' . $counter;
+                            $counter++;
+                        }
+
                         ProductVariant::create([
                             'product_id' => $product->id,
                             'size' => $variantData['size'] ?? null,
                             'color' => $variantData['color'] ?? null,
                             'stock_quantity' => $variantData['stock'],
                             'price' => $variantData['price'] ?? null,
-                            'sku' => ($product->sku ?: 'SKU') . '-' . Str::slug($variantData['size'] ?? 'default') . '-' . Str::slug($variantData['color'] ?? 'default'),
+                            'sku' => $variantSku,
                             'is_available' => true,
                         ]);
                     }
@@ -196,13 +205,22 @@ class ProductController extends Controller
                     } else {
                         // Create new
                         if ($variantData['size'] || $variantData['color']) {
+                            $baseSku = $product->sku ?: 'PRD-' . $product->id;
+                            $variantSku = $baseSku . '-' . Str::slug($variantData['size'] ?? 'default') . '-' . Str::slug($variantData['color'] ?? 'default');
+                            $originalSku = $variantSku;
+                            $counter = 1;
+                            while (\App\Models\ProductVariant::where('sku', $variantSku)->exists()) {
+                                $variantSku = $originalSku . '-' . $counter;
+                                $counter++;
+                            }
+
                             $newVariant = ProductVariant::create([
                                 'product_id' => $product->id,
                                 'size' => $variantData['size'] ?? null,
                                 'color' => $variantData['color'] ?? null,
                                 'stock_quantity' => $variantData['stock'],
                                 'price' => $variantData['price'] ?? null,
-                                'sku' => ($product->sku ?: 'SKU') . '-' . Str::slug($variantData['size'] ?? 'default') . '-' . Str::slug($variantData['color'] ?? 'default'),
+                                'sku' => $variantSku,
                                 'is_available' => true,
                             ]);
                             $keptVariantIds[] = $newVariant->id;
