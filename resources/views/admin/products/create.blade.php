@@ -71,7 +71,8 @@
             <!-- Images -->
             <div class="bg-white shadow rounded-lg p-6 mb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Product Images</h3>
-                <input type="file" name="images[]" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                <input type="file" name="images[]" id="images" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                <div id="image-preview" class="flex flex-wrap gap-4 mt-4 hidden"></div>
                 <p class="text-xs text-gray-500 mt-2">Upload multiple images. First image will be primary.</p>
                 @error('images.*') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
             </div>
@@ -131,6 +132,43 @@
             container.appendChild(newRow);
             variantCount++;
         }
+
+        document.getElementById('images').addEventListener('change', function(e) {
+            const preview = document.getElementById('image-preview');
+            preview.innerHTML = '';
+            
+            if (this.files && this.files.length > 0) {
+                preview.classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+                return;
+            }
+
+            Array.from(this.files).forEach((file, index) => {
+                if (!/\.(jpe?g|png|gif|webp)$/i.test(file.name)) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.createElement('div');
+                    container.className = 'relative flex-shrink-0';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'h-24 w-24 object-cover rounded shadow-sm border border-gray-200';
+                    container.appendChild(img);
+                    
+                    if (index === 0) {
+                        const badge = document.createElement('div');
+                        badge.className = 'absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-[10px] uppercase font-bold text-center py-1 rounded-b';
+                        badge.innerText = 'Primary';
+                        container.appendChild(badge);
+                    }
+                    
+                    preview.appendChild(container);
+                }
+                reader.readAsDataURL(file);
+            });
+        });
     </script>
 
 @endsection

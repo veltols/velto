@@ -101,7 +101,8 @@
                 </div>
                 
                 <label class="block text-sm font-medium text-gray-700 mt-4">Add New Images</label>
-                <input type="file" name="new_images[]" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                <input type="file" name="new_images[]" id="new-images" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                <div id="new-image-preview" class="flex flex-wrap gap-4 mt-4 hidden"></div>
             </div>
 
             <!-- Variants Management -->
@@ -149,6 +150,41 @@
                     container.appendChild(newRow);
                     variantCount++;
                 }
+
+                document.getElementById('new-images').addEventListener('change', function(e) {
+                    const preview = document.getElementById('new-image-preview');
+                    preview.innerHTML = '';
+                    
+                    if (this.files && this.files.length > 0) {
+                        preview.classList.remove('hidden');
+                    } else {
+                        preview.classList.add('hidden');
+                        return;
+                    }
+
+                    Array.from(this.files).forEach((file) => {
+                        if (!/\.(jpe?g|png|gif|webp)$/i.test(file.name)) return;
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const container = document.createElement('div');
+                            container.className = 'relative flex-shrink-0';
+                            
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'h-24 w-24 object-cover rounded shadow-sm border border-gray-200';
+                            
+                            const badge = document.createElement('div');
+                            badge.className = 'absolute bottom-0 left-0 right-0 bg-blue-500 bg-opacity-70 text-white text-[10px] uppercase font-bold text-center py-1 rounded-b';
+                            badge.innerText = 'New';
+                            
+                            container.appendChild(img);
+                            container.appendChild(badge);
+                            preview.appendChild(container);
+                        }
+                        reader.readAsDataURL(file);
+                    });
+                });
             </script>
 
             <div class="flex justify-end">
