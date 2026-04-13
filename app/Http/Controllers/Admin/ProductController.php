@@ -73,13 +73,14 @@ class ProductController extends Controller
             ]);
 
             // Handle Images
+            $primaryIndex = (int) $request->input('primary_image_index', 0);
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $index => $image) {
                     $path = $image->store('products', 'public');
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $path,
-                        'is_primary' => $index === 0,
+                        'is_primary' => $index === $primaryIndex,
                         'display_order' => $index,
                     ]);
                 }
