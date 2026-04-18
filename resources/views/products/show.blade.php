@@ -61,46 +61,64 @@
             <div class="lg:grid lg:grid-cols-2 lg:gap-x-16 lg:items-start">
                 
                 <!-- Image Gallery -->
-                <div class="relative flex flex-col gap-6 select-none">
+                <div class="relative flex flex-col gap-4 select-none">
+                    @php
+                        // Sort so primary image appears absolutely first natively
+                        $sortedImages = collect();
+                        if ($product->images && $product->images->count() > 0) {
+                            $sortedImages = $product->images->sort(function ($a, $b) {
+                                if ($a->is_primary && !$b->is_primary) return -1;
+                                if (!$a->is_primary && $b->is_primary) return 1;
+                                return ($a->display_order ?? 0) <=> ($b->display_order ?? 0);
+                            })->values();
+                        } elseif ($product->primary_image) {
+                            $fakeImage = new \stdClass();
+                            $fakeImage->image_path = $product->primary_image;
+                            $sortedImages = collect([$fakeImage]);
+                        } else {
+                            $fakeImage = new \stdClass();
+                            $fakeImage->image_path = 'https://placehold.co/400x500?text=No+Image';
+                            $sortedImages = collect([$fakeImage]);
+                        }
+                    @endphp
+
                     <!-- Main Slider Area -->
-                    <div class="relative w-full aspect-w-1 aspect-h-1 md:aspect-w-4 md:aspect-h-5 bg-gray-50 overflow-hidden rounded-sm group">
-                        <!-- Scroll Snap Container -->
-                        <div x-ref="slider" 
-                             class="absolute inset-0 flex flex-nowrap overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide bg-white"
-                             @scroll.debounce.50ms="updateActiveIndex">
-                            <template x-for="(image, index) in images" :key="index">
-                                <div class="w-full h-full flex-none snap-center relative" style="min-width: 100%">
-                                    <img :src="getImageUrl(image)" 
-                                         class="w-full h-full object-cover object-center block" 
-                                         :alt="product.name"
-                                         onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
+                    <div class="swiper main-swiper w-full aspect-square md:aspect-[4/5] bg-gray-50 overflow-hidden rounded-sm group">
+                        <div class="swiper-wrapper">
+                            @foreach($sortedImages as $image)
+                                <div class="swiper-slide w-full h-full">
+                                    @php
+                                        $path = is_object($image) ? $image->image_path : $image['image_path'];
+                                        $url = Str::startsWith($path, 'http') ? $path : asset('storage/' . $path);
+                                    @endphp
+                                    <img src="{{ $url }}" class="w-full h-full object-cover object-center block" alt="{{ $product->name }}" onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 </div>
-                            </template>
+                            @endforeach
                         </div>
                         
-                        <!-- Navigation Arrows -->
-                        <div class="absolute inset-0 flex items-center justify-between p-4" x-show="images.length > 1">
-                            <button @click="prevImage" class="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-black shadow-md transition transform hover:scale-110 z-10 focus:outline-none">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                            </button>
-                            <button @click="nextImage" class="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-black shadow-md transition transform hover:scale-110 z-10 focus:outline-none">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </button>
-                        </div>
+                        <!-- Navigation Arrows (Hidden if single image) -->
+                        @if($sortedImages->count() > 1)
+                            <div class="swiper-button-next !text-black !w-10 !h-10 !bg-white/90 hover:!bg-white !rounded-full !shadow-md transition transform hover:scale-110 after:!text-sm after:!font-bold"></div>
+                            <div class="swiper-button-prev !text-black !w-10 !h-10 !bg-white/90 hover:!bg-white !rounded-full !shadow-md transition transform hover:scale-110 after:!text-sm after:!font-bold"></div>
+                        @endif
                     </div>
 
                     <!-- Thumbnails -->
-                    <div class="grid grid-cols-5 gap-4" x-show="images.length > 1">
-                        <template x-for="(image, index) in images" :key="index">
-                            <button @click="activeImageIndex = index" 
-                                    class="relative aspect-square overflow-hidden rounded-sm bg-gray-50 border-2 transition-all duration-300"
-                                    :class="activeImageIndex === index ? 'border-black opacity-100 ring-1 ring-black' : 'border-transparent opacity-60 hover:opacity-100'">
-                                <img :src="getImageUrl(image)" 
-                                     class="w-full h-full object-cover object-center"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=Error';">
-                            </button>
-                        </template>
-                    </div>
+                    @if($sortedImages->count() > 1)
+                        <div class="swiper thumb-swiper w-full overflow-hidden">
+                            <div class="swiper-wrapper">
+                                @foreach($sortedImages as $image)
+                                    <div class="swiper-slide !w-1/5 aspect-square bg-gray-50 border-2 border-transparent transition-all duration-300 cursor-pointer overflow-hidden rounded-sm opacity-60 hover:opacity-100 [&.swiper-slide-thumb-active]:border-black [&.swiper-slide-thumb-active]:opacity-100">
+                                        @php
+                                            $path = is_object($image) ? $image->image_path : $image['image_path'];
+                                            $url = Str::startsWith($path, 'http') ? $path : asset('storage/' . $path);
+                                        @endphp
+                                        <img src="{{ $url }}" class="w-full h-full object-cover object-center" onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=Error';">
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Product Info -->
@@ -190,20 +208,31 @@
                             <p x-show="!selectedColor && uniqueColors.length > 0" class="text-xs text-gray-400 mt-2 italic">Select a color to view sizes.</p>
                         </div>
 
-                        <!-- Quantity & Add to Cart -->
-                        <div class="flex flex-row gap-3 mb-8 md:mb-10">
-                            <div class="flex items-center border border-gray-300 rounded-sm w-28 md:w-32 h-10 md:h-12 flex-shrink-0">
-                                <button type="button" class="w-8 md:w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition" @click="if(quantity > 1) quantity--">-</button>
-                                <input type="number" x-model="quantity" class="w-full h-full text-center border-none focus:ring-0 text-gray-900 font-bold text-sm bg-transparent" min="1" readonly>
-                                <button type="button" class="w-8 md:w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition" @click="incrementQuantity()">+</button>
+                        <!-- Actions Container -->
+                        <div class="flex flex-col gap-3 mb-8 md:mb-10 w-full">
+                            <!-- Quantity & Add to Cart -->
+                            <div class="flex flex-row gap-3 w-full">
+                                <div class="flex items-center border border-gray-300 rounded-sm w-28 md:w-32 h-10 md:h-12 flex-shrink-0">
+                                    <button type="button" class="w-8 md:w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition" @click="if(quantity > 1) quantity--">-</button>
+                                    <input type="number" x-model="quantity" class="w-full h-full text-center border-none focus:ring-0 text-gray-900 font-bold text-sm bg-transparent" min="1" readonly>
+                                    <button type="button" class="w-8 md:w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition" @click="incrementQuantity()">+</button>
+                                </div>
+                                
+                                <button type="submit" 
+                                        :disabled="loading || !canAddToCart"
+                                        class="flex-1 bg-black text-white h-10 md:h-12 px-4 md:px-8 text-xs md:text-sm font-bold uppercase tracking-[0.15em] hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 flex items-center justify-center gap-2 md:gap-3 shadow-lg hover:shadow-xl whitespace-nowrap">
+                                    <span x-text="loading ? 'Adding...' : (checkStockStatus().text === 'Out of Stock' ? 'Out of Stock' : 'Add to Bag')"></span>
+                                    <svg x-show="!loading && checkStockStatus().text !== 'Out of Stock'" class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                </button>
                             </div>
                             
-                            <button type="submit" 
-                                    :disabled="loading || !canAddToCart"
-                                    class="flex-1 bg-black text-white h-10 md:h-12 px-4 md:px-8 text-xs md:text-sm font-bold uppercase tracking-[0.15em] hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 flex items-center justify-center gap-2 md:gap-3 shadow-lg hover:shadow-xl whitespace-nowrap">
-                                <span x-text="loading ? 'Adding...' : (checkStockStatus().text === 'Out of Stock' ? 'Out of Stock' : 'Add to Bag')"></span>
-                                <svg x-show="!loading && checkStockStatus().text !== 'Out of Stock'" class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                            </button>
+                            <!-- WhatsApp Order Button -->
+                            <a :href="generateWhatsAppLink()" target="_blank" class="w-full bg-[#25D366] text-white h-10 md:h-12 px-4 md:px-8 text-xs md:text-sm font-bold uppercase tracking-[0.15em] hover:bg-[#128C7E] transition transform active:scale-95 flex items-center justify-center gap-2 md:gap-3 shadow-lg hover:shadow-xl rounded-sm">
+                                <svg class="w-5 h-5 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                                </svg>
+                                Order via WhatsApp
+                            </a>
                         </div>
                     </form>
 
@@ -356,14 +385,15 @@
         </div>
     </div>
 
+    <link rel="stylesheet" href="https://unpkg.com/swiper@11/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper@11/swiper-bundle.min.js"></script>
+
     <script>
         function productDetail() {
             return {
                 product: @json($product),
                 variants: @json($product->variants),
-                images: @json($product->images),
                 
-                activeImageIndex: 0,
                 showSizeGuide: false,
                 selectedColor: null,
                 selectedVariant: null,
@@ -375,24 +405,45 @@
                     if (this.variants) {
                         this.variants.forEach(v => v.stock_quantity = parseInt(v.stock_quantity));
                     }
-
-                    // Initialize images list (prepend primary if separate, but controller sends 'images' relationship which usually includes all)
-                    // If images empty, enable placeholder
-                    if (this.images.length === 0 && this.product.primary_image) {
-                       this.images = [this.product.primary_image];
-                    } else if (this.images.length === 0) {
-                       // Fallback placeholder object if absolutely no images
-                       this.images = [{ image_path: 'https://placehold.co/400x500?text=No+Image' }];
-                    } else {
-                        // Ensure primary image is first or handled? 
-                        // Assuming $product->images collection contains all relevant images
-                    }
                     
-                    // Auto-select first color/size if needed? User usually prefers explicit selection.
-                    // But if there's only one color, select it.
+                    // Auto-select first color/size if needed
                     if (this.uniqueColors.length === 1) {
                         this.selectColor(this.uniqueColors[0]);
                     }
+
+                    // Initialize Swipers safely after Alpine renders and scripts load
+                    this.$nextTick(() => {
+                        let thumbSwiper = null;
+                        if (document.querySelector('.thumb-swiper')) {
+                            thumbSwiper = new Swiper(".thumb-swiper", {
+                                spaceBetween: 16,
+                                slidesPerView: 5,
+                                freeMode: true,
+                                watchSlidesProgress: true,
+                            });
+                        }
+
+                        if (document.querySelector('.main-swiper')) {
+                            new Swiper(".main-swiper", {
+                                spaceBetween: 10,
+                                navigation: {
+                                    nextEl: ".swiper-button-next",
+                                    prevEl: ".swiper-button-prev",
+                                },
+                                thumbs: thumbSwiper ? { swiper: thumbSwiper } : {},
+                                grabCursor: true,
+                            });
+                        }
+
+                        // Override Global WhatsApp button to send current Product details
+                        const globalWaBtn = document.getElementById('global-whatsapp-btn');
+                        if (globalWaBtn) {
+                            globalWaBtn.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                window.open(this.generateWhatsAppLink(), '_blank');
+                            });
+                        }
+                    });
                 },
 
                 get uniqueColors() {
@@ -462,35 +513,27 @@
                     }
                 },
 
-                updateActiveIndex() {
-                    const slider = this.$refs.slider;
-                    const scrollPosition = slider.scrollLeft;
-                    const width = slider.offsetWidth;
-                    this.activeImageIndex = Math.round(scrollPosition / width);
-                },
-
-                scrollToImage(index) {
-                    this.activeImageIndex = index;
-                    this.$refs.slider.scrollTo({
-                        left: this.$refs.slider.offsetWidth * index,
-                        behavior: 'smooth'
-                    });
-                },
-
-                prevImage() {
-                    const newIndex = this.activeImageIndex === 0 ? this.images.length - 1 : this.activeImageIndex - 1;
-                    this.scrollToImage(newIndex);
-                },
-
-                nextImage() {
-                    const newIndex = this.activeImageIndex === this.images.length - 1 ? 0 : this.activeImageIndex + 1;
-                    this.scrollToImage(newIndex);
-                },
-
-                getImageUrl(image) {
-                     if (!image.image_path) return image; // For string URLs (placeholders)
-                     if (image.image_path.startsWith('http')) return image.image_path;
-                     return '/storage/' + image.image_path;
+                generateWhatsAppLink() {
+                    let text = `Hello! I would like to order the following product:\n\n`;
+                    text += `*${this.product.name}*\n`;
+                    
+                    if (this.selectedColor) {
+                        text += `Color: ${this.selectedColor}\n`;
+                    }
+                    if (this.selectedVariant && this.selectedVariant.size) {
+                        text += `Size: ${this.selectedVariant.size}\n`;
+                    }
+                    
+                    text += `Quantity: ${this.quantity}\n`;
+                    
+                    const price = this.currentPrice.onSale ? this.currentPrice.sale : this.currentPrice.regular;
+                    text += `Price: Rs. ${Number(price).toLocaleString()}\n`;
+                    text += `Total: Rs. ${Number(price * this.quantity).toLocaleString()}\n\n`;
+                    text += `Product Link: ${window.location.href}`;
+                    
+                    const encodedText = encodeURIComponent(text);
+                    // Use WhatsApp phone number
+                    return `https://wa.me/923069101633?text=${encodedText}`; 
                 },
 
                 addToBag() {
