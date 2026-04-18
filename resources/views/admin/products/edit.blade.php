@@ -105,11 +105,34 @@
                 <div id="new-image-preview" class="flex flex-wrap gap-4 mt-4 hidden"></div>
             </div>
 
+            <!-- Bulk Variant Generator -->
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-6">
+                <h4 class="text-md font-bold text-gray-900 mb-3">⚡ Bulk Add New Combinations</h4>
+                <p class="text-xs text-gray-500 mb-4">Quickly append multiple sizes across multiple colors to this product. Separate values with commas (e.g., "7, 8, 9" and "Black, Brown").</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700">Sizes (Comma Separated)</label>
+                        <input type="text" id="bulk_sizes" placeholder="7, 8, 9, 10" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700">Colors (Comma Separated)</label>
+                        <input type="text" id="bulk_colors" placeholder="Black, Brown" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700">Default Stock</label>
+                        <input type="number" id="bulk_stock" value="10" min="0" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
+                    </div>
+                    <div>
+                        <button type="button" onclick="generateBulkVariants()" class="w-full bg-gray-900 text-white px-4 py-2 text-sm rounded hover:bg-gray-700 transition">Add Rows</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Variants Management -->
             <div class="bg-white shadow rounded-lg p-6 mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-medium text-gray-900">Manage Variants</h3>
-                    <button type="button" onclick="addVariant()" class="text-sm bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">+ Add Variant</button>
+                    <button type="button" onclick="addVariant()" class="text-sm bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">+ Add Single</button>
                 </div>
                 
                 <div id="variants-container">
@@ -128,7 +151,7 @@
                             <input type="text" name="variants[{{ $index }}][color]" value="{{ old('variants.'.$index.'.color', $variant->color) }}" placeholder="Color" class="text-sm border-gray-300 rounded-md">
                             <input type="number" name="variants[{{ $index }}][stock]" value="{{ old('variants.'.$index.'.stock', $variant->stock_quantity) }}" class="text-sm border-gray-300 rounded-md @error('variants.'.$index.'.stock') border-red-500 @enderror">
                             <input type="number" name="variants[{{ $index }}][price]" value="{{ old('variants.'.$index.'.price', $variant->price) }}" placeholder="Price" class="text-sm border-gray-300 rounded-md">
-                            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 text-sm">Remove</button>
+                            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 text-sm flex items-center justify-center border border-red-200 rounded hover:bg-red-50">Remove</button>
                         </div>
                     @endforeach
                 </div>
@@ -136,19 +159,54 @@
 
             <script>
                 let variantCount = {{ $product->variants->count() }};
-                function addVariant() {
+                
+                function addVariant(size = '', color = '', stock = 10) {
                     const container = document.getElementById('variants-container');
                     const newRow = document.createElement('div');
                     newRow.className = 'variant-row grid grid-cols-5 gap-4 mb-2';
                     newRow.innerHTML = `
-                        <input type="text" name="variants[${variantCount}][size]" placeholder="Size" class="text-sm border-gray-300 rounded-md">
-                        <input type="text" name="variants[${variantCount}][color]" placeholder="Color" class="text-sm border-gray-300 rounded-md">
-                        <input type="number" name="variants[${variantCount}][stock]" value="10" class="text-sm border-gray-300 rounded-md">
+                        <input type="text" name="variants[${variantCount}][size]" value="${size}" placeholder="Size" class="text-sm border-gray-300 rounded-md">
+                        <input type="text" name="variants[${variantCount}][color]" value="${color}" placeholder="Color" class="text-sm border-gray-300 rounded-md">
+                        <input type="number" name="variants[${variantCount}][stock]" value="${stock}" class="text-sm border-gray-300 rounded-md">
                         <input type="number" name="variants[${variantCount}][price]" placeholder="Price" class="text-sm border-gray-300 rounded-md">
-                        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 text-sm">Remove</button>
+                        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 text-sm flex items-center justify-center border border-red-200 rounded hover:bg-red-50">Remove</button>
                     `;
                     container.appendChild(newRow);
                     variantCount++;
+                }
+
+                function generateBulkVariants() {
+                    const sizeInput = document.getElementById('bulk_sizes').value;
+                    const colorInput = document.getElementById('bulk_colors').value;
+                    const stockInput = document.getElementById('bulk_stock').value || 10;
+                    
+                    const sizes = sizeInput.split(',').map(s => s.trim()).filter(s => s !== '');
+                    const colors = colorInput.split(',').map(c => c.trim()).filter(c => c !== '');
+                    
+                    if (sizes.length === 0 && colors.length === 0) {
+                        alert("Please enter sizes or colors to generate.");
+                        return;
+                    }
+                    
+                    if (colors.length === 0 && sizes.length > 0) {
+                        sizes.forEach(sz => addVariant(sz, '', stockInput));
+                        document.getElementById('bulk_sizes').value = '';
+                        return;
+                    }
+                    if (sizes.length === 0 && colors.length > 0) {
+                        colors.forEach(col => addVariant('', col, stockInput));
+                        document.getElementById('bulk_colors').value = '';
+                        return;
+                    }
+                    
+                    colors.forEach(col => {
+                        sizes.forEach(sz => {
+                            addVariant(sz, col, stockInput);
+                        });
+                    });
+                    
+                    document.getElementById('bulk_sizes').value = '';
+                    document.getElementById('bulk_colors').value = '';
                 }
 
                 document.getElementById('new-images').addEventListener('change', function(e) {
