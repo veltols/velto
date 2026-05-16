@@ -8,6 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@hasSection('title') @yield('title') - {{ config('app.name', 'Velto') }} @else {{ config('app.name', 'Velto') }} @endif</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="@yield('meta_description', 'Premium Leather Shoes by Velto. Handcrafted with Italian tradition and modern aesthetics to create footwear that stands the test of time.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'leather shoes, handcrafted shoes, velto, premium footwear, men shoes, luxury leather')">
+    <link rel="canonical" href="@yield('canonical_url', url()->current())">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:url" content="@yield('canonical_url', url()->current())">
+    <meta property="og:title" content="@hasSection('title') @yield('title') - {{ config('app.name', 'Velto') }} @else {{ config('app.name', 'Velto') }} @endif">
+    <meta property="og:description" content="@yield('meta_description', 'Premium Leather Shoes by Velto. Handcrafted with Italian tradition and modern aesthetics.')">
+    <meta property="og:image" content="@yield('og_image', asset('images/headerlogo.png'))">
+    <meta property="og:site_name" content="{{ config('app.name', 'Velto') }}">
+    <meta property="article:publisher" content="https://www.facebook.com/p/Velto-LS-61567129000247/">
+
     @stack('seo')
 
     <!-- Fonts -->

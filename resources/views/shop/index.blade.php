@@ -1,13 +1,7 @@
 <x-app-layout>
     @section('title', isset($category) ? $category->name . ' - Shop' : 'Shop All Products')
-    @push('seo')
-        <meta name="description" content="{{ isset($category) ? 'Shop our exclusive collection of ' . $category->name . ' at Velto.' : 'Explore the full collection of Velto handcrafted leather shoes.' }}">
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="{{ isset($category) ? $category->name . ' - Velto Shop' : 'Shop All Products - Velto' }}">
-        <meta property="og:description" content="{{ isset($category) ? 'Shop our exclusive collection of ' . $category->name . ' at Velto.' : 'Explore the full collection of Velto handcrafted leather shoes.' }}">
-        <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:image" content="{{ asset('images/banner-shoes-wide.png') }}">
-    @endpush
+    @section('meta_description', isset($category) ? 'Shop our exclusive collection of ' . $category->name . ' at Velto.' : 'Explore the full collection of Velto handcrafted leather shoes.')
+    @section('og_image', asset('images/banner-shoes-wide.png'))
     <style>
         .desktop-filter-force { display: none; }
         .mobile-filter-force { display: block; }

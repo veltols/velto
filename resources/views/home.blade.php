@@ -1,13 +1,7 @@
 <x-app-layout>
     @section('title', 'Luxury Leather Shoes')
-    @push('seo')
-        <meta name="description" content="Velto - Exquisite craftsmanship and modern luxury. Shop our 2026 Artisan Collection of handcrafted leather shoes.">
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="Velto - Luxury Leather Shoes">
-        <meta property="og:description" content="Elevate your stride with Velto's handcrafted leather shoes. Where Italian heritage meets modern luxury.">
-        <meta property="og:url" content="{{ route('home') }}">
-        <meta property="og:image" content="{{ asset('images/velto_banner_wide.png') }}">
-    @endpush
+    @section('meta_description', 'Velto - Exquisite craftsmanship and modern luxury. Shop our 2026 Artisan Collection of handcrafted leather shoes.')
+    @section('og_image', asset('images/velto_banner_wide.png'))
     <!-- Hero Section -->
     <section class="relative w-full overflow-hidden" style="height: 800px; min-height: 800px;">
         <div class="absolute inset-0">

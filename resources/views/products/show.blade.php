@@ -1,26 +1,12 @@
 <x-app-layout>
     @section('title', $product->name)
+    @section('meta_description', Str::limit($product->description, 160))
+    @section('og_type', 'product')
+    @section('og_image', $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : ($product->images->isNotEmpty() ? asset('storage/' . $product->images->first()->image_path) : asset('images/headerlogo.png')))
+    
     @push('seo')
-        <meta name="description" content="{{ Str::limit($product->description, 160) }}">
-        <meta property="og:type" content="product">
-        <meta property="og:title" content="{{ $product->name }} - Velto">
-        <meta property="og:description" content="{{ Str::limit($product->description, 200) }}">
-        <meta property="og:url" content="{{ route('product.show', $product->slug) }}">
-        @if($product->primaryImage)
-            <meta property="og:image" content="{{ asset('storage/' . $product->primaryImage->image_path) }}">
-        @elseif($product->images->isNotEmpty())
-            <meta property="og:image" content="{{ asset('storage/' . $product->images->first()->image_path) }}">
-        @endif
         <meta property="product:price:amount" content="{{ $product->sale_price ?? $product->base_price }}">
         <meta property="product:price:currency" content="PKR">
-        
-        <!-- Twitter Card -->
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="{{ $product->name }}">
-        <meta name="twitter:description" content="{{ Str::limit($product->description, 200) }}">
-        @if($product->primaryImage)
-            <meta name="twitter:image" content="{{ asset('storage/' . $product->primaryImage->image_path) }}">
-        @endif
     @endpush
     <div class="bg-white" x-data="productDetail()">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
