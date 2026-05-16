@@ -11,7 +11,7 @@
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="@yield('meta_description', 'Best quality men\'s shoes. Velto Leather Shoes Top Shoes Brand in Pakistan. Shop our latest collection of stylish and comfortable footwear designed to elevate your everyday look. Enjoy free shipping and easy returns!')">
-    <meta name="keywords" content="@yield('meta_keywords', 'leather shoes, handcrafted shoes, velto, velto leather shoes, premium footwear, men shoes, luxury leather, pakistan shoes brand')">
+    <meta name="keywords" content="@yield('meta_keywords', 'leather shoes, handcrafted shoes, velto, velto leather shoes, premium footwear, men shoes, luxury leather, pakistan shoes brand,customize shoes')">
     <link rel="canonical" href="@yield('canonical_url', url()->current())">
 
     <!-- Open Graph / Facebook -->
