@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
+use App\Helpers\SitemapHelper;
 class CategoryController extends Controller
 {
     public function index()
@@ -39,7 +39,7 @@ class CategoryController extends Controller
         }
 
         Category::create($validated);
-
+        SitemapHelper::generate();
         return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
     }
 
@@ -75,13 +75,14 @@ class CategoryController extends Controller
         }
 
         $category->save();
-
+        SitemapHelper::generate();
         return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
     }
 
     public function destroy(Category $category)
     {
         $category->delete();
+        SitemapHelper::generate();
         return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
     }
 }

@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
+use App\Helpers\SitemapHelper;
 class ProductController extends Controller
 {
     public function index(Request $request)
@@ -111,6 +111,7 @@ class ProductController extends Controller
                     }
                 }
             }
+            SitemapHelper::generate();
 
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
@@ -231,7 +232,7 @@ class ProductController extends Controller
             }
             // Delete variants not in the list
             $product->variants()->whereNotIn('id', $keptVariantIds)->delete();
-            
+            SitemapHelper::generate();
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
 
@@ -244,6 +245,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+        SitemapHelper::generate();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
     }
 
