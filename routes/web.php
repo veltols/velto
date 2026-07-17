@@ -14,14 +14,6 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\BannerController;
-use App\Helpers\SitemapHelper;
-
-Route::get('/generate-sitemap', function () {
-
-    SitemapHelper::generate();
-
-    return 'Sitemap Generated Successfully';
-});
 /*
 |--------------------------------------------------------------------------
 | Web Routes
