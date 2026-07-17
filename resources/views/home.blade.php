@@ -99,17 +99,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
                 @foreach($featured as $product)
                     <div class="group cursor-pointer">
-                        <div class="relative overflow-hidden bg-gray-50 aspect-[4/5] mb-4 rounded-sm">
+                        <div class="relative overflow-hidden bg-white aspect-square mb-4 rounded-sm p-6">
                              <a href="{{ route('product.show', $product->slug) }}">
                                 @if($product->primaryImage)
                                     <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" 
                                          alt="{{ $product->name }}" 
-                                         class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
+                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
                                          onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 @elseif($product->images->isNotEmpty())
                                     <img src="{{ asset('storage/' . $product->images->first()->image_path) }}" 
                                          alt="{{ $product->name }}" 
-                                         class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
+                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
                                          onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 @else
                                     <img src="https://placehold.co/400x500?text=No+Image+400x500" class="w-full h-full object-cover object-center">
@@ -191,17 +191,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
                 @foreach($newArrivals as $product)
                     <div class="group cursor-pointer">
-                        <div class="relative overflow-hidden bg-gray-50 aspect-[4/5] mb-4 rounded-sm">
+                        <div class="relative overflow-hidden bg-white aspect-square mb-4 rounded-sm p-6">
                              <a href="{{ route('product.show', $product->slug) }}">
                                 @if($product->primaryImage)
                                     <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" 
                                          alt="{{ $product->name }}" 
-                                         class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
+                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
                                          onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 @elseif($product->images->isNotEmpty())
                                     <img src="{{ asset('storage/' . $product->images->first()->image_path) }}" 
                                          alt="{{ $product->name }}" 
-                                         class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
+                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
                                          onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 @else
                                     <img src="https://placehold.co/400x500?text=No+Image+400x500" class="w-full h-full object-cover object-center">

@@ -275,17 +275,17 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
                      @foreach($relatedProducts as $related)
                     <div class="group cursor-pointer">
-                        <div class="relative overflow-hidden bg-gray-50 aspect-[4/5] mb-4 rounded-sm">
+                        <div class="relative overflow-hidden bg-white aspect-square mb-4 rounded-sm p-6">
                             <a href="{{ route('product.show', $related->slug) }}">
                                 @if($related->primaryImage)
                                     <img src="{{ asset('storage/' . $related->primaryImage->image_path) }}" 
                                          alt="{{ $related->name }}" 
-                                         class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
+                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
                                          onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 @elseif($related->images->isNotEmpty())
                                     <img src="{{ asset('storage/' . $related->images->first()->image_path) }}" 
                                          alt="{{ $related->name }}" 
-                                         class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
+                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
                                          onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 @else
                                     <img src="https://placehold.co/400x500?text=No+Image+400x500" class="w-full h-full object-cover object-center">
