@@ -48,25 +48,32 @@
                 
                 <!-- Image Gallery -->
                 <div class="relative flex flex-col gap-4 select-none">
-                    @php
-                        // Sort so primary image appears absolutely first natively
-                        $sortedImages = collect();
-                        if ($product->images && $product->images->count() > 0) {
-                            $sortedImages = $product->images->sort(function ($a, $b) {
-                                if ($a->is_primary && !$b->is_primary) return -1;
-                                if (!$a->is_primary && $b->is_primary) return 1;
-                                return ($a->display_order ?? 0) <=> ($b->display_order ?? 0);
-                            })->values();
-                        } elseif ($product->primary_image) {
-                            $fakeImage = new \stdClass();
-                            $fakeImage->image_path = $product->primary_image;
-                            $sortedImages = collect([$fakeImage]);
-                        } else {
-                            $fakeImage = new \stdClass();
-                            $fakeImage->image_path = 'https://placehold.co/400x500?text=No+Image';
-                            $sortedImages = collect([$fakeImage]);
-                        }
-                    @endphp
+                  @php
+    if ($product->images && $product->images->count() > 0) {
+
+        // Exclude primary image from slider
+        $sortedImages = $product->images
+            ->filter(function ($image) {
+                return !$image->is_primary;
+            })
+            ->sortBy(function ($image) {
+                return $image->display_order ?? 0;
+            })
+            ->values();
+
+        // If no non-primary images exist, show placeholder
+        if ($sortedImages->isEmpty()) {
+            $fakeImage = new \stdClass();
+            $fakeImage->image_path = 'https://placehold.co/400x500?text=No+Image';
+            $sortedImages = collect([$fakeImage]);
+        }
+
+    } else {
+        $fakeImage = new \stdClass();
+        $fakeImage->image_path = 'https://placehold.co/400x500?text=No+Image';
+        $sortedImages = collect([$fakeImage]);
+    }
+@endphp
 
                     <!-- Main Slider Area -->
                     <div class="swiper main-swiper w-full aspect-square md:aspect-[4/5] bg-gray-50 overflow-hidden rounded-sm group">
