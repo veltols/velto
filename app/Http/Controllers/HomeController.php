@@ -14,6 +14,7 @@ class HomeController extends Controller
         $featured = Product::with('primaryImage', 'images', 'category')
             ->where('is_featured', true)
             ->where('is_active', true)
+            ->latest()
             ->take(8)
             ->get();
 
