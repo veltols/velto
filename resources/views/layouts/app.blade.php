@@ -183,7 +183,7 @@
                     <a href="{{ route('home') }}" class="nav-link text-[12px] font-black uppercase tracking-[0.1em] text-gray-900 whitespace-nowrap">HOME</a>
                     <a href="{{ route('shop.index') }}" class="nav-link text-[12px] font-black uppercase tracking-[0.1em] text-gray-900 whitespace-nowrap">SHOP</a>
                     <a href="{{ route('shop.index', ['sort' => 'newest']) }}" class="nav-link text-[12px] font-black uppercase tracking-[0.1em] text-gray-900 whitespace-nowrap">NEW ARRIVAL</a>
-                    <a href="{{ route('shop.index', ['on_sale' => 1]) }}" class="nav-link text-[12px] font-black uppercase tracking-[0.1em] text-gray-900 whitespace-nowrap">SALE</a>
+                    <a href="{{ route('shop.index', ['on_sale' => 1]) }}" class="nav-link text-[12px] font-black uppercase tracking-[0.1em] whitespace-nowrap hover:opacity-80 transition-opacity" style="color: #7B1B2A;">SALE</a>
                 </div>
             </div>
         </div>
@@ -206,7 +206,10 @@
                     <a href="{{ route('home') }}" class="text-lg font-medium text-gray-900 border-b border-gray-100 pb-2">Home</a>
                     <a href="{{ route('shop.index') }}" class="text-lg font-medium text-gray-900 border-b border-gray-100 pb-2">Shop</a>
                     <a href="{{ route('shop.index', ['sort' => 'newest']) }}" class="text-lg font-medium text-gray-900 border-b border-gray-100 pb-2">New Arrivals</a>
-                    <a href="{{ route('shop.index', ['on_sale' => 1]) }}" class="text-lg font-medium text-gray-900 border-b border-gray-100 pb-2">Sale</a>
+                    <a href="{{ route('shop.index', ['on_sale' => 1]) }}" class="text-lg font-bold border-b border-gray-100 pb-2 flex items-center justify-between" style="color: #7B1B2A;">
+                        <span>Sale</span>
+                        <span class="text-white text-[9px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-widest" style="background-color: #7B1B2A;">Hot</span>
+                    </a>
                     @foreach($categories as $category)
                         <a href="{{ route('shop.category', $category->slug) }}" class="text-lg font-medium text-gray-900 border-b border-gray-100 pb-2">{{ $category->name }}</a>
                     @endforeach

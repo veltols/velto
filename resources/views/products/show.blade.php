@@ -285,11 +285,16 @@
                                 @endif
                             </a>
                              @if($related->isOnSale())
-                                <div class="absolute top-2 left-2 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest shadow-lg" style="background-color: #7B1B2A;">Sale -{{ $related->discountPercentage() }}%</div>
-                            @endif
+                                 <!-- Left Ribbon: Discount Percentage -->
+                                 <div class="absolute top-0 left-0 text-white text-[9px] font-extrabold px-3 pt-2 pb-3.5 text-center uppercase tracking-wider z-10 shadow-md" style="background-color: #7B1B2A; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);">
+                                     {{ $related->discountPercentage() }}% OFF
+                                 </div>
+                                 <!-- Right Badge: Sale -->
+                                 <div class="absolute top-0 right-0 bg-black text-white text-[9px] font-extrabold px-3 py-2 uppercase tracking-widest z-10 shadow-md">Sale</div>
+                             @endif
                              @if($related->variants->sum('stock_quantity') <= 0)
-                                <div class="absolute top-2 right-2 bg-gray-900 text-white text-xs px-2 py-1 uppercase tracking-wide">Sold Out</div>
-                            @endif
+                                 <div class="absolute top-0 right-0 bg-black text-white text-[9px] font-extrabold px-3 py-2 uppercase tracking-widest z-20 shadow-md">Sold Out</div>
+                             @endif
                         </div>
                         <div>
                             <p class="text-xs text-gray-500 mb-1 tracking-wide">{{ $related->category->name ?? 'Category' }}</p>
