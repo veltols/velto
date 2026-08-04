@@ -119,7 +119,7 @@
                                         @if($product->isOnSale())
                                             <p class="text-xl md:text-3xl font-bold text-black">Rs. {{ number_format($product->sale_price) }}</p>
                                             <p class="text-base md:text-xl font-medium text-gray-400 line-through">Rs. {{ number_format($product->base_price) }}</p>
-                                            <span class="bg-black text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-widest">-{{ $product->discountPercentage() }}%</span>
+                                            <span class="bg-[#7B1B2A] text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-widest">-{{ $product->discountPercentage() }}%</span>
                                         @else
                                             <p class="text-xl md:text-3xl font-medium text-gray-900">Rs. {{ number_format($product->base_price) }}</p>
                                         @endif
@@ -133,7 +133,7 @@
                                         <template x-if="currentPrice.onSale">
                                             <div class="flex items-baseline space-x-4">
                                                 <p class="text-base md:text-xl font-medium text-gray-400 line-through" x-text="'Rs. ' + Number(currentPrice.regular).toLocaleString()"></p>
-                                                <span class="bg-black text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-widest" x-text="'-' + currentPrice.discount + '%'"></span>
+                                                <span class="bg-[#7B1B2A] text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-widest" x-text="'-' + currentPrice.discount + '%'"></span>
                                             </div>
                                         </template>
                                     </div>
@@ -285,7 +285,7 @@
                                 @endif
                             </a>
                              @if($related->isOnSale())
-                                <div class="absolute top-2 left-2 bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest shadow-lg">Sale</div>
+                                <div class="absolute top-2 left-2 bg-[#7B1B2A] text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest shadow-lg">Sale -{{ $related->discountPercentage() }}%</div>
                             @endif
                              @if($related->variants->sum('stock_quantity') <= 0)
                                 <div class="absolute top-2 right-2 bg-gray-900 text-white text-xs px-2 py-1 uppercase tracking-wide">Sold Out</div>
