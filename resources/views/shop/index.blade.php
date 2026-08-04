@@ -276,14 +276,14 @@
                                         </a>
                                         @if($product->isOnSale())
                                             <!-- Left Ribbon: Discount Percentage -->
-                                            <div class="absolute top-0 left-0 text-white text-[9px] font-extrabold px-3 pt-2 pb-3.5 text-center uppercase tracking-wider z-10 shadow-md" style="background-color: #7B1B2A; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);">
+                                            <div class="absolute top-0 left-0 text-white font-extrabold text-center uppercase shadow-md" style="background-color: #7B1B2A; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%); font-size: 9px; padding: 8px 12px 14px 12px; line-height: 1; letter-spacing: 0.05em; z-index: 10;">
                                                 {{ $product->discountPercentage() }}% OFF
                                             </div>
                                             <!-- Right Badge: Sale -->
-                                            <div class="absolute top-0 right-0 bg-black text-white text-[9px] font-extrabold px-3 py-2 uppercase tracking-widest z-10 shadow-md">Sale</div>
+                                            <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 10;">Sale</div>
                                         @endif
                                         @if($product->variants->sum('stock_quantity') <= 0)
-                                            <div class="absolute top-0 right-0 bg-black text-white text-[9px] font-extrabold px-3 py-2 uppercase tracking-widest z-20 shadow-md">Sold Out</div>
+                                            <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 20;">Sold Out</div>
                                         @endif
                                     </div>
                                     <div>
