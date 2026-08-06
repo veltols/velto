@@ -7,7 +7,7 @@
     @endif
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@hasSection('title') @yield('title') - {{ config('app.name', 'Velto Leather Shoes') }} @else Velto Leather Shoes: Premium Quality Men's Shoes Brand | Top Shoes Brand – Velto Leather Shoes @endif</title>
+    <title>@hasSection('title') @yield('title')  @else Velto Leather Shoes: Premium Quality Men's Shoes Brand | Top Shoes Brand | Velto Leather Shoes @endif</title>
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="@yield('meta_description', 'Best quality men\'s shoes. Velto Leather Shoes Top Shoes Brand in Pakistan. Shop our latest collection of stylish and comfortable footwear designed to elevate your everyday look. Enjoy free shipping and easy returns!')">

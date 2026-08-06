@@ -1,12 +1,76 @@
 <x-app-layout>
-    @section('title', $product->name)
-    @section('meta_description', Str::limit($product->description, 160))
+    @section('title', $product->name . ' | Velto Leather Shoes')
+    @section('meta_description', $product->name .' Buy premium quality men shoes from Velto Leather Shoes. Cash on delivery available across Pakistan.')
     @section('og_type', 'product')
     @section('og_image', $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : ($product->images->isNotEmpty() ? asset('storage/' . $product->images->first()->image_path) : asset('images/headerlogo.png')))
     
     @push('seo')
         <meta property="product:price:amount" content="{{ $product->sale_price ?? $product->base_price }}">
         <meta property="product:price:currency" content="PKR">
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org/",
+                "@type": "Product",
+                "name": "{{ $product->name }}",
+                "image": [
+                    "{{ $product->primaryImage ? asset('storage/'.$product->primaryImage->image_path) : '' }}"
+                ],
+                "description": "{{ Str::limit(strip_tags($product->description), 200) }}",
+                "brand": {
+                    "@type": "Brand",
+                    "name": "Velto Leather Shoes"
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "url": "{{ url()->current() }}",
+                    "priceCurrency": "PKR",
+                    "price": "{{ $product->sale_price ?? $product->base_price }}",
+                    "availability": "https://schema.org/InStock"
+                }
+            }
+        </script>
+        <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ route('home') }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Shop",
+      "item": "{{ route('shop.index') }}"
+    }
+    @if($product->category),
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{{ $product->category->name }}",
+      "item": "{{ route('shop.category', $product->category->slug) }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "{{ $product->name }}",
+      "item": "{{ url()->current() }}"
+    }
+    @else
+    ,
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{{ $product->name }}",
+      "item": "{{ url()->current() }}"
+    }
+    @endif
+  ]
+}
+</script>
     @endpush
     <div class="bg-white" x-data="productDetail()">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
@@ -77,7 +141,7 @@
                                         $path = is_object($image) ? $image->image_path : $image['image_path'];
                                         $url = Str::startsWith($path, 'http') ? $path : asset('storage/' . $path);
                                     @endphp
-                                    <img src="{{ $url }}" class="w-full h-full object-cover object-center block" alt="{{ $product->name }}" onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
+                                    <img src="{{ $url }}" class="w-full h-full object-cover object-center block" alt="{{ $product->name }} - Men's leather shoes Pakistan" onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 </div>
                             @endforeach
                         </div>
@@ -272,12 +336,12 @@
                             <a href="{{ route('product.show', $related->slug) }}">
                                 @if($related->primaryImage)
                                     <img src="{{ asset('storage/' . $related->primaryImage->image_path) }}" 
-                                         alt="{{ $related->name }}" 
+                                         alt="{{ $related->name }} - Men's leather shoes Pakistan" 
                                          class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
                                          onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 @elseif($related->images->isNotEmpty())
                                     <img src="{{ asset('storage/' . $related->images->first()->image_path) }}" 
-                                         alt="{{ $related->name }}" 
+                                         alt="{{ $related->name }} - Men's leather shoes Pakistan" 
                                          class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
                                          onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 @else
