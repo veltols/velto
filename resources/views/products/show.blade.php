@@ -75,7 +75,7 @@
     <div class="bg-white" x-data="productDetail()">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
             <!-- Breadcrumbs -->
-            <nav class="flex mb-8" aria-label="Breadcrumb">
+            {{-- <nav class="flex mb-8" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-2">
                     <li class="inline-flex items-center">
                         <a href="{{ route('home') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black transition">
@@ -107,7 +107,7 @@
                         </div>
                     </li>
                 </ol>
-            </nav>
+            </nav> --}}
             <div class="lg:grid lg:grid-cols-2 lg:gap-x-16 lg:items-start">
                 
                 <!-- Image Gallery -->
