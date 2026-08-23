@@ -101,8 +101,10 @@
                 </div>
                 
                 <label class="block text-sm font-medium text-gray-700 mt-4">Add New Images</label>
+                <input type="hidden" name="new_primary_image_index" id="new_primary_image_index" value="">
                 <input type="file" name="new_images[]" id="new-images" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
                 <div id="new-image-preview" class="flex flex-wrap gap-4 mt-4 hidden"></div>
+                <p class="text-xs text-gray-500 mt-2">Upload multiple images. Click on a new image preview to set it as Primary.</p>
             </div>
 
             <!-- Bulk Variant Generator -->
@@ -112,11 +114,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div>
                         <label class="block text-xs font-semibold text-gray-700">Sizes (Comma Separated)</label>
-                        <input type="text" id="bulk_sizes" placeholder="7, 8, 9, 10" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
+                        <input type="text" id="bulk_sizes" value="39, 40, 41, 42, 43, 44" placeholder="7, 8, 9, 10" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-700">Colors (Comma Separated)</label>
-                        <input type="text" id="bulk_colors" placeholder="Black, Brown" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
+                        <input type="text" id="bulk_colors" value="Black" placeholder="Black, Brown" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-700">Default Stock</label>
@@ -190,12 +192,10 @@
                     
                     if (colors.length === 0 && sizes.length > 0) {
                         sizes.forEach(sz => addVariant(sz, '', stockInput));
-                        document.getElementById('bulk_sizes').value = '';
                         return;
                     }
                     if (sizes.length === 0 && colors.length > 0) {
                         colors.forEach(col => addVariant('', col, stockInput));
-                        document.getElementById('bulk_colors').value = '';
                         return;
                     }
                     
@@ -204,15 +204,14 @@
                             addVariant(sz, col, stockInput);
                         });
                     });
-                    
-                    document.getElementById('bulk_sizes').value = '';
-                    document.getElementById('bulk_colors').value = '';
                 }
 
                 document.getElementById('new-images').addEventListener('change', function(e) {
                     const preview = document.getElementById('new-image-preview');
+                    const primaryInput = document.getElementById('new_primary_image_index');
                     preview.innerHTML = '';
-                    
+                    primaryInput.value = ''; // reset
+
                     if (this.files && this.files.length > 0) {
                         preview.classList.remove('hidden');
                     } else {
@@ -220,24 +219,60 @@
                         return;
                     }
 
-                    Array.from(this.files).forEach((file) => {
+                    Array.from(this.files).forEach((file, index) => {
                         if (!/\.(jpe?g|png|gif|webp)$/i.test(file.name)) return;
-                        
+
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             const container = document.createElement('div');
-                            container.className = 'relative flex-shrink-0';
-                            
+                            container.className = 'relative flex-shrink-0 cursor-pointer group rounded shadow-sm border-2 border-transparent transition-all overflow-hidden';
+                            container.dataset.index = index;
+
                             const img = document.createElement('img');
                             img.src = e.target.result;
-                            img.className = 'h-24 w-24 object-cover rounded shadow-sm border border-gray-200';
-                            
-                            const badge = document.createElement('div');
-                            badge.className = 'absolute bottom-0 left-0 right-0 bg-blue-500 bg-opacity-70 text-white text-[10px] uppercase font-bold text-center py-1 rounded-b';
-                            badge.innerText = 'New';
-                            
+                            img.className = 'h-24 w-24 object-cover';
                             container.appendChild(img);
+
+                            const badge = document.createElement('div');
+                            badge.className = 'new-primary-badge absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-[10px] uppercase font-bold text-center py-1';
+
+                            if (index === 0 && primaryInput.value === '') {
+                                // First image auto-selected as primary for new uploads
+                                primaryInput.value = index;
+                                badge.innerText = 'Primary';
+                                container.classList.add('border-black', 'shadow-md');
+                            } else if (parseInt(primaryInput.value) === index) {
+                                badge.innerText = 'Primary';
+                                container.classList.add('border-black', 'shadow-md');
+                            } else {
+                                badge.innerText = 'Make Primary';
+                                badge.classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity');
+                            }
+
                             container.appendChild(badge);
+
+                            container.addEventListener('click', function() {
+                                primaryInput.value = index;
+                                // Reset all previews
+                                Array.from(preview.children).forEach(child => {
+                                    child.classList.remove('border-black', 'shadow-md');
+                                    child.classList.add('border-transparent');
+                                    const childBadge = child.querySelector('.new-primary-badge');
+                                    if (childBadge) {
+                                        childBadge.innerText = 'Make Primary';
+                                        childBadge.classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity');
+                                    }
+                                });
+                                // Highlight selected
+                                this.classList.remove('border-transparent');
+                                this.classList.add('border-black', 'shadow-md');
+                                const currentBadge = this.querySelector('.new-primary-badge');
+                                if (currentBadge) {
+                                    currentBadge.innerText = 'Primary';
+                                    currentBadge.classList.remove('opacity-0', 'group-hover:opacity-100', 'transition-opacity');
+                                }
+                            });
+
                             preview.appendChild(container);
                         }
                         reader.readAsDataURL(file);

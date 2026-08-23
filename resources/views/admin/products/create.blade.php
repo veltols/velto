@@ -85,11 +85,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div>
                         <label class="block text-xs font-semibold text-gray-700">Sizes (Comma Separated)</label>
-                        <input type="text" id="bulk_sizes" placeholder="7, 8, 9, 10" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
+                        <input type="text" id="bulk_sizes" value="39, 40, 41, 42, 43, 44" placeholder="7, 8, 9, 10" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-700">Colors (Comma Separated)</label>
-                        <input type="text" id="bulk_colors" placeholder="Black, Brown" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
+                        <input type="text" id="bulk_colors" value="Black" placeholder="Black, Brown" class="mt-1 block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-black focus:ring-black">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-700">Default Stock</label>
@@ -176,13 +176,11 @@
             // If only sizes provided
             if (colors.length === 0 && sizes.length > 0) {
                 sizes.forEach(sz => addVariant(sz, '', stockInput));
-                document.getElementById('bulk_sizes').value = '';
                 return;
             }
             // If only colors provided
             if (sizes.length === 0 && colors.length > 0) {
                 colors.forEach(col => addVariant('', col, stockInput));
-                document.getElementById('bulk_colors').value = '';
                 return;
             }
             
@@ -192,10 +190,6 @@
                     addVariant(sz, col, stockInput);
                 });
             });
-            
-            // Clear inputs after generation
-            document.getElementById('bulk_sizes').value = '';
-            document.getElementById('bulk_colors').value = '';
         }
 
         document.getElementById('images').addEventListener('change', function(e) {

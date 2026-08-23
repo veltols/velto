@@ -39,7 +39,7 @@
                 @if($customer->orders->isEmpty())
                     <p class="text-sm text-gray-500">This customer has not placed any orders yet.</p>
                 @else
-                    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                    <div class="overflow-hidden overflow-x-auto shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
                         <table class="min-w-full divide-y divide-gray-300">
                             <thead class="bg-gray-50">
                                 <tr>

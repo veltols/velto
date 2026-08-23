@@ -176,13 +176,21 @@ class ProductController extends Controller
             // Handle New Images
             if ($request->hasFile('new_images')) {
                 $currentOrder = $product->images()->max('display_order') ?? 0;
-                foreach ($request->file('new_images') as $image) {
+                $newPrimaryIndex = $request->input('new_primary_image_index');
+                $hasNewPrimary = $newPrimaryIndex !== null && $newPrimaryIndex !== '';
+
+                // If a new image is set as primary, demote all existing primary images first
+                if ($hasNewPrimary) {
+                    $product->images()->where('is_primary', true)->update(['is_primary' => false]);
+                }
+
+                foreach ($request->file('new_images') as $index => $image) {
                     $currentOrder++;
                     $path = $image->store('products', 'public');
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $path,
-                        'is_primary' => false,
+                        'is_primary' => $hasNewPrimary && (int)$newPrimaryIndex === $index,
                         'display_order' => $currentOrder,
                     ]);
                 }

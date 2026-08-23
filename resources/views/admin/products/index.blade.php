@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-white rounded-lg shadow overflow-hidden overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -53,7 +53,7 @@
                                     @endif
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ $product->name }}</div>
+                                    <div class="text-sm font-medium text-gray-900"><a href="{{ route('product.show', $product->slug) }}" target="_blank">{{ $product->name }}</a></div>
                                     <div class="text-sm text-gray-500">SKU: {{ $product->sku }}</div>
                                 </div>
                             </div>

@@ -6,7 +6,7 @@
     <div class="flex flex-col lg:flex-row gap-6">
         <!-- Main Order Info -->
         <div class="flex-1">
-            <div class="bg-white shadow rounded-lg overflow-hidden mb-6">
+            <div class="bg-white shadow rounded-lg overflow-hidden overflow-x-auto mb-6">
                 <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                     <h3 class="text-lg font-medium text-gray-900">Order Items</h3>
                     <span class="text-sm text-gray-500">{{ $order->created_at->format('M d, Y h:i A') }}</span>
