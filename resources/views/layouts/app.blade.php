@@ -5,6 +5,9 @@
     @if(config('app.env') !== 'production')
         <meta name="robots" content="noindex">
     @endif
+    @if(config('app.env') == 'production')
+    <meta name="google-site-verification" content="2gNOJLFRAmeJL8EBqmY7dWvhb0rQFdeHDWVhV0JXgLk" />
+    @endif
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@hasSection('title') @yield('title')  @else Velto Leather Shoes: Premium Quality Men's Shoes Brand | Top Shoes Brand | Velto Leather Shoes @endif</title>
@@ -58,6 +61,21 @@
             width: 100%;
         }
     </style>
+    @if(config('app.env') == 'production')
+<!-- TikTok Pixel Code Start -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+
+  ttq.load('D9TEUKBC77U97D5QJ1KG');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+<!-- TikTok Pixel Code End -->
+@endif
 </head>
 <body class="antialiased bg-white text-gray-900 flex flex-col min-h-screen" x-data="{ mobileMenuOpen: false, cartOpen: false }">
     
