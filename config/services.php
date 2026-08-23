@@ -31,4 +31,21 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'whatsapp' => [
+        'driver' => env('WHATSAPP_DRIVER', 'log'),
+        'to' => env('WHATSAPP_TO'),
+        'twilio' => [
+            'sid' => env('TWILIO_AUTH_SID'),
+            'token' => env('TWILIO_AUTH_TOKEN'),
+            'from' => env('TWILIO_FROM'),
+        ],
+        'ultramsg' => [
+            'instance_id' => env('ULTRAMSG_INSTANCE_ID'),
+            'token' => env('ULTRAMSG_TOKEN'),
+        ],
+        'callmebot' => [
+            'apikey' => env('CALLMEBOT_APIKEY'),
+        ],
+    ],
+
 ];

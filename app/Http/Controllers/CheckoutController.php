@@ -158,6 +158,13 @@ class CheckoutController extends Controller
 
             DB::commit();
 
+            try {
+                // Send WhatsApp notification to admin
+                app(\App\Services\WhatsAppService::class)->sendOrderNotification($order);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('WhatsApp notification failed: ' . $e->getMessage());
+            }
+
             // Redirect to success page with order details
              return redirect()->route('checkout.success', $order->id);
 
