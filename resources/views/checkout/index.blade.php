@@ -116,20 +116,19 @@
                                 <label for="payment_cod" class="ml-3 block text-sm font-medium text-gray-700">Cash on Delivery</label>
                             </div>
                             <p class="text-sm text-gray-500 mb-2">Pay when you receive your order.</p>
-                            <div class="bg-gray-100 border-l-4 border-black p-4 mb-6">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-sm">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 mt-0.5">
+                                        <svg class="h-5 w-5 text-amber-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 5.323V3a1 1 0 011-1z"/>
                                         </svg>
                                     </div>
                                     <div class="ml-3">
-                                        <h3 class="text-sm font-bold text-black">Payment Policy</h3>
-                                        <div class="mt-2 text-sm text-gray-700 space-y-1">
-                                            <p><strong>Cash on Delivery (COD) | (50% Advance Payment Required)</strong></p>
-                                            <p>Since our shoes are made to order, we take <strong>50% Advance Payment</strong> at the time of booking order.</p>
-                                            <p><strong>100% Payment Required for all Sale Articles.</strong></p>
-                                            <p class="pt-1 font-semibold">Free shipping across Pakistan.</p>
+                                        <h3 class="text-sm font-bold text-amber-800">📦 Open Box Policy</h3>
+                                        <div class="mt-2 text-sm text-amber-900 space-y-1.5">
+                                            <p>✅ You can <strong>open the box and inspect your order</strong> before making the payment to the courier.</p>
+                                            <p>❌ <strong>Do not wear the shoes.</strong> If the shoes are worn, the return or refund will not be accepted.</p>
+                                            <p class="pt-1 text-xs text-amber-700 font-medium">Once worn, the item is considered accepted and cannot be returned.</p>
                                         </div>
                                     </div>
                                 </div>
