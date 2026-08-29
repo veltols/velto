@@ -78,4 +78,63 @@
             </div>
         </div>
     </div>
+@if(config('app.env') == 'production')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Make sure TikTok Pixel is loaded
+        if (typeof ttq === 'undefined') {
+            console.warn('TikTok Pixel is not loaded.');
+            return;
+        }
+
+        // Prevent duplicate Purchase event if customer refreshes the page
+        const purchaseKey = 'tiktok_purchase_{{ $order->id }}';
+
+        if (sessionStorage.getItem(purchaseKey)) {
+            console.log('TikTok Purchase already tracked:', '{{ $order->order_number }}');
+            return;
+        }
+
+        // Build purchased products
+        const contents = [
+            @foreach($order->items as $item)
+            {
+                content_id: String('{{ $item->product_id }}'),
+                content_type: 'product',
+                quantity: {{ (int) $item->quantity }},
+                price: {{ (float) $item->price }}
+            }@if(!$loop->last),@endif
+            @endforeach
+        ];
+
+        // TikTok Purchase Event
+        ttq.track('Purchase', {
+            contents: contents,
+
+            // First product ID for TikTok content_id
+            content_id: contents.length > 0
+                ? contents[0].content_id
+                : String('{{ $order->id }}'),
+
+            content_type: 'product',
+
+            // Actual order total including shipping
+            value: {{ (float) $order->total }},
+
+            currency: 'PKR'
+        });
+
+        // Mark this order as tracked in this browser session
+        sessionStorage.setItem(purchaseKey, '1');
+
+        console.log('TikTok Purchase fired successfully:', {
+            order_number: '{{ $order->order_number }}',
+            contents: contents,
+            value: {{ (float) $order->total }},
+            currency: 'PKR'
+        });
+    });
+</script>
+@endif
 </x-app-layout>

@@ -460,7 +460,26 @@
                     if (this.variants) {
                         this.variants.forEach(v => v.stock_quantity = parseInt(v.stock_quantity));
                     }
-                    
+                    // TikTok ViewContent - Production only
+                    @if(config('app.env') == 'production')
+                        if (typeof ttq !== 'undefined') {
+                            ttq.track('ViewContent', {
+                                content_id: String(this.product.id),
+                                content_type: 'product',
+                                value: Number(
+                                    this.product.sale_price || this.product.base_price
+                                ),
+                                currency: 'PKR'
+                            });
+
+                            console.log('TikTok ViewContent fired:', {
+                                content_id: String(this.product.id),
+                                value: Number(
+                                    this.product.sale_price || this.product.base_price
+                                )
+                            });
+                        }
+                    @endif
                     // Auto-select first color/size if needed
                     if (this.uniqueColors.length === 1) {
                         this.selectColor(this.uniqueColors[0]);

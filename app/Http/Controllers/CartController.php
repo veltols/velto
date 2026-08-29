@@ -107,11 +107,21 @@ class CartController extends Controller
              return $price * $item->quantity;
         });
 
+        // Product price for TikTok tracking
+        $trackingPrice = $request->variant_id
+            ? (float) ProductVariant::find($request->variant_id)->final_price
+            : (float) Product::find($request->product_id)->price;
+
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => 'Item added to cart!',
             'cart_count' => $count,
-            'cart_total' => 'PKR ' . number_format($total)
+            'cart_total' => 'PKR ' . number_format($total),
+
+            // TikTok tracking data
+            'product_id' => (string) $request->product_id,
+            'quantity' => (int) $request->quantity,
+            'price' => $trackingPrice,
         ]);
     }
 

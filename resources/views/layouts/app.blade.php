@@ -375,6 +375,26 @@ src="https://www.facebook.com/tr?id=2091403465098163&ev=PageView&noscript=1"
                 const data = await response.json();
 
                 if (data.success) {
+                    @if(config('app.env') == 'production')
+                        // TikTok AddToCart - Production only
+                        if (typeof ttq !== 'undefined') {
+                            ttq.track('AddToCart', {
+                                content_id: String(data.product_id),
+                                content_type: 'product',
+                                quantity: Number(data.quantity),
+                                price: Number(data.price),
+                                value: Number(data.price) * Number(data.quantity),
+                                currency: 'PKR'
+                            });
+
+                            console.log('TikTok AddToCart fired:', {
+                                content_id: String(data.product_id),
+                                quantity: Number(data.quantity),
+                                price: Number(data.price),
+                                value: Number(data.price) * Number(data.quantity)
+                            });
+                        }
+                    @endif
                     // Update ALL instances of cart-count and cart-total
                     const countEls = document.querySelectorAll('#cart-count');
                     const totalEls = document.querySelectorAll('#cart-total');
