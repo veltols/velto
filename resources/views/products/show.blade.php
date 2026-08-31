@@ -275,7 +275,19 @@
                                     <svg x-show="!loading && checkStockStatus().text !== 'Out of Stock'" class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                                 </button>
                             </div>
-                            
+
+                            <!-- Buy Now Button -->
+                            <button type="button"
+                                    @click="buyNow()"
+                                    :disabled="loading || !canAddToCart"
+                                    style="background-color:#7B1B2A;"
+                                    onmouseover="if(!this.disabled) this.style.backgroundColor='#5a1320'"
+                                    onmouseout="if(!this.disabled) this.style.backgroundColor='#7B1B2A'"
+                                    class="w-full text-white h-10 md:h-12 px-4 md:px-8 text-xs md:text-sm font-bold uppercase tracking-[0.15em] disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 flex items-center justify-center gap-2 md:gap-3 shadow-lg rounded-sm">
+                                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <span x-text="loading ? 'Processing...' : 'Buy Now'"></span>
+                            </button>
+
                             <!-- WhatsApp Order Button -->
                             <a :href="generateWhatsAppLink()" target="_blank" style="background-color: #25D366;" onmouseover="this.style.backgroundColor='#128C7E'" onmouseout="this.style.backgroundColor='#25D366'" class="w-full text-white h-10 md:h-12 px-4 md:px-8 text-xs md:text-sm font-bold uppercase tracking-[0.15em] transition transform active:scale-95 flex items-center justify-center gap-2 md:gap-3 shadow-lg hover:shadow-xl rounded-sm">
                                 <svg class="w-5 h-5 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -283,6 +295,33 @@
                                 </svg>
                                 Order via WhatsApp
                             </a>
+
+                            <!-- Trust Badges -->
+                            <div style="border: 1px solid #e5e7eb; border-radius: 6px; margin-top: 16px; overflow: hidden;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; background-color: #f9fafb;">
+                                    <!-- Cash on Delivery -->
+                                    <div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-right: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;">
+                                        <svg style="width:18px;height:18px;color:#16a34a;flex-shrink:0;" fill="none" stroke="#16a34a" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span style="font-size:11px;font-weight:600;color:#111827;line-height:1.3;">Cash on Delivery Available</span>
+                                    </div>
+                                    <!-- Delivery -->
+                                    <div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid #e5e7eb;">
+                                        <svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12L19 8M10 12v4M14 12v4"/></svg>
+                                        <span style="font-size:11px;font-weight:600;color:#111827;line-height:1.3;">Delivery in 3–5 Working Days</span>
+                                    </div>
+                                    <!-- 7-Day Exchange -->
+                                    <div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-right: 1px solid #e5e7eb;">
+                                        <svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="#d97706" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                        <span style="font-size:11px;font-weight:600;color:#111827;line-height:1.3;">7-Day Exchange</span>
+                                    </div>
+                                    <!-- Easy Size Exchange -->
+                                    <div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px;">
+                                        <svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="#7c3aed" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                                        <span style="font-size:11px;font-weight:600;color:#111827;line-height:1.3;">Easy Size Exchange</span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </form>
 
@@ -480,9 +519,13 @@
                             });
                         }
                     @endif
-                    // Auto-select first color/size if needed
-                    if (this.uniqueColors.length === 1) {
+                    // Auto-select first color and first available size
+                    if (this.uniqueColors.length > 0) {
                         this.selectColor(this.uniqueColors[0]);
+                    } else if (this.variants.length > 0) {
+                        // No color variants, auto-select first in-stock size
+                        const firstAvailable = this.variants.find(v => v.stock_quantity > 0) || this.variants[0];
+                        if (firstAvailable) this.selectedVariant = firstAvailable;
                     }
 
                     // Initialize Swipers safely after Alpine renders and scripts load
@@ -576,8 +619,13 @@
 
                 selectColor(color) {
                     this.selectedColor = color;
-                    this.selectedVariant = null; 
+                    this.selectedVariant = null;
                     this.quantity = 1;
+                    // Auto-select first in-stock size for chosen color
+                    this.$nextTick(() => {
+                        const firstAvailable = this.availableSizes.find(v => v.stock_quantity > 0) || this.availableSizes[0];
+                        if (firstAvailable) this.selectedVariant = firstAvailable;
+                    });
                 },
 
                 incrementQuantity() {
@@ -625,6 +673,39 @@
                         .catch(() => {
                             this.loading = false;
                         });
+                },
+
+                async buyNow() {
+                    if (!this.canAddToCart) {
+                        showNotification('Please select a size', 'error');
+                        return;
+                    }
+                    this.loading = true;
+                    try {
+                        const response = await fetch("{{ route('cart.store') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                product_id: this.product.id,
+                                quantity: this.quantity,
+                                variant_id: this.selectedVariant ? this.selectedVariant.id : null
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            window.location.href = "{{ route('checkout.index') }}";
+                        } else {
+                            showNotification(data.message || 'Could not process. Please try again.', 'error');
+                            this.loading = false;
+                        }
+                    } catch (error) {
+                        showNotification('Something went wrong. Please try again.', 'error');
+                        this.loading = false;
+                    }
                 }
             }
         }
