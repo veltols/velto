@@ -422,7 +422,7 @@ src="https://www.facebook.com/tr?id=2259213124835399&ev=PageView&noscript=1"
     </a>
 
     <!-- Cart Sidebar Drawer -->
-    <div x-cloak x-show="cartOpen" class="relative z-50" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+    <div x-cloak x-show="cartOpen" class="fixed inset-0 z-[9999]" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
         <!-- Backdrop -->
         <div x-show="cartOpen"
              x-transition:enter="ease-in-out duration-300"
@@ -431,114 +431,110 @@ src="https://www.facebook.com/tr?id=2259213124835399&ev=PageView&noscript=1"
              x-transition:leave="ease-in-out duration-300"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+             class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity cursor-pointer"
              @click="closeCartDrawer()"></div>
 
-        <div class="fixed inset-0 overflow-hidden">
-            <div class="absolute inset-0 overflow-hidden">
-                <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-6 sm:pl-10">
-                    <div x-show="cartOpen"
-                         x-transition:enter="transform transition ease-in-out duration-300 sm:duration-500"
-                         x-transition:enter-start="translate-x-full"
-                         x-transition:enter-end="translate-x-0"
-                         x-transition:leave="transform transition ease-in-out duration-300 sm:duration-500"
-                         x-transition:leave-start="translate-x-0"
-                         x-transition:leave-end="translate-x-full"
-                         class="pointer-events-auto w-screen max-w-md bg-white shadow-2xl flex flex-col">
-                        
-                        <!-- Header -->
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-gray-50/75">
-                            <div class="flex items-center gap-3">
-                                <h2 class="text-base font-serif font-bold uppercase tracking-wider text-gray-900" id="slide-over-title">Your Cart</h2>
-                                <span class="bg-black text-white text-xs font-bold px-2.5 py-0.5 rounded-full" x-text="cartCount"></span>
-                            </div>
-                            <button @click="closeCartDrawer()" type="button" class="p-2 text-gray-400 hover:text-black rounded-full hover:bg-gray-200/60 transition focus:outline-none">
-                                <span class="sr-only">Close cart</span>
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 pointer-events-none">
+            <div x-show="cartOpen"
+                 x-transition:enter="transform transition ease-in-out duration-300 sm:duration-500"
+                 x-transition:enter-start="translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transform transition ease-in-out duration-300 sm:duration-500"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="translate-x-full"
+                 class="pointer-events-auto w-screen max-w-md bg-white shadow-2xl flex flex-col h-full">
+                
+                <!-- Header -->
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-gray-50/75 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-base font-serif font-bold uppercase tracking-wider text-gray-900" id="slide-over-title">Your Cart</h2>
+                        <span class="bg-black text-white text-xs font-bold px-2.5 py-0.5 rounded-full" x-text="cartCount"></span>
+                    </div>
+                    <button @click.stop="closeCartDrawer()" type="button" class="p-2 text-gray-400 hover:text-black rounded-full hover:bg-gray-200/60 transition focus:outline-none cursor-pointer">
+                        <span class="sr-only">Close cart</span>
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Body (Item List) -->
+                <div class="flex-1 overflow-y-auto px-6 py-2 divide-y divide-gray-100 min-h-0">
+                    <!-- Loading indicator -->
+                    <div x-show="cartLoading" class="py-4 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
+                        <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
+                        <span>Updating cart...</span>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div x-show="!cartLoading && cartItems.length === 0" class="py-16 text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                         </div>
+                        <h3 class="text-base font-serif font-bold text-gray-900 mb-1">Your cart is empty</h3>
+                        <p class="text-xs text-gray-500 mb-6">Looks like you haven't added any pairs yet.</p>
+                        <a href="{{ route('shop.index') }}" @click="closeCartDrawer()" class="inline-block bg-black text-white px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition cursor-pointer">
+                            Start Shopping
+                        </a>
+                    </div>
 
-                        <!-- Body (Item List) -->
-                        <div class="flex-1 overflow-y-auto px-6 py-2 divide-y divide-gray-100">
-                            <!-- Loading indicator -->
-                            <div x-show="cartLoading" class="py-4 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
-                                <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                                </svg>
-                                <span>Updating cart...</span>
+                    <!-- Items Loop -->
+                    <template x-for="item in cartItems" :key="item.id">
+                        <div class="py-4 flex gap-4">
+                            <!-- Image -->
+                            <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-sm border border-gray-100 bg-gray-50">
+                                <img :src="item.image" :alt="item.name" class="h-full w-full object-contain object-center">
                             </div>
 
-                            <!-- Empty State -->
-                            <div x-show="!cartLoading && cartItems.length === 0" class="py-16 text-center">
-                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                                </div>
-                                <h3 class="text-base font-serif font-bold text-gray-900 mb-1">Your cart is empty</h3>
-                                <p class="text-xs text-gray-500 mb-6">Looks like you haven't added any pairs yet.</p>
-                                <a href="{{ route('shop.index') }}" @click="closeCartDrawer()" class="inline-block bg-black text-white px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition">
-                                    Start Shopping
-                                </a>
-                            </div>
-
-                            <!-- Items Loop -->
-                            <template x-for="item in cartItems" :key="item.id">
-                                <div class="py-4 flex gap-4">
-                                    <!-- Image -->
-                                    <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-sm border border-gray-100 bg-gray-50">
-                                        <img :src="item.image" :alt="item.name" class="h-full w-full object-contain object-center">
+                            <!-- Details -->
+                            <div class="flex-1 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-start gap-2">
+                                        <a :href="item.url" class="text-xs sm:text-sm font-bold text-gray-900 hover:underline line-clamp-1 cursor-pointer" x-text="item.name"></a>
+                                        <!-- Remove button -->
+                                        <button type="button" @click.stop="removeCartItem(item.id)" class="text-gray-400 hover:text-red-600 transition p-1.5 cursor-pointer focus:outline-none" title="Remove item">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
                                     </div>
-
-                                    <!-- Details -->
-                                    <div class="flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div class="flex justify-between items-start gap-2">
-                                                <a :href="item.url" class="text-xs sm:text-sm font-bold text-gray-900 hover:underline line-clamp-1" x-text="item.name"></a>
-                                                <!-- Remove button -->
-                                                <button type="button" @click="removeCartItem(item.id)" class="text-gray-400 hover:text-red-600 transition p-1">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                                </button>
-                                            </div>
-                                            <template x-if="item.variant">
-                                                <p class="text-xs text-gray-500 mt-0.5" x-text="item.variant"></p>
-                                            </template>
-                                        </div>
-
-                                        <div class="flex justify-between items-end mt-3">
-                                            <!-- Qty Controls -->
-                                            <div class="flex items-center border border-gray-200 rounded-sm">
-                                                <button type="button" @click="updateCartItemQty(item.id, item.quantity - 1)" class="px-2.5 py-0.5 text-gray-500 hover:text-black text-xs font-bold hover:bg-gray-100 transition">-</button>
-                                                <span class="px-2 py-0.5 text-xs font-bold text-gray-900 min-w-[1.5rem] text-center" x-text="item.quantity"></span>
-                                                <button type="button" @click="updateCartItemQty(item.id, item.quantity + 1)" class="px-2.5 py-0.5 text-gray-500 hover:text-black text-xs font-bold hover:bg-gray-100 transition">+</button>
-                                            </div>
-                                            <p class="text-xs font-bold text-gray-900" x-text="item.total_formatted"></p>
-                                        </div>
-                                    </div>
+                                    <template x-if="item.variant">
+                                        <p class="text-xs text-gray-500 mt-0.5" x-text="item.variant"></p>
+                                    </template>
                                 </div>
-                            </template>
-                        </div>
 
-                        <!-- Footer -->
-                        <div x-show="cartItems.length > 0" class="border-t border-gray-100 px-6 py-5 bg-gray-50 space-y-4">
-                            <div class="flex justify-between text-sm font-bold text-gray-900">
-                                <span>Subtotal</span>
-                                <span x-text="cartTotalFormatted"></span>
-                            </div>
-                            <p class="text-[11px] text-gray-500 text-center">Free shipping & Cash on delivery available.</p>
-                            <div class="grid grid-cols-2 gap-3">
-                                <a href="{{ route('cart.index') }}" class="w-full text-center border border-black bg-white text-black py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-100 transition">
-                                    View Cart
-                                </a>
-                                <a href="{{ route('checkout.index') }}" style="background-color: #7B1B2A;" class="w-full text-center text-white py-3 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition">
-                                    Checkout
-                                </a>
+                                <div class="flex justify-between items-end mt-3">
+                                    <!-- Qty Controls -->
+                                    <div class="flex items-center border border-gray-200 rounded-sm">
+                                        <button type="button" @click.stop="updateCartItemQty(item.id, item.quantity - 1)" class="px-2.5 py-1 text-gray-600 hover:text-black text-xs font-bold hover:bg-gray-100 transition cursor-pointer focus:outline-none">-</button>
+                                        <span class="px-2 py-1 text-xs font-bold text-gray-900 min-w-[1.5rem] text-center select-none" x-text="item.quantity"></span>
+                                        <button type="button" @click.stop="updateCartItemQty(item.id, item.quantity + 1)" class="px-2.5 py-1 text-gray-600 hover:text-black text-xs font-bold hover:bg-gray-100 transition cursor-pointer focus:outline-none">+</button>
+                                    </div>
+                                    <p class="text-xs font-bold text-gray-900" x-text="item.total_formatted"></p>
+                                </div>
                             </div>
                         </div>
+                    </template>
+                </div>
 
+                <!-- Footer -->
+                <div x-show="cartItems.length > 0" class="border-t border-gray-100 px-6 py-5 bg-gray-50 space-y-4 flex-shrink-0">
+                    <div class="flex justify-between text-sm font-bold text-gray-900">
+                        <span>Subtotal</span>
+                        <span x-text="cartTotalFormatted"></span>
+                    </div>
+                    <p class="text-[11px] text-gray-500 text-center">Free shipping & Cash on delivery available.</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="{{ route('cart.index') }}" @click="closeCartDrawer()" class="w-full text-center border border-black bg-white text-black py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-100 transition cursor-pointer flex items-center justify-center">
+                            View Cart
+                        </a>
+                        <a href="{{ route('checkout.index') }}" @click="closeCartDrawer()" style="background-color: #7B1B2A;" class="w-full text-center text-white py-3 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition cursor-pointer flex items-center justify-center">
+                            Checkout
+                        </a>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
