@@ -70,7 +70,8 @@
                                         @endif
                                     </div>
 
-                                    <div class="ml-6 flex-1">
+                                    <div class="ml-6 flex-1 flex flex-col justify-between">
+                                        <div>
                                             <div class="flex justify-between text-base font-medium text-gray-900">
                                                 <h3>{{ $item->product->name }}</h3>
                                                 <div class="flex flex-col items-end">
@@ -87,7 +88,7 @@
                                             </div>
                                             <p class="mt-1 text-sm text-gray-500">{{ $item->variant ? $item->variant->size . ' | ' . $item->variant->color : '' }}</p>
                                         </div>
-                                        <div class="flex flex-1 items-end justify-between text-sm">
+                                        <div class="flex items-end justify-between text-sm pt-2">
                                             <p class="text-gray-500">Qty {{ $item->quantity }}</p>
                                         </div>
                                     </div>
