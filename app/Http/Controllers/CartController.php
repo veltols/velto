@@ -38,48 +38,7 @@ class CartController extends Controller
             return $price * $item->quantity;
         });
 
-        if (request()->wantsJson() || request()->ajax()) {
-            $formattedItems = $this->formatCartItems($cartItems);
-
-            return response()->json([
-                'success' => true,
-                'items' => $formattedItems,
-                'cart_count' => $cartItems->sum('quantity'),
-                'subtotal' => (float) $subtotal,
-                'cart_total' => 'PKR ' . number_format($subtotal),
-                'subtotal_formatted' => 'PKR ' . number_format($subtotal),
-            ]);
-        }
-
         return view('cart.index', compact('cartItems', 'subtotal'));
-    }
-
-    private function formatCartItems($cartItems)
-    {
-        return $cartItems->map(function ($item) {
-            $imagePath = $item->product->primaryImage ? $item->product->primaryImage->image_path : null;
-            $imageUrl = $imagePath
-                ? (Str::startsWith($imagePath, 'http') ? $imagePath : asset('storage/' . $imagePath))
-                : 'https://placehold.co/100x100?text=No+Img';
-            $price = $item->variant ? $item->variant->final_price : $item->product->price;
-
-            return [
-                'id' => $item->id,
-                'product_id' => $item->product_id,
-                'variant_id' => $item->product_variant_id,
-                'name' => $item->product->name,
-                'slug' => $item->product->slug,
-                'url' => route('product.show', $item->product->slug),
-                'image' => $imageUrl,
-                'variant' => $item->variant ? trim(($item->variant->size ? 'Size: ' . $item->variant->size : '') . ($item->variant->color ? ' / Color: ' . $item->variant->color : '')) : null,
-                'quantity' => (int) $item->quantity,
-                'stock' => $item->variant ? (int)$item->variant->stock_quantity : 99,
-                'price' => (float) $price,
-                'price_formatted' => 'PKR ' . number_format($price),
-                'total' => (float) ($price * $item->quantity),
-                'total_formatted' => 'PKR ' . number_format($price * $item->quantity),
-            ];
-        })->values();
     }
 
     public function store(Request $request)
@@ -137,8 +96,7 @@ class CartController extends Controller
         }
 
         // Recalculate totals for response
-        $currentCart = Cart::with(['product', 'product.primaryImage', 'variant'])
-            ->where('session_id', $sessionId)
+        $currentCart = Cart::where('session_id', $sessionId)
             ->when($userId, function($q) use ($userId) {
                 $q->orWhere('user_id', $userId);
             })->get();
@@ -159,7 +117,6 @@ class CartController extends Controller
             'message' => 'Item added to cart!',
             'cart_count' => $count,
             'cart_total' => 'PKR ' . number_format($total),
-            'items' => $this->formatCartItems($currentCart),
 
             // TikTok tracking data
             'product_id' => (string) $request->product_id,
@@ -196,8 +153,7 @@ class CartController extends Controller
         $sessionId = $this->getSessionId();
         $userId = auth()->id();
 
-        $currentCart = Cart::with(['product', 'product.primaryImage', 'variant'])
-            ->where('session_id', $sessionId)
+        $currentCart = Cart::where('session_id', $sessionId)
             ->when($userId, function($q) use ($userId) {
                 $q->orWhere('user_id', $userId);
             })->get();
@@ -215,8 +171,7 @@ class CartController extends Controller
             'success' => true,
             'cart_count' => $count,
             'cart_total' => 'PKR ' . number_format($total),
-            'item_subtotal' => 'PKR ' . number_format($itemSubtotal),
-            'items' => $this->formatCartItems($currentCart),
+            'item_subtotal' => 'PKR ' . number_format($itemSubtotal)
         ]);
     }
 
@@ -230,15 +185,14 @@ class CartController extends Controller
 
         $cartItem->delete();
 
-        if (request()->wantsJson() || request()->ajax()) {
+        if (request()->wantsJson()) {
             $sessionId = $this->getSessionId();
             $userId = auth()->id();
             
-            $currentCart = Cart::with(['product', 'product.primaryImage', 'variant'])
-                ->where('session_id', $sessionId)
-                ->when($userId, function($q) use ($userId) {
-                    $q->orWhere('user_id', $userId);
-                })->get();
+            $currentCart = Cart::where('session_id', $sessionId)
+            ->when($userId, function($q) use ($userId) {
+                $q->orWhere('user_id', $userId);
+            })->get();
 
             $count = $currentCart->sum('quantity');
             $total = $currentCart->sum(function($item) {
@@ -250,8 +204,7 @@ class CartController extends Controller
                 'success' => true,
                 'message' => 'Item removed',
                 'cart_count' => $count,
-                'cart_total' => 'PKR ' . number_format($total),
-                'items' => $this->formatCartItems($currentCart),
+                'cart_total' => 'PKR ' . number_format($total)
             ]);
         }
 
@@ -268,13 +221,12 @@ class CartController extends Controller
                 $q->orWhere('user_id', $userId);
             })->delete();
 
-        if (request()->wantsJson() || request()->ajax()) {
+        if (request()->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Cart cleared',
                 'cart_count' => 0,
-                'cart_total' => 'PKR 0',
-                'items' => [],
+                'cart_total' => 'PKR 0'
             ]);
         }
 
