@@ -273,20 +273,7 @@
                                         class="flex-1 bg-black text-white h-10 md:h-12 px-4 md:px-8 text-xs md:text-sm font-bold uppercase tracking-[0.15em] hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 flex items-center justify-center gap-2 md:gap-3 shadow-lg hover:shadow-xl whitespace-nowrap">
                                     <span x-text="loading ? 'Adding...' : (checkStockStatus().text === 'Out of Stock' ? 'Out of Stock' : 'Add to Bag')"></span>
                                     <svg x-show="!loading && checkStockStatus().text !== 'Out of Stock'" class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                                </button>
                             </div>
-
-                            <!-- Buy Now Button -->
-                            <button type="button"
-                                    @click="buyNow()"
-                                    :disabled="loading || !canAddToCart"
-                                    style="background-color:#7B1B2A;"
-                                    onmouseover="if(!this.disabled) this.style.backgroundColor='#5a1320'"
-                                    onmouseout="if(!this.disabled) this.style.backgroundColor='#7B1B2A'"
-                                    class="w-full text-white h-10 md:h-12 px-4 md:px-8 text-xs md:text-sm font-bold uppercase tracking-[0.15em] disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 flex items-center justify-center gap-2 md:gap-3 shadow-lg rounded-sm">
-                                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                <span x-text="loading ? 'Processing...' : 'Buy Now'"></span>
-                            </button>
 
                             <!-- WhatsApp Order Button -->
                             <a :href="generateWhatsAppLink()" target="_blank" style="background-color: #25D366;" onmouseover="this.style.backgroundColor='#128C7E'" onmouseout="this.style.backgroundColor='#25D366'" class="w-full text-white h-10 md:h-12 px-4 md:px-8 text-xs md:text-sm font-bold uppercase tracking-[0.15em] transition transform active:scale-95 flex items-center justify-center gap-2 md:gap-3 shadow-lg hover:shadow-xl rounded-sm">
@@ -673,39 +660,6 @@
                         .catch(() => {
                             this.loading = false;
                         });
-                },
-
-                async buyNow() {
-                    if (!this.canAddToCart) {
-                        showNotification('Please select a size', 'error');
-                        return;
-                    }
-                    this.loading = true;
-                    try {
-                        const response = await fetch("{{ route('cart.store') }}", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                            },
-                            body: JSON.stringify({
-                                product_id: this.product.id,
-                                quantity: this.quantity,
-                                variant_id: this.selectedVariant ? this.selectedVariant.id : null
-                            })
-                        });
-                        const data = await response.json();
-                        if (data.success) {
-                            window.location.href = "{{ route('checkout.index') }}";
-                        } else {
-                            showNotification(data.message || 'Could not process. Please try again.', 'error');
-                            this.loading = false;
-                        }
-                    } catch (error) {
-                        showNotification('Something went wrong. Please try again.', 'error');
-                        this.loading = false;
-                    }
                 }
             }
         }
