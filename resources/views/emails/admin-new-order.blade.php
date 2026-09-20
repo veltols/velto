@@ -256,6 +256,7 @@
             <table class="table-items">
                 <thead>
                     <tr>
+                        <th style="width: 50px;"></th>
                         <th>Item</th>
                         <th>Variant</th>
                         <th style="text-align:center;">Qty</th>
@@ -264,7 +265,22 @@
                 </thead>
                 <tbody>
                     @foreach($order->items as $item)
+                        @php
+                            $imgUrl = null;
+                            if ($item->product && $item->product->primaryImage && !empty($item->product->primaryImage->image_path)) {
+                                $path = $item->product->primaryImage->image_path;
+                                $imgUrl = str_starts_with($path, 'http') ? $path : url('storage/' . $path);
+                            } elseif ($item->product && $item->product->images && $item->product->images->isNotEmpty()) {
+                                $path = $item->product->images->first()->image_path;
+                                $imgUrl = str_starts_with($path, 'http') ? $path : url('storage/' . $path);
+                            } else {
+                                $imgUrl = url('images/hero-shoes.png');
+                            }
+                        @endphp
                         <tr>
+                            <td style="width: 50px; padding-right: 10px;">
+                                <img src="{{ $imgUrl }}" alt="{{ $item->product_name }}" width="44" height="44" style="width:44px; height:44px; object-fit:contain; background:#ffffff; border:1px solid #e4e4e7; border-radius:4px; display:block;">
+                            </td>
                             <td>
                                 <strong>{{ $item->product_name }}</strong>
                             </td>
