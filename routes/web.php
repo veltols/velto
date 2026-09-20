@@ -30,6 +30,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{category}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/products/{id}/quick-view', [ProductController::class, 'quickView'])->name('product.quick-view');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
@@ -39,6 +40,23 @@ Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.dest
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/preview/order-email/{id?}', function ($id = null) {
+    $order = $id ? \App\Models\Order::with(['items.product.primaryImage', 'items.product.images'])->find($id) 
+                 : \App\Models\Order::with(['items.product.primaryImage', 'items.product.images'])->latest()->first();
+    if (!$order) {
+        return 'No orders found in database to preview email with.';
+    }
+    return new \App\Mail\OrderConfirmationMail($order);
+})->name('email.preview');
+
+Route::get('/preview/admin-order-email/{id?}', function ($id = null) {
+    $order = $id ? \App\Models\Order::with(['items.product.primaryImage', 'items.product.images'])->find($id) 
+                 : \App\Models\Order::with(['items.product.primaryImage', 'items.product.images'])->latest()->first();
+    if (!$order) {
+        return 'No orders found in database to preview email with.';
+    }
+    return new \App\Mail\AdminNewOrderMail($order);
+})->name('email.admin.preview');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {

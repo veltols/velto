@@ -24,7 +24,7 @@
                         @foreach($order->items as $item)
                             <tr>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ $item->product_name }}</div>
+                                    <div class="text-sm font-medium text-gray-900"><a href="{{ route('product.show', $item?->product?->slug) }}" target="_blank">{{ $item->product_name }}</a></div>
                                     <div class="text-sm text-gray-500">{{ $item->variant_info }}</div>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">Rs. {{ number_format($item->price) }}</td>

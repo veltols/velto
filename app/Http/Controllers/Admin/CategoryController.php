@@ -26,7 +26,7 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|max:255',
             'parent_id' => 'nullable|exists:categories,id',
-            'description' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:8192',
             'is_active' => 'boolean',
             'display_order' => 'integer',
         ]);
@@ -55,6 +55,7 @@ class CategoryController extends Controller
             'name' => 'required|max:255',
             'parent_id' => 'nullable|exists:categories,id',
             'description' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:8192',
             'is_active' => 'boolean',
             'display_order' => 'integer',
         ]);

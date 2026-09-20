@@ -48,7 +48,7 @@ class ProductController extends Controller
             'sku' => 'nullable|unique:products,sku',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp,gif|max:8192',
             'variants' => 'nullable|array',
             'variants.*.size' => 'nullable|string',
             'variants.*.color' => 'nullable|string',

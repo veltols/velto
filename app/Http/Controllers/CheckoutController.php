@@ -165,6 +165,22 @@ class CheckoutController extends Controller
                 \Illuminate\Support\Facades\Log::error('WhatsApp notification failed: ' . $e->getMessage());
             }
 
+            try {
+                // 1. Send Order Confirmation Email to customer
+                if (!empty($order->email)) {
+                    $order->load(['items.product.primaryImage', 'items.product.images']);
+                    \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderConfirmationMail($order));
+                }
+
+                // 2. Send New Order Alert Email to store admin
+                $adminEmail = env('ADMIN_EMAIL', 'veltoleathershoes@gmail.com');
+                if (!empty($adminEmail)) {
+                    \Illuminate\Support\Facades\Mail::to($adminEmail)->send(new \App\Mail\AdminNewOrderMail($order));
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Order email sending failed: ' . $e->getMessage());
+            }
+
             // Redirect to success page with order details
              return redirect()->route('checkout.success', $order->id);
 

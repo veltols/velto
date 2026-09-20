@@ -21,6 +21,8 @@
                         <tr>
                             <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Title</th>
                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Image</th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Type</th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Order</th>
                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
                             <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                 <span class="sr-only">Actions</span>
@@ -33,11 +35,19 @@
                             <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $banner->title }}</td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                 @if($banner->image_path)
-                                    <img src="{{ Storage::url($banner->image_path) }}" alt="" class="h-10 w-10 rounded-full object-cover">
+                                    <img src="{{ Storage::url($banner->image_path) }}" alt="" class="h-10 w-16 rounded object-cover">
                                 @else
                                     <span class="text-gray-400">No Image</span>
                                 @endif
                             </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm">
+                                @if($banner->is_slider)
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800">Hero Slider</span>
+                                @else
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-purple-100 text-purple-800">Mid-page</span>
+                                @endif
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $banner->sort_order }}</td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm">
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $banner->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                                     {{ $banner->is_active ? 'Active' : 'Inactive' }}

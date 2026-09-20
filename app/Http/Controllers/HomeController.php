@@ -24,10 +24,14 @@ class HomeController extends Controller
             ->take(4)
             ->get();
 
-        $categories = Category::withCount('products')->where('is_active', true)->orderBy('display_order')->take(6)->get();
+        $categories = Category::with(['products.primaryImage'])->withCount('products')->where('is_active', true)->orderBy('display_order')->get();
 
-        $banner = Banner::where('is_active', true)->first();
+        // Hero slider banners (multiple, ordered)
+        $sliderBanners = Banner::where('is_active', true)->where('is_slider', true)->orderBy('sort_order')->get();
 
-        return view('home', compact('featured', 'newArrivals', 'categories', 'banner'));
+        // Mid-page single banner
+        $banner = Banner::where('is_active', true)->where('is_slider', false)->first();
+
+        return view('home', compact('featured', 'newArrivals', 'categories', 'banner', 'sliderBanners'));
     }
 }

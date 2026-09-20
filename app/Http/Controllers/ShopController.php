@@ -10,7 +10,7 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with('primaryImage', 'category', 'variants')
+        $query = Product::with('primaryImage', 'images', 'category', 'variants')
             ->where('is_active', true);
 
         $this->applyFilters($query, $request);
@@ -26,7 +26,7 @@ class ShopController extends Controller
     {
         $category = Category::where('slug', $slug)->firstOrFail();
         
-        $query = Product::with('primaryImage', 'category', 'variants')
+        $query = Product::with('primaryImage', 'images', 'category', 'variants')
             ->where('category_id', $category->id)
             ->where('is_active', true);
             

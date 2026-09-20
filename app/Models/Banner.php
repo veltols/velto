@@ -16,9 +16,12 @@ class Banner extends Model
         'button_link',
         'image_path',
         'is_active',
+        'is_slider',
+        'sort_order',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_slider' => 'boolean',
     ];
 }

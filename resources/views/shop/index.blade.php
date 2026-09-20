@@ -255,52 +255,9 @@
                     </div>
 
                     @if($products->count() > 0)
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
                             @foreach($products as $product)
-                                <div class="group cursor-pointer">
-                                    <div class="relative overflow-hidden bg-white aspect-square mb-4 rounded-sm p-6">
-                                         <a href="{{ route('product.show', $product->slug) }}">
-                                            @if($product->primaryImage)
-                                                <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" 
-                                                     alt="{{ $product->name }}" 
-                                                     class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
-                                                     onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
-                                            @elseif($product->images->isNotEmpty())
-                                                <img src="{{ asset('storage/' . $product->images->first()->image_path) }}" 
-                                                     alt="{{ $product->name }}" 
-                                                     class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
-                                                     onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
-                                            @else
-                                                <img src="https://placehold.co/400x500?text=No+Image+400x500" class="w-full h-full object-cover object-center">
-                                            @endif
-                                        </a>
-                                        @if($product->isOnSale())
-                                            <!-- Left Ribbon: Discount Percentage -->
-                                            <div class="absolute top-0 left-0 text-white font-extrabold text-center uppercase shadow-md" style="background-color: #7B1B2A; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%); font-size: 9px; padding: 8px 12px 14px 12px; line-height: 1; letter-spacing: 0.05em; z-index: 10;">
-                                                {{ $product->discountPercentage() }}% OFF
-                                            </div>
-                                            <!-- Right Badge: Sale -->
-                                            <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 10;">Sale</div>
-                                        @endif
-                                        @if($product->variants->sum('stock_quantity') <= 0)
-                                            <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 20;">Sold Out</div>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500 mb-1 tracking-wide">{{ $product->category->name ?? 'Category' }}</p>
-                                        <h3 class="text-base font-bold text-gray-900 mb-1">
-                                            <a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a>
-                                        </h3>
-                                        <div class="flex items-center gap-3">
-                                            @if($product->isOnSale())
-                                                <p class="text-sm text-black font-bold">Rs. {{ number_format($product->sale_price) }}</p>
-                                                <p class="text-xs text-gray-400 line-through">Rs. {{ number_format($product->base_price) }}</p>
-                                            @else
-                                                <p class="text-sm text-gray-900 font-medium">Rs. {{ number_format($product->base_price) }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
+                                <x-product-card :product="$product" />
                             @endforeach
                         </div>
 

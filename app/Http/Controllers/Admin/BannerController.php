@@ -11,7 +11,7 @@ class BannerController extends Controller
 {
     public function index()
     {
-        $banners = Banner::latest()->get();
+        $banners = Banner::orderBy('is_slider', 'desc')->orderBy('sort_order')->orderBy('created_at', 'desc')->get();
         return view('admin.banners.index', compact('banners'));
     }
 
@@ -23,12 +23,14 @@ class BannerController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'text' => 'nullable|string',
+            'title'       => 'required|string|max:255',
+            'text'        => 'nullable|string',
             'button_text' => 'required|string|max:50',
             'button_link' => 'required|string|max:255',
-            'image' => 'nullable|image|max:2048', // 2MB Max
-            'is_active' => 'boolean',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:8192',
+            'is_active'   => 'boolean',
+            'is_slider'   => 'boolean',
+            'sort_order'  => 'nullable|integer|min:0',
         ]);
 
         if ($request->hasFile('image')) {
@@ -36,12 +38,13 @@ class BannerController extends Controller
             $validated['image_path'] = $path;
         }
 
-        if ($request->has('is_active') && $request->is_active) {
-            // Deactivate other banners if this one is active
-            Banner::where('is_active', true)->update(['is_active' => false]);
-            $validated['is_active'] = true;
-        } else {
-             $validated['is_active'] = false;
+        $validated['is_active'] = $request->boolean('is_active');
+        $validated['is_slider'] = $request->boolean('is_slider');
+        $validated['sort_order'] = $request->input('sort_order', 0);
+
+        // If NOT a slider banner, only one mid-page banner can be active at a time
+        if ($validated['is_active'] && !$validated['is_slider']) {
+            Banner::where('is_active', true)->where('is_slider', false)->update(['is_active' => false]);
         }
 
         Banner::create($validated);
@@ -57,12 +60,14 @@ class BannerController extends Controller
     public function update(Request $request, Banner $banner)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'text' => 'nullable|string',
+            'title'       => 'required|string|max:255',
+            'text'        => 'nullable|string',
             'button_text' => 'required|string|max:50',
             'button_link' => 'required|string|max:255',
-            'image' => 'nullable|image|max:2048',
-            'is_active' => 'boolean',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:8192',
+            'is_active'   => 'boolean',
+            'is_slider'   => 'boolean',
+            'sort_order'  => 'nullable|integer|min:0',
         ]);
 
         if ($request->hasFile('image')) {
@@ -73,11 +78,13 @@ class BannerController extends Controller
             $validated['image_path'] = $path;
         }
 
-        if ($request->has('is_active') && $request->is_active) {
-            Banner::where('id', '!=', $banner->id)->where('is_active', true)->update(['is_active' => false]);
-            $validated['is_active'] = true;
-        } else {
-             $validated['is_active'] = false;
+        $validated['is_active'] = $request->boolean('is_active');
+        $validated['is_slider'] = $request->boolean('is_slider');
+        $validated['sort_order'] = $request->input('sort_order', 0);
+
+        // If NOT a slider banner, only one mid-page banner can be active at a time
+        if ($validated['is_active'] && !$validated['is_slider']) {
+            Banner::where('id', '!=', $banner->id)->where('is_active', true)->where('is_slider', false)->update(['is_active' => false]);
         }
 
         $banner->update($validated);

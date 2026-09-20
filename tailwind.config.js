@@ -23,5 +23,18 @@ export default {
         },
     },
 
+    safelist: [
+        'group-hover:opacity-0',
+        'group-hover:opacity-100',
+        'group-hover:translate-y-0',
+        'translate-y-2',
+        'opacity-0',
+        'opacity-100',
+        'z-10',
+        'z-20',
+        'z-30',
+        'line-clamp-3',
+    ],
+
     plugins: [forms, typography, aspectRatio],
 };

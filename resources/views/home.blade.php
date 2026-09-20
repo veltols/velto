@@ -2,7 +2,161 @@
     @section('title', 'Luxury Leather Shoes')
     @section('meta_description', 'Velto - Exquisite craftsmanship and modern luxury. Shop our 2026 Artisan Collection of handcrafted leather shoes.')
     @section('og_image', asset('images/velto_banner_wide.png'))
-    <!-- Hero Section -->
+    <!-- Hero Slider Section -->
+    @if($sliderBanners->isNotEmpty())
+    <section class="relative w-full overflow-hidden hero-slider-section">
+
+        <!-- Swiper CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+        <div class="swiper hero-swiper" style="width:100%;height:100%;">
+            <div class="swiper-wrapper">
+                @foreach($sliderBanners as $slide)
+                <div class="swiper-slide">
+                    <div class="relative w-full h-full flex items-center justify-center">
+                        {{-- Background image --}}
+                        @if($slide->image_path)
+                            <img src="{{ Storage::url($slide->image_path) }}"
+                                 alt="{{ $slide->title }}"
+                                 class="absolute inset-0 w-full h-full object-cover object-center">
+                        @else
+                            <div class="absolute inset-0 bg-gray-900"></div>
+                        @endif
+
+                        {{-- Subtle Dark Scrim for Text Legibility --}}
+                        <div class="absolute inset-0 bg-black/30"></div>
+
+                        {{-- Slide Content (Centered straddling split background) --}}
+                        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center text-center">
+                            <div class="max-w-3xl text-white flex flex-col items-center justify-center swiper-slide-content">
+                                
+                                {{-- Main Title --}}
+                                @if($slide->title)
+                                    <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal tracking-wide text-white mb-3 sm:mb-5 leading-tight drop-shadow-lg">
+                                        {!! nl2br(e($slide->title)) !!}
+                                    </h1>
+                                @endif
+
+                                {{-- Subtitle / Description --}}
+                                @if($slide->text)
+                                    <p class="text-sm sm:text-base md:text-lg text-white/95 max-w-xl sm:max-w-2xl mx-auto font-light leading-relaxed mb-6 sm:mb-8 tracking-wide drop-shadow-md">
+                                        {{ $slide->text }}
+                                    </p>
+                                @endif
+
+                                {{-- Button --}}
+                                @if($slide->button_text)
+                                    <div>
+                                        <a href="{{ $slide->button_link }}"
+                                           class="inline-block bg-black text-white px-8 py-3.5 sm:px-10 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] hover:bg-gray-800 transition-all duration-300 shadow-xl border border-white/20">
+                                            {{ $slide->button_text }}
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            {{-- Navigation Arrows --}}
+            <div class="swiper-button-next hero-swiper-next"></div>
+            <div class="swiper-button-prev hero-swiper-prev"></div>
+
+            {{-- Pagination Dots --}}
+            <div class="swiper-pagination hero-swiper-pagination"></div>
+        </div>
+
+        <style>
+            .hero-slider-section {
+                height: 560px !important;
+                min-height: 420px !important;
+                width: 100% !important;
+                position: relative !important;
+                display: block !important;
+            }
+            @media (max-width: 1024px) {
+                .hero-slider-section {
+                    height: 480px !important;
+                }
+            }
+            @media (max-width: 640px) {
+                .hero-slider-section {
+                    height: 380px !important;
+                    min-height: 320px !important;
+                }
+            }
+            .hero-swiper .swiper-button-next,
+            .hero-swiper .swiper-button-prev {
+                color: #fff;
+                background: rgba(0,0,0,0.35);
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                border: 1px solid rgba(255,255,255,0.4);
+                transition: all 0.3s ease;
+                z-index: 20;
+            }
+            .hero-swiper .swiper-button-next:hover,
+            .hero-swiper .swiper-button-prev:hover {
+                background: rgba(0,0,0,0.8);
+                border-color: #fff;
+                transform: scale(1.08);
+            }
+            .hero-swiper .swiper-button-next::after,
+            .hero-swiper .swiper-button-prev::after {
+                font-size: 16px;
+                font-weight: 700;
+            }
+            .hero-swiper .swiper-pagination-bullet {
+                width: 24px;
+                height: 3px;
+                border-radius: 0;
+                background: rgba(255,255,255,0.5);
+                opacity: 1;
+                transition: all 0.3s ease;
+            }
+            .hero-swiper .swiper-pagination-bullet-active {
+                background: #fff;
+                width: 40px;
+            }
+        </style>
+
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof Swiper !== 'undefined') {
+                    initHeroSwiper();
+                } else {
+                    window.addEventListener('load', initHeroSwiper);
+                }
+
+                function initHeroSwiper() {
+                    new Swiper('.hero-swiper', {
+                        loop: true,
+                        speed: 800,
+                        autoplay: {
+                            delay: 5000,
+                            disableOnInteraction: false,
+                        },
+                        effect: 'fade',
+                        fadeEffect: { crossFade: true },
+                        navigation: {
+                            nextEl: '.hero-swiper-next',
+                            prevEl: '.hero-swiper-prev',
+                        },
+                        pagination: {
+                            el: '.hero-swiper-pagination',
+                            clickable: true,
+                        }
+                    });
+                }
+            });
+        </script>
+    </section>
+    @else
+    {{-- Fallback: Static hero when no slider banners configured --}}
     <section class="relative w-full overflow-hidden" style="height: 800px; min-height: 800px;">
         <div class="absolute inset-0">
             <img src="{{ asset('images/hero_banner.png') }}" alt="Velto Luxury Collection" class="w-full h-full object-cover object-center transform scale-105">
@@ -28,56 +182,159 @@
             </div>
         </div>
     </section>
+    @endif
 
-    <!-- Categories Grid (Ashion Style) -->
-    <section class="py-20 bg-white">
+    <!-- Categories Section -->
+    <section class="py-20 bg-white border-b border-gray-100">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach($categories->take(4) as $category)
-                    @php
-                        // Masonry Layout Logic
-                        $colSpan = 'col-span-1';
-                        $rowSpan = '';
-                        $height = 'h-[290px]';
-                        
-                        if ($loop->index == 0) {
-                            $colSpan = 'col-span-1 md:col-span-2';
-                            $rowSpan = 'row-span-2';
-                            $height = 'h-[600px]';
-                        } elseif ($loop->index == 3) {
-                            $colSpan = 'col-span-1 md:col-span-2';
-                        }
+            
+            {{-- Section Header --}}
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 md:gap-0">
+                <div>
+                    <span class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-2 block">Categories</span>
+                    <h2 class="text-4xl font-serif font-bold text-gray-900">Shop By Category</h2>
+                </div>
+                <a href="{{ route('shop.index') }}" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition flex items-center group">
+                    View All Categories
+                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
 
-                        // Handle Category Image
-                        if ($category->image) {
-                            $imageUrl = asset('storage/' . $category->image);
-                        } else {
-                            // Fallback based on index for variety
-                            if ($loop->index == 0) {
-                                 $imageUrl = 'https://placehold.co/800x600?text=' . urlencode($category->name);
-                            } elseif ($loop->index == 3) {
-                                 $imageUrl = 'https://placehold.co/800x290?text=' . urlencode($category->name);
+            {{-- Categories Grid (Matches Featured & New Arrivals layout) --}}
+            @if($categories->isNotEmpty())
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+                @foreach($categories as $category)
+                    @php
+                        $imageUrl = null;
+                        
+                        // 1. Primary: Use 'image' column from categories table
+                        if (!empty($category->image)) {
+                            if (\Illuminate\Support\Str::startsWith($category->image, ['http://', 'https://'])) {
+                                $imageUrl = $category->image;
                             } else {
-                                 $imageUrl = 'https://placehold.co/400x290?text=' . urlencode($category->name);
+                                $imageUrl = asset('storage/' . $category->image);
                             }
+                        } 
+                        // 2. Secondary: Fallback to first product image in this category
+                        elseif ($category->products->isNotEmpty() && $category->products->first()->primaryImage) {
+                            $imageUrl = asset('storage/' . $category->products->first()->primaryImage->image_path);
+                        } 
+                        // 3. Fallback default
+                        else {
+                            $imageUrl = asset('images/hero-shoes.png');
                         }
                     @endphp
 
-                    <div class="{{ $colSpan }} {{ $rowSpan }} relative group overflow-hidden {{ $height }}">
-                        <img src="{{ $imageUrl }}" 
-                             alt="{{ $category->name }}" 
-                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                             onerror="this.onerror=null;this.src='https://placehold.co/800x600?text=Image+Not+Found';">
-                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all"></div>
-                        <div style="position: absolute; bottom: 20px; left: 20px; padding: 24px; background-color: rgba(0, 0, 0, 0.6); max-width: 85%; z-index: 10; border-radius: 12px;">
-                            <h3 style="color: white; margin-bottom: 8px;" class="{{ $loop->index == 0 ? 'text-4xl' : 'text-2xl' }} font-serif font-bold">{{ $category->name }}</h3>
-                            <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 16px;" class="text-sm">{{ $category->products_count }} items</p>
-                            <a href="{{ route('shop.category', $category->slug) }}" class="inline-block bg-white text-black px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all duration-300 rounded-md">
-                                Shop Now
+                    <div class="group cursor-pointer">
+                        <div class="relative overflow-hidden bg-gray-100 aspect-[4/5] mb-4 rounded-none">
+                            <a href="{{ route('shop.category', $category->slug) }}" class="block w-full h-full">
+                                <img src="{{ $imageUrl }}" 
+                                     alt="{{ $category->name }}" 
+                                     class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
+                                     onerror="this.onerror=null;this.src='{{ asset('images/hero-shoes.png') }}';">
+                                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition duration-300"></div>
+                                
+                                {{-- Item Count Badge matching Product Badges --}}
+                                <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 10;">
+                                    {{ $category->products_count }} {{ \Illuminate\Support\Str::plural('item', $category->products_count) }}
+                                </div>
+                            </a>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold text-gray-400 tracking-[0.2em] uppercase block mb-1">COLLECTION</span>
+                            <h3 class="text-xl sm:text-2xl font-serif font-bold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                                <a href="{{ route('shop.category', $category->slug) }}">{{ $category->name }}</a>
+                            </h3>
+                            <a href="{{ route('shop.category', $category->slug) }}" class="inline-flex items-center text-xs font-bold uppercase tracking-[0.2em] text-gray-800 hover:text-black transition group/btn mt-1">
+                                <span class="leading-tight text-left">SHOP<br>COLLECTION</span>
+                                <svg class="w-6 h-6 ml-3 transform group-hover/btn:translate-x-1.5 transition-transform duration-300 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"></path>
+                                </svg>
                             </a>
                         </div>
                     </div>
                 @endforeach
+            </div>
+
+            {{-- Centered Solid Black VIEW ALL Button for Categories --}}
+            <div class="mt-14 text-center">
+                <a href="{{ route('shop.index') }}" class="inline-block bg-black text-white px-12 py-4 text-xs sm:text-sm font-bold uppercase tracking-[0.25em] hover:bg-gray-800 transition duration-300 rounded-none shadow-sm">
+                    VIEW ALL
+                </a>
+            </div>
+            @endif
+
+        </div>
+    </section>
+
+    <!-- New Arrivals Section (Immediately below Categories) -->
+    <section id="new-arrivals" class="py-24 bg-gray-50 border-t border-b border-gray-100">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 md:gap-0">
+                <div>
+                    <span class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-2 block">Exclusive</span>
+                    <h2 class="text-4xl font-serif font-bold text-gray-900">New Arrivals</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
+                @foreach($newArrivals as $product)
+                    <x-product-card :product="$product" />
+                @endforeach
+            </div>
+
+            {{-- Image 2: Solid Black VIEW ALL Button --}}
+            <div class="mt-14 text-center">
+                <a href="{{ route('shop.index') }}" class="inline-block bg-black text-white px-12 py-4 text-xs sm:text-sm font-bold uppercase tracking-[0.25em] hover:bg-black transition duration-300 rounded-none shadow-sm">
+                    VIEW ALL
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Side-by-Side Promo Banner Section (Directly below New Arrivals) -->
+    <section class="py-20 sm:py-24 bg-white border-b border-gray-100">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                
+                {{-- Left Image: Studio Shot --}}
+                <div class="group relative overflow-hidden aspect-[4/5] bg-[#f5f2ee] rounded-none border border-gray-100 shadow-sm">
+                    <a href="{{ route('shop.index') }}" class="block w-full h-full">
+                        <img src="{{ asset('images/pro2.webp') }}" 
+                             alt="Velto Crocodile Leather Loafers" 
+                             class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105">
+                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition duration-300"></div>
+                        
+                        <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-6 border border-gray-100 shadow-lg transition-transform duration-300 group-hover:-translate-y-1">
+                            <span class="text-[11px] font-bold text-gray-400 tracking-[0.25em] uppercase block mb-1">Croco Collection</span>
+                            <h3 class="text-2xl font-serif font-bold text-gray-900 mb-3">Crocodile Leather Loafers</h3>
+                            <div class="inline-flex items-center text-xs font-bold uppercase tracking-[0.2em] text-black hover:text-gray-700 transition">
+                                <span>SHOP NOW</span>
+                                <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- Right Image: On-Model Lookbook --}}
+                <div class="group relative overflow-hidden aspect-[4/5] bg-[#f5f2ee] rounded-none border border-gray-100 shadow-sm">
+                    <a href="{{ route('shop.index') }}" class="block w-full h-full">
+                        <img src="{{ asset('images/pro1.webp') }}" 
+                             alt="Velto Gentleman Lookbook" 
+                             class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105">
+                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition duration-300"></div>
+                        
+                        <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-6 border border-gray-100 shadow-lg transition-transform duration-300 group-hover:-translate-y-1">
+                            <span class="text-[11px] font-bold text-gray-400 tracking-[0.25em] uppercase block mb-1">Lookbook 2026</span>
+                            <h3 class="text-2xl font-serif font-bold text-gray-900 mb-3">The Gentleman's Stride</h3>
+                            <div class="inline-flex items-center text-xs font-bold uppercase tracking-[0.2em] text-black hover:text-gray-700 transition">
+                                <span>DISCOVER MORE</span>
+                                <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
             </div>
         </div>
     </section>
@@ -87,161 +344,117 @@
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 md:gap-0">
                 <div>
-                     <span class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-2 block">Special</span>
-                    <h2 class="text-4xl font-serif font-bold">Featured Items</h2>
+                    <span class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-2 block">Special</span>
+                    <h2 class="text-4xl font-serif font-bold text-gray-900">Featured Items</h2>
                 </div>
-                <a href="{{ route('shop.index') }}" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition flex items-center group">
-                    View All Products
-                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
                 @foreach($featured as $product)
-                    <div class="group cursor-pointer">
-                        <div class="relative overflow-hidden bg-white aspect-square mb-4 rounded-sm p-6">
-                             <a href="{{ route('product.show', $product->slug) }}">
-                                @if($product->primaryImage)
-                                    <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" 
-                                         alt="{{ $product->name }}" 
-                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
-                                         onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
-                                @elseif($product->images->isNotEmpty())
-                                    <img src="{{ asset('storage/' . $product->images->first()->image_path) }}" 
-                                         alt="{{ $product->name }}" 
-                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
-                                         onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
-                                @else
-                                    <img src="https://placehold.co/400x500?text=No+Image+400x500" class="w-full h-full object-cover object-center">
-                                @endif
-                            </a>
-                            
-
-                             @if($product->isOnSale())
-                                 <!-- Left Ribbon: Discount Percentage -->
-                                 <div class="absolute top-0 left-0 text-white font-extrabold text-center uppercase shadow-md" style="background-color: #7B1B2A; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%); font-size: 9px; padding: 8px 12px 14px 12px; line-height: 1; letter-spacing: 0.05em; z-index: 10;">
-                                     {{ $product->discountPercentage() }}% OFF
-                                 </div>
-                                 <!-- Right Badge: Sale -->
-                                 <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 10;">Sale</div>
-                             @endif
-                             @if($product->variants->sum('stock_quantity') <= 0)
-                                 <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 20;">Sold Out</div>
-                            @endif
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500 mb-1 tracking-wide">{{ $product->category->name ?? 'Category' }}</p>
-                            <h3 class="text-base font-bold text-gray-900 mb-1">
-                                <a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a>
-                            </h3>
-                            <div class="flex items-center gap-3">
-                                @if($product->isOnSale())
-                                    <p class="text-sm text-black font-bold">Rs. {{ number_format($product->sale_price) }}</p>
-                                    <p class="text-xs text-gray-400 line-through">Rs. {{ number_format($product->base_price) }}</p>
-                                @else
-                                    <p class="text-sm text-gray-900 font-medium">Rs. {{ number_format($product->base_price) }}</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+                    <x-product-card :product="$product" />
                 @endforeach
             </div>
-        </div>
-    </section>
 
-    <!-- Mid-page Banner -->
-    @if($banner)
-    <section class="relative w-full bg-center bg-cover bg-no-repeat flex items-center justify-center" style="height: 600px; min-height: 600px; background-image: url('{{ $banner->image_path ? Storage::url($banner->image_path) : 'https://placehold.co/1920x800/000000/ffffff?text=' . urlencode($banner->title) }}');">
-        <div class="absolute inset-0 bg-black/60"></div>
-        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
-            @if($banner->text)
-            <span class="block text-sm md:text-base font-bold uppercase tracking-[0.3em] mb-4 text-white/70 animate-fade-in">{{ $banner->text }}</span>
-            @endif
-            <h2 class="text-4xl md:text-6xl font-serif font-bold mb-8 text-white leading-tight">{{ $banner->title }}</h2>
-            <a href="{{ $banner->button_link }}" class="inline-block bg-black text-white px-10 py-4 text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-black transition duration-300 transform hover:-translate-y-1">
-                {{ $banner->button_text }}
-            </a>
-        </div>
-    </section>
-    @else
-    <section class="relative w-full bg-center bg-cover bg-no-repeat flex items-center justify-center" style="height: 800px; min-height: 800px; background-image: url('https://placehold.co/1920x800/000000/ffffff?text=Velto+Luxury+Collection');">
-        <div class="absolute inset-0 bg-black/60"></div>
-        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
-            <span class="block text-sm md:text-base font-bold uppercase tracking-[0.3em] mb-4 text-white/70 animate-fade-in">The Art of Shoemaking</span>
-            <h2 class="text-4xl md:text-6xl font-serif font-bold mb-8 text-white leading-tight">Handcrafted Perfection</h2>
-            <p class="text-lg md:text-xl text-gray-200 mb-10 font-light leading-relaxed max-w-2xl mx-auto">
-                While trends fade, quality endures. Discover the meticulous process behind every pair of Velto shoes, crafted to stand the test of time.
-            </p>
-            <a href="{{ route('shop.index') }}" class="inline-block border-2 border-white text-white px-10 py-4 text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-black transition duration-300 transform hover:-translate-y-1">
-                Discover More
-            </a>
-        </div>
-    </section>
-    @endif
-
-    <!-- New Arrivals -->
-    <section id="new-arrivals" class="py-24 bg-gray-50">
-        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 md:gap-0">
-                <div>
-                     <span class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-2 block">Exclusive</span>
-                    <h2 class="text-4xl font-serif font-bold">New Arrivals</h2>
-                </div>
-                <a href="{{ route('shop.index') }}" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition flex items-center group">
-                    View All
-                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            {{-- Image 2: Solid Black VIEW ALL Button --}}
+            <div class="mt-14 text-center">
+                <a href="{{ route('shop.index') }}" class="inline-block bg-black text-white px-12 py-4 text-xs sm:text-sm font-bold uppercase tracking-[0.25em] hover:bg-black transition duration-300 rounded-none shadow-sm">
+                    VIEW ALL
                 </a>
             </div>
+        </div>
+    </section>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
-                @foreach($newArrivals as $product)
-                    <div class="group cursor-pointer">
-                        <div class="relative overflow-hidden bg-white aspect-square mb-4 rounded-sm p-6">
-                             <a href="{{ route('product.show', $product->slug) }}">
-                                @if($product->primaryImage)
-                                    <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" 
-                                         alt="{{ $product->name }}" 
-                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
-                                         onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
-                                @elseif($product->images->isNotEmpty())
-                                    <img src="{{ asset('storage/' . $product->images->first()->image_path) }}" 
-                                         alt="{{ $product->name }}" 
-                                         class="w-full h-full object-contain object-center transition duration-700 ease-out group-hover:scale-105"
-                                         onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
-                                @else
-                                    <img src="https://placehold.co/400x500?text=No+Image+400x500" class="w-full h-full object-cover object-center">
-                                @endif
-                            </a>
-                            
+    <!-- Why Choose Velto / Mid-page Feature Section -->
+    <section class="py-16 sm:py-24 bg-white border-t border-b border-gray-100">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
+            <div class="flex flex-col lg:flex-row items-stretch overflow-hidden bg-[#faf9f6] rounded-none border border-gray-200/80 shadow-lg">
+                
+                {{-- Left Side: Image Container (50% on lg) --}}
+                <div class="w-full lg:w-1/2 relative min-h-[360px] sm:min-h-[460px] lg:min-h-[540px] overflow-hidden group bg-gray-100">
+                    @php
+                        $midBannerImg = ($banner && $banner->image_path) 
+                            ? Storage::url($banner->image_path) 
+                            : asset('images/why_choose_velto.jpg');
+                    @endphp
+                    <img src="{{ $midBannerImg }}" 
+                         alt="{{ ($banner && $banner->title) ? $banner->title : 'Velto Leather Collection' }}" 
+                         class="absolute inset-0 w-full h-full object-cover object-left sm:object-center transition-transform duration-1000 ease-out group-hover:scale-105"
+                         onerror="this.onerror=null;this.src='{{ asset('images/why_choose_velto.jpg') }}';">
+                    
+                    {{-- Subtle Overlay --}}
+                    <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors duration-300"></div>
 
-                             @if($product->isOnSale())
-                                 <!-- Left Ribbon: Discount Percentage -->
-                                 <div class="absolute top-0 left-0 text-white font-extrabold text-center uppercase shadow-md" style="background-color: #7B1B2A; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%); font-size: 9px; padding: 8px 12px 14px 12px; line-height: 1; letter-spacing: 0.05em; z-index: 10;">
-                                     {{ $product->discountPercentage() }}% OFF
-                                 </div>
-                                 <!-- Right Badge: Sale -->
-                                 <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 10;">Sale</div>
-                             @endif
-                             @if($product->variants->sum('stock_quantity') <= 0)
-                                 <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 20;">Sold Out</div>
-                            @endif
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500 mb-1 tracking-wide">{{ $product->category->name ?? 'Category' }}</p>
-                            <h3 class="text-base font-bold text-gray-900 mb-1">
-                                <a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a>
-                            </h3>
-                            <div class="flex items-center gap-3">
-                                @if($product->isOnSale())
-                                    <p class="text-sm text-black font-bold">Rs. {{ number_format($product->sale_price) }}</p>
-                                    <p class="text-xs text-gray-400 line-through">Rs. {{ number_format($product->base_price) }}</p>
-                                @else
-                                    <p class="text-sm text-gray-900 font-medium">Rs. {{ number_format($product->base_price) }}</p>
-                                @endif
+                    {{-- Floating Glass Badge on Image --}}
+                    <div class="absolute bottom-6 left-6 bg-black/85 backdrop-blur-md px-5 py-3 border border-white/20 text-white flex items-center gap-3 shadow-xl">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span class="text-xs font-bold tracking-[0.2em] uppercase text-gray-100">Artisan Handcrafted</span>
+                    </div>
+                </div>
+
+                {{-- Right Side: Elegant Light Luxury Content Panel (50% on lg) --}}
+                <div class="w-full lg:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center items-start text-left bg-[#faf9f6] text-gray-900 relative">
+                    
+                    {{-- Sub-tag & Accent Line --}}
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-8 h-[2px] bg-black"></span>
+                        <span class="text-xs font-bold uppercase tracking-[0.3em] text-gray-500">Heritage Collection</span>
+                    </div>
+
+                    {{-- Main Title --}}
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold tracking-tight text-gray-900 mb-5 leading-tight">
+                        {{ ($banner && $banner->title) ? $banner->title : 'Velto Leather Collection' }}
+                    </h2>
+
+                    {{-- Description --}}
+                    <p class="text-sm sm:text-base text-gray-600 font-light leading-relaxed mb-8 max-w-xl">
+                        {{ ($banner && $banner->text) ? $banner->text : 'Refined craftsmanship meets modern elegance in every pair. Handcrafted from top-grain leather in small batches with meticulous attention to detail.' }}
+                    </p>
+
+                    {{-- Key Features Highlights Grid --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 mb-10 w-full pt-6 border-t border-gray-200">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-5 h-5 rounded-full bg-black/5 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3.5 h-3.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                             </div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-gray-800">Full-Grain Leather</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-5 h-5 rounded-full bg-black/5 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3.5 h-3.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-gray-800">Hand-Stitched Finish</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-5 h-5 rounded-full bg-black/5 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3.5 h-3.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-gray-800">Ergonomic Comfort</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-5 h-5 rounded-full bg-black/5 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3.5 h-3.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-gray-800">Master Craftsmanship</span>
                         </div>
                     </div>
-                @endforeach
+
+                    {{-- Button --}}
+                    @php
+                        $targetLink = route('shop.index');
+                        if ($banner && $banner->button_link) {
+                            $targetLink = $banner->button_link;
+                        }
+                    @endphp
+                    <div>
+                        <a href="{{ $targetLink }}" 
+                           class="inline-flex items-center justify-center bg-black text-white px-10 py-4 text-xs sm:text-sm font-bold uppercase tracking-[0.25em] hover:bg-black transition-all duration-300 shadow-lg group/btn hover:shadow-xl">
+                            <span>{{ ($banner && $banner->button_text) ? $banner->button_text : 'SHOP NOW' }}</span>
+                            <svg class="w-4 h-4 ml-3 transform group-hover/btn:translate-x-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </section>
