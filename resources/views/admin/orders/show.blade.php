@@ -22,14 +22,48 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @foreach($order->items as $item)
+                            @php
+                                $imgUrl = null;
+                                if ($item->product && $item->product->primaryImage) {
+                                    $imgUrl = asset('storage/' . $item->product->primaryImage->image_path);
+                                } elseif ($item->product && $item->product->images && $item->product->images->isNotEmpty()) {
+                                    $imgUrl = asset('storage/' . $item->product->images->first()->image_path);
+                                } else {
+                                    $imgUrl = asset('images/hero-shoes.png');
+                                }
+                            @endphp
                             <tr>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-900"><a href="{{ route('product.show', $item?->product?->slug) }}" target="_blank">{{ $item->product_name }}</a></div>
-                                    <div class="text-sm text-gray-500">{{ $item->variant_info }}</div>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="h-14 w-14 flex-shrink-0 bg-white border border-gray-200 rounded p-1 flex items-center justify-center">
+                                            @if($item->product)
+                                                <a href="{{ route('product.show', $item->product->slug) }}" target="_blank">
+                                                    <img class="h-full w-full object-contain" src="{{ $imgUrl }}" alt="{{ $item->product_name }}">
+                                                </a>
+                                            @else
+                                                <img class="h-full w-full object-contain" src="{{ $imgUrl }}" alt="{{ $item->product_name }}">
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold text-gray-900">
+                                                @if($item->product)
+                                                    <a href="{{ route('product.show', $item->product->slug) }}" target="_blank" class="hover:underline hover:text-black flex items-center gap-1.5">
+                                                        <span>{{ $item->product_name }}</span>
+                                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                    </a>
+                                                @else
+                                                    <span>{{ $item->product_name }}</span>
+                                                @endif
+                                            </div>
+                                            @if($item->variant_info)
+                                                <div class="text-xs text-gray-500 mt-0.5"><span class="font-semibold text-gray-700">Variant:</span> {{ $item->variant_info }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-500">Rs. {{ number_format($item->price) }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ $item->quantity }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-900 text-right">Rs. {{ number_format($item->subtotal) }}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-700">Rs. {{ number_format($item->price) }}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-700">{{ $item->quantity }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900 font-bold text-right">Rs. {{ number_format($item->subtotal) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
