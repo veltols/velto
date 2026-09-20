@@ -26,7 +26,7 @@
     $displayTitle = \Illuminate\Support\Str::words($product->name, 4, '...');
 @endphp
 
-<div class="relative flex flex-col h-full cursor-pointer">
+<div class="relative flex flex-col h-full cursor-pointer rounded-sm bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.13)] transition-all duration-300 hover:-translate-y-1 p-2.5 pb-4">
     
     {{-- Product Image Container — 'group' scoped HERE so hover only fires on image area --}}
     <div class="group relative w-full aspect-[3/4] bg-white overflow-hidden mb-3.5 rounded-none">
