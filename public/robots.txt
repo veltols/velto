@@ -1,2 +1,3 @@
 User-agent: *
 Disallow:
+Sitemap: https://velto.pk/sitemap.xml
