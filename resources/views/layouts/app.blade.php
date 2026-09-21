@@ -23,14 +23,13 @@
     <meta property="og:url" content="@yield('canonical_url', url()->current())">
     <meta property="og:title" content="@hasSection('title') @yield('title') | Velto Leather Shoes @else Velto Leather Shoes: Premium Quality Men's Shoes Brand | Top Shoes Brand – Velto Leather Shoes @endif">
     <meta property="og:description" content="@yield('meta_description', 'Best quality men\'s shoes. Velto Leather Shoes Top Shoes Brand in Pakistan. Shop our latest collection of stylish and comfortable footwear.')">
-    <meta property="og:image" content="@yield('og_image', asset('images/headerlogo.png'))">
+    <meta property="og:image" content="@yield('og_image', asset('images/velto_social_share.webp'))">
     <meta property="og:site_name" content="{{ config('app.name', 'Velto Leather Shoes') }}">
-    <meta property="article:publisher" content="https://www.facebook.com/p/Velto-LS-61567129000247/">
     <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="@yield('title', 'Velto Leather Shoes')">
 <meta name="twitter:description" content="@yield('meta_description', 'Premium men’s leather shoes in Pakistan.')">
-<meta name="twitter:image" content="@yield('og_image', asset('images/headerlogo.png'))">
+<meta name="twitter:image" content="@yield('og_image', asset('images/velto_social_share.webp'))">
     @stack('seo')
 
     <!-- Fonts -->
