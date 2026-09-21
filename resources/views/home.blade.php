@@ -24,21 +24,21 @@
                             <div class="w-full bg-gray-900 aspect-[16/7]"></div>
                         @endif
 
-                        {{-- Subtle Dark Scrim for Text Legibility --}}
+                        {{-- Black Transparency Shadow on Image for High Legibility --}}
                         @if($slide->title || $slide->text || $slide->button_text)
-                            <div class="absolute inset-0 bg-black/35 pointer-events-none"></div>
+                            <div class="hero-slide-scrim" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.72) 100%); pointer-events: none; z-index: 2;"></div>
 
                             {{-- Slide Content Overlay --}}
                             <div class="absolute inset-0 z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center text-center">
-                                <div class="max-w-3xl text-white flex flex-col items-center justify-center swiper-slide-content py-4 sm:py-8">
+                                <div class="max-w-3xl text-white flex flex-col items-center justify-center swiper-slide-content py-4 sm:py-8 px-6" style="background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 80%); border-radius: 16px;">
                                     {{-- Main Title --}}
                                     @if($slide->title)
                                         @if($index === 0)
-                                            <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-2 sm:mb-4 leading-tight drop-shadow-lg">
+                                            <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-2 sm:mb-4 leading-tight hero-text-shadow">
                                                 {!! nl2br(e($slide->title)) !!}
                                             </h1>
                                         @else
-                                            <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-2 sm:mb-4 leading-tight drop-shadow-lg">
+                                            <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-2 sm:mb-4 leading-tight hero-text-shadow">
                                                 {!! nl2br(e($slide->title)) !!}
                                             </h2>
                                         @endif
@@ -46,7 +46,7 @@
 
                                     {{-- Subtitle / Description --}}
                                     @if($slide->text)
-                                        <p class="text-xs sm:text-sm md:text-base text-white/95 max-w-xl sm:max-w-2xl mx-auto font-light leading-relaxed mb-4 sm:mb-6 tracking-wide drop-shadow-md line-clamp-3 sm:line-clamp-none">
+                                        <p class="text-xs sm:text-sm md:text-base text-white/95 max-w-xl sm:max-w-2xl mx-auto font-light leading-relaxed mb-4 sm:mb-6 tracking-wide hero-subtext-shadow line-clamp-3 sm:line-clamp-none">
                                             {{ $slide->text }}
                                         </p>
                                     @endif
@@ -97,6 +97,24 @@
                 width: 100% !important;
                 height: auto !important;
                 display: block !important;
+            }
+            .hero-slide-scrim {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.72) 100%);
+                pointer-events: none;
+                z-index: 2;
+            }
+            .hero-text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,1), 0 4px 16px rgba(0,0,0,0.95), 0 0 24px rgba(0,0,0,0.9) !important;
+            }
+            .hero-subtext-shadow {
+                text-shadow: 0 1px 3px rgba(0,0,0,1), 0 2px 10px rgba(0,0,0,0.95), 0 0 16px rgba(0,0,0,0.85) !important;
             }
             .hero-swiper .swiper-button-next,
             .hero-swiper .swiper-button-prev {
