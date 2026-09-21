@@ -11,7 +11,7 @@
 
         <div class="swiper hero-swiper" style="width:100%;height:100%;">
             <div class="swiper-wrapper">
-                @foreach($sliderBanners as $slide)
+                @foreach($sliderBanners as $index => $slide)
                 <div class="swiper-slide">
                     <div class="relative w-full h-full flex items-center justify-center">
                         {{-- Background image --}}
@@ -31,10 +31,21 @@
                             <div class="max-w-3xl text-white flex flex-col items-center justify-center swiper-slide-content">
                                 
                                 {{-- Main Title --}}
-                                @if($slide->title)
+                                {{-- @if($slide->title)
                                     <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal tracking-wide text-white mb-3 sm:mb-5 leading-tight drop-shadow-lg">
                                         {!! nl2br(e($slide->title)) !!}
                                     </h1>
+                                @endif --}}
+                                @if($slide->title)
+                                    @if($index === 0)
+                                        <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal tracking-wide text-white mb-3 sm:mb-5 leading-tight drop-shadow-lg">
+                                            {!! nl2br(e($slide->title)) !!}
+                                        </h1>
+                                    @else
+                                        <h2 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal tracking-wide text-white mb-3 sm:mb-5 leading-tight drop-shadow-lg">
+                                            {!! nl2br(e($slide->title)) !!}
+                                        </h2>
+                                    @endif
                                 @endif
 
                                 {{-- Subtitle / Description --}}
