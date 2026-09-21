@@ -20,7 +20,7 @@ class OrderConfirmationMail extends Mailable
      */
     public function __construct(Order $order)
     {
-        $this->order = $order;
+        $this->order = $order->loadMissing(['items.product.primaryImage', 'items.product.images']);
     }
 
     /**

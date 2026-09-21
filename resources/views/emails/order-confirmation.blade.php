@@ -227,8 +227,8 @@
         
         <!-- Header -->
         <div class="header">
-            <a href="{{ config('app.url') }}" target="_blank" style="text-decoration: none;">
-                <img src="{{ asset('images/headerlogo.png') }}" alt="Velto Leather Shoes">
+            <a href="{{ config('app.url', url('/')) }}" target="_blank" style="text-decoration: none;">
+                <img src="{{ url('images/footerlogo.png') }}" alt="Velto Leather Shoes" style="max-height: 44px; width: auto; display: block; margin: 0 auto;">
             </a>
             <div class="header-title">Velto Leather Shoes</div>
         </div>
@@ -263,17 +263,19 @@
             @foreach($order->items as $item)
                 @php
                     $imgUrl = null;
-                    if ($item->product && $item->product->primaryImage) {
-                        $imgUrl = asset('storage/' . $item->product->primaryImage->image_path);
-                    } elseif ($item->product && $item->product->images->isNotEmpty()) {
-                        $imgUrl = asset('storage/' . $item->product->images->first()->image_path);
+                    if ($item->product && $item->product->primaryImage && !empty($item->product->primaryImage->image_path)) {
+                        $path = $item->product->primaryImage->image_path;
+                        $imgUrl = str_starts_with($path, 'http') ? $path : url('storage/' . $path);
+                    } elseif ($item->product && $item->product->images && $item->product->images->isNotEmpty()) {
+                        $path = $item->product->images->first()->image_path;
+                        $imgUrl = str_starts_with($path, 'http') ? $path : url('storage/' . $path);
                     } else {
-                        $imgUrl = asset('images/hero-shoes.png');
+                        $imgUrl = url('images/hero-shoes.png');
                     }
                 @endphp
                 <div class="item-row">
                     <div class="item-img">
-                        <img src="{{ $imgUrl }}" alt="{{ $item->product_name }}">
+                        <img src="{{ $imgUrl }}" alt="{{ $item->product_name }}" width="56" height="56" style="width:56px;height:56px;object-fit:contain;">
                     </div>
                     <div class="item-info">
                         <div class="item-name">{{ $item->product_name }}</div>

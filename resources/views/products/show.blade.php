@@ -75,7 +75,7 @@
     <div class="bg-white" x-data="productDetail()">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 py-6 lg:py-10">
             <!-- Breadcrumbs -->
-            <nav class="flex mb-6 text-xs text-gray-500 font-medium" aria-label="Breadcrumb">
+            {{-- <nav class="flex mb-6 text-xs text-gray-500 font-medium" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-2">
                     <li>
                         <a href="{{ route('home') }}" class="hover:text-black transition">Home</a>
@@ -97,7 +97,7 @@
                         <span class="truncate">{{ $product->name }}</span>
                     </li>
                 </ol>
-            </nav>
+            </nav> --}}
 
             <div class="lg:grid lg:grid-cols-2 lg:gap-x-14 lg:items-start">
                 
