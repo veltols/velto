@@ -1,5 +1,5 @@
 <x-app-layout>
-    @section('title', "Men's Leather Shoes in Pakistan | Premium Loafers & Formal Shoes | Velto Leather Shoes")
+    @section('title', "Men's Leather Shoes in Pakistan | Premium Loafers & Formal Shoes")
     @section('meta_description', "Shop premium men's leather shoes in Pakistan from Velto. Explore leather loafers, suede loafers and formal shoes crafted for comfort, style and everyday elegance. Cash on delivery available.")
     @section('og_image', asset('images/velto_banner_wide.png'))
     <!-- Hero Slider Section -->

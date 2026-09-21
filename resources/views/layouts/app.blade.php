@@ -7,25 +7,30 @@
     @endif
     @if(config('app.env') == 'production')
     <meta name="google-site-verification" content="2gNOJLFRAmeJL8EBqmY7dWvhb0rQFdeHDWVhV0JXgLk" />
+    <meta name="robots" content="index, follow">
     @endif
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@hasSection('title') @yield('title')  @else Velto Leather Shoes: Premium Quality Men's Shoes Brand | Top Shoes Brand | Velto Leather Shoes @endif</title>
+    <title>@hasSection('title') @yield('title') | | Velto Leather Shoes  @else Velto Leather Shoes: Premium Quality Men's Shoes Brand | Top Shoes Brand | Velto Leather Shoes @endif</title>
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="@yield('meta_description', 'Best quality men\'s shoes. Velto Leather Shoes Top Shoes Brand in Pakistan. Shop our latest collection of stylish and comfortable footwear designed to elevate your everyday look. Enjoy free shipping and easy returns!')">
-    <meta name="keywords" content="@yield('meta_keywords', 'leather shoes, handcrafted shoes, velto, velto leather shoes, premium footwear, men shoes, luxury leather, pakistan shoes brand, customize shoes')">
+   
     <link rel="canonical" href="@yield('canonical_url', url()->current())">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="@yield('canonical_url', url()->current())">
-    <meta property="og:title" content="@hasSection('title') @yield('title') - {{ config('app.name', 'Velto Leather Shoes') }} @else Velto Leather Shoes: Premium Quality Men's Shoes Brand | Top Shoes Brand – Velto Leather Shoes @endif">
+    <meta property="og:title" content="@hasSection('title') @yield('title') | Velto Leather Shoes @else Velto Leather Shoes: Premium Quality Men's Shoes Brand | Top Shoes Brand – Velto Leather Shoes @endif">
     <meta property="og:description" content="@yield('meta_description', 'Best quality men\'s shoes. Velto Leather Shoes Top Shoes Brand in Pakistan. Shop our latest collection of stylish and comfortable footwear.')">
     <meta property="og:image" content="@yield('og_image', asset('images/headerlogo.png'))">
     <meta property="og:site_name" content="{{ config('app.name', 'Velto Leather Shoes') }}">
     <meta property="article:publisher" content="https://www.facebook.com/p/Velto-LS-61567129000247/">
-
+    <!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="@yield('title', 'Velto Leather Shoes')">
+<meta name="twitter:description" content="@yield('meta_description', 'Premium men’s leather shoes in Pakistan.')">
+<meta name="twitter:image" content="@yield('og_image', asset('images/headerlogo.png'))">
     @stack('seo')
 
     <!-- Fonts -->
