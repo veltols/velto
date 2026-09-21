@@ -8,94 +8,95 @@
         <!-- Swiper CSS -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-        <div class="swiper hero-swiper" style="width:100%;height:100%;">
+        <div class="swiper hero-swiper w-full">
             <div class="swiper-wrapper">
                 @foreach($sliderBanners as $index => $slide)
                 <div class="swiper-slide">
-                    <div class="relative w-full h-full flex items-center justify-center">
-                        {{-- Background image --}}
+                    <div class="relative w-full overflow-hidden">
+                        {{-- Slide Image (natural aspect ratio and height) --}}
                         @if($slide->image_path)
                             <img src="{{ Storage::url($slide->image_path) }}"
-                                 alt="{{ $slide->title }}"
-                                 class="absolute inset-0 w-full h-full object-cover object-center">
+                                 alt="{{ $slide->title ?: 'Velto Banner' }}"
+                                 class="w-full h-auto block object-cover hero-slide-img"
+                                 loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                 fetchpriority="{{ $index === 0 ? 'high' : 'auto' }}">
                         @else
-                            <div class="absolute inset-0 bg-gray-900"></div>
+                            <div class="w-full bg-gray-900 aspect-[16/7]"></div>
                         @endif
 
                         {{-- Subtle Dark Scrim for Text Legibility --}}
-                        <div class="absolute inset-0 bg-black/30"></div>
+                        @if($slide->title || $slide->text || $slide->button_text)
+                            <div class="absolute inset-0 bg-black/35 pointer-events-none"></div>
 
-                        {{-- Slide Content (Centered straddling split background) --}}
-                        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center text-center">
-                            <div class="max-w-3xl text-white flex flex-col items-center justify-center swiper-slide-content">
-                                
-                                {{-- Main Title --}}
-                                {{-- @if($slide->title)
-                                    <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal tracking-wide text-white mb-3 sm:mb-5 leading-tight drop-shadow-lg">
-                                        {!! nl2br(e($slide->title)) !!}
-                                    </h1>
-                                @endif --}}
-                                @if($slide->title)
-                                    @if($index === 0)
-                                        <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal tracking-wide text-white mb-3 sm:mb-5 leading-tight drop-shadow-lg">
-                                            {!! nl2br(e($slide->title)) !!}
-                                        </h1>
-                                    @else
-                                        <h2 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal tracking-wide text-white mb-3 sm:mb-5 leading-tight drop-shadow-lg">
-                                            {!! nl2br(e($slide->title)) !!}
-                                        </h2>
+                            {{-- Slide Content Overlay --}}
+                            <div class="absolute inset-0 z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center text-center">
+                                <div class="max-w-3xl text-white flex flex-col items-center justify-center swiper-slide-content py-4 sm:py-8">
+                                    {{-- Main Title --}}
+                                    @if($slide->title)
+                                        @if($index === 0)
+                                            <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-2 sm:mb-4 leading-tight drop-shadow-lg">
+                                                {!! nl2br(e($slide->title)) !!}
+                                            </h1>
+                                        @else
+                                            <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-2 sm:mb-4 leading-tight drop-shadow-lg">
+                                                {!! nl2br(e($slide->title)) !!}
+                                            </h2>
+                                        @endif
                                     @endif
-                                @endif
 
-                                {{-- Subtitle / Description --}}
-                                @if($slide->text)
-                                    <p class="text-sm sm:text-base md:text-lg text-white/95 max-w-xl sm:max-w-2xl mx-auto font-light leading-relaxed mb-6 sm:mb-8 tracking-wide drop-shadow-md">
-                                        {{ $slide->text }}
-                                    </p>
-                                @endif
+                                    {{-- Subtitle / Description --}}
+                                    @if($slide->text)
+                                        <p class="text-xs sm:text-sm md:text-base text-white/95 max-w-xl sm:max-w-2xl mx-auto font-light leading-relaxed mb-4 sm:mb-6 tracking-wide drop-shadow-md line-clamp-3 sm:line-clamp-none">
+                                            {{ $slide->text }}
+                                        </p>
+                                    @endif
 
-                                {{-- Button --}}
-                                @if($slide->button_text)
-                                    <div>
-                                        <a href="{{ $slide->button_link }}"
-                                           class="inline-block bg-black text-white px-8 py-3.5 sm:px-10 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] hover:bg-gray-800 transition-all duration-300 shadow-xl border border-white/20">
-                                            {{ $slide->button_text }}
-                                        </a>
-                                    </div>
-                                @endif
+                                    {{-- Button --}}
+                                    @if($slide->button_text)
+                                        <div>
+                                            <a href="{{ $slide->button_link ?: '#' }}"
+                                               class="inline-block bg-black text-white px-6 py-2.5 sm:px-10 sm:py-3.5 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] hover:bg-gray-800 transition-all duration-300 shadow-xl border border-white/20">
+                                                {{ $slide->button_text }}
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
+                        @elseif($slide->button_link)
+                            <a href="{{ $slide->button_link }}" class="absolute inset-0 z-10 block" aria-label="{{ $slide->title ?: 'Banner link' }}"></a>
+                        @endif
                     </div>
                 </div>
                 @endforeach
             </div>
 
             {{-- Navigation Arrows --}}
-            <div class="swiper-button-next hero-swiper-next"></div>
-            <div class="swiper-button-prev hero-swiper-prev"></div>
-
-            {{-- Pagination Dots --}}
-            <div class="swiper-pagination hero-swiper-pagination"></div>
+            @if($sliderBanners->count() > 1)
+                <div class="swiper-button-next hero-swiper-next"></div>
+                <div class="swiper-button-prev hero-swiper-prev"></div>
+                <div class="swiper-pagination hero-swiper-pagination"></div>
+            @endif
         </div>
 
         <style>
             .hero-slider-section {
-                height: 560px !important;
-                min-height: 420px !important;
                 width: 100% !important;
                 position: relative !important;
                 display: block !important;
+                height: auto !important;
+                min-height: 0 !important;
             }
-            @media (max-width: 1024px) {
-                .hero-slider-section {
-                    height: 480px !important;
-                }
+            .hero-swiper {
+                width: 100% !important;
+                height: auto !important;
             }
-            @media (max-width: 640px) {
-                .hero-slider-section {
-                    height: 380px !important;
-                    min-height: 320px !important;
-                }
+            .hero-swiper .swiper-slide {
+                height: auto !important;
+            }
+            .hero-slide-img {
+                width: 100% !important;
+                height: auto !important;
+                display: block !important;
             }
             .hero-swiper .swiper-button-next,
             .hero-swiper .swiper-button-prev {
@@ -131,6 +132,12 @@
                 background: #fff;
                 width: 40px;
             }
+            @media (max-width: 640px) {
+                .hero-swiper .swiper-button-next,
+                .hero-swiper .swiper-button-prev {
+                    display: none !important;
+                }
+            }
         </style>
 
         <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
@@ -143,9 +150,15 @@
                 }
 
                 function initHeroSwiper() {
-                    new Swiper('.hero-swiper', {
-                        loop: true,
+                    const swiperEl = document.querySelector('.hero-swiper');
+                    if (!swiperEl) return;
+
+                    const heroSwiper = new Swiper('.hero-swiper', {
+                        loop: {{ $sliderBanners->count() > 1 ? 'true' : 'false' }},
                         speed: 800,
+                        autoHeight: true,
+                        observer: true,
+                        observeParents: true,
                         autoplay: {
                             delay: 5000,
                             disableOnInteraction: false,
@@ -159,7 +172,32 @@
                         pagination: {
                             el: '.hero-swiper-pagination',
                             clickable: true,
+                        },
+                        on: {
+                            init: function() {
+                                this.updateAutoHeight(100);
+                            },
+                            imagesReady: function() {
+                                this.updateAutoHeight(100);
+                            }
                         }
+                    });
+
+                    // Update Swiper height as soon as images finish downloading
+                    const images = swiperEl.querySelectorAll('.hero-slide-img');
+                    images.forEach(function(img) {
+                        if (img.complete) {
+                            heroSwiper.updateAutoHeight(100);
+                        } else {
+                            img.addEventListener('load', function() {
+                                heroSwiper.updateAutoHeight(100);
+                                heroSwiper.update();
+                            });
+                        }
+                    });
+
+                    window.addEventListener('resize', function() {
+                        heroSwiper.updateAutoHeight(100);
                     });
                 }
             });
