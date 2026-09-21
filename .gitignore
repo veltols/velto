@@ -17,3 +17,5 @@ yarn-error.log
 /.vscode
 /package.json
 /.vite
+robots.txt
+public/sitemap.xml
