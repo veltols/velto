@@ -29,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="@yield('title', 'Velto Leather Shoes')">
 <meta name="twitter:description" content="@yield('meta_description', 'Premium men’s leather shoes in Pakistan.')">
-<meta name="twitter:image" content="@yield('og_image', asset('images/velto_social_share.webp'))">
+<meta name="twitter:image" content="@yield('og_image', asset('images/velto_social_share.webp'))"> 
     @stack('seo')
 
     <!-- Fonts -->
