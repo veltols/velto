@@ -1,6 +1,6 @@
 <x-app-layout>
-    @section('title', 'Luxury Leather Shoes')
-    @section('meta_description', 'Velto - Exquisite craftsmanship and modern luxury. Shop our 2026 Artisan Collection of handcrafted leather shoes.')
+    @section('title', "Men's Leather Shoes in Pakistan | Premium Loafers & Formal Shoes | Velto Leather Shoes")
+    @section('meta_description', "Shop premium men's leather shoes in Pakistan from Velto. Explore leather loafers, suede loafers and formal shoes crafted for comfort, style and everyday elegance. Cash on delivery available.")
     @section('og_image', asset('images/velto_banner_wide.png'))
     <!-- Hero Slider Section -->
     @if($sliderBanners->isNotEmpty())
@@ -192,7 +192,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 md:gap-0">
                 <div>
                     <span class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-2 block">Categories</span>
-                    <h2 class="text-4xl font-serif font-bold text-gray-900">Shop By Category</h2>
+                    <h2 class="text-4xl font-serif font-bold text-gray-900">Shop Men's Shoes by Category</h2>
                 </div>
                 <a href="{{ route('shop.index') }}" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition flex items-center group">
                     View All Categories
@@ -229,7 +229,7 @@
                         <div class="relative overflow-hidden bg-gray-100 aspect-[4/5] mb-4 rounded-none">
                             <a href="{{ route('shop.category', $category->slug) }}" class="block w-full h-full">
                                 <img src="{{ $imageUrl }}" 
-                                     alt="{{ $category->name }}" 
+                                     alt="{{ $category->name }} for Men - Velto" 
                                      class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
                                      onerror="this.onerror=null;this.src='{{ asset('images/hero-shoes.png') }}';">
                                 <div class="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition duration-300"></div>
@@ -320,7 +320,7 @@
                 <div class="group relative overflow-hidden aspect-[4/5] bg-[#f5f2ee] rounded-none border border-gray-100 shadow-sm">
                     <a href="{{ route('shop.index') }}" class="block w-full h-full">
                         <img src="{{ asset('images/pro1.webp') }}" 
-                             alt="Velto Gentleman Lookbook" 
+                             alt="Velto men's premium leather shoes lookbook"
                              class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105">
                         <div class="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition duration-300"></div>
                         
