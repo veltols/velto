@@ -12,33 +12,33 @@
             <div class="swiper-wrapper">
                 @foreach($sliderBanners as $index => $slide)
                 <div class="swiper-slide">
-                    <div class="relative w-full overflow-hidden">
-                        {{-- Slide Image (natural aspect ratio and height) --}}
+                    <div class="relative w-full h-full overflow-hidden hero-slide-inner">
+                        {{-- Slide Image (object-cover with balanced height so it is not heavily zoomed) --}}
                         @if($slide->image_path)
                             <img src="{{ Storage::url($slide->image_path) }}"
                                  alt="{{ $slide->title ?: 'Velto Banner' }}"
-                                 class="w-full h-auto block object-cover hero-slide-img"
+                                 class="absolute inset-0 w-full h-full object-cover object-center hero-slide-img"
                                  loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
                                  fetchpriority="{{ $index === 0 ? 'high' : 'auto' }}">
                         @else
-                            <div class="w-full bg-gray-900 aspect-[16/7]"></div>
+                            <div class="w-full h-full bg-gray-900"></div>
                         @endif
 
-                        {{-- Black Transparency Shadow on Image for High Legibility --}}
+                        {{-- Dark Scrim on Image for High Legibility --}}
                         @if($slide->title || $slide->text || $slide->button_text)
-                            <div class="hero-slide-scrim" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.72) 100%); pointer-events: none; z-index: 2;"></div>
+                            <div class="hero-slide-scrim" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.48) 50%, rgba(0,0,0,0.75) 100%); pointer-events: none; z-index: 2;"></div>
 
                             {{-- Slide Content Overlay --}}
-                            <div class="absolute inset-0 z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center text-center">
-                                <div class="max-w-3xl text-white flex flex-col items-center justify-center swiper-slide-content py-4 sm:py-8 px-6" style="background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 80%); border-radius: 16px;">
+                            <div class="absolute inset-0 z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center pb-6 sm:pb-4">
+                                <div class="max-w-3xl text-white flex flex-col items-center justify-center swiper-slide-content py-2 px-4 sm:py-6 sm:px-8" style="background: radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 85%); border-radius: 16px;">
                                     {{-- Main Title --}}
                                     @if($slide->title)
                                         @if($index === 0)
-                                            <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-2 sm:mb-4 leading-tight hero-text-shadow">
+                                            <h1 class="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-1.5 sm:mb-3 leading-tight hero-text-shadow">
                                                 {!! nl2br(e($slide->title)) !!}
                                             </h1>
                                         @else
-                                            <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-2 sm:mb-4 leading-tight hero-text-shadow">
+                                            <h2 class="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-serif font-normal tracking-wide text-white mb-1.5 sm:mb-3 leading-tight hero-text-shadow">
                                                 {!! nl2br(e($slide->title)) !!}
                                             </h2>
                                         @endif
@@ -46,16 +46,15 @@
 
                                     {{-- Subtitle / Description --}}
                                     @if($slide->text)
-                                        <p class="text-xs sm:text-sm md:text-base text-white/95 max-w-xl sm:max-w-2xl mx-auto font-light leading-relaxed mb-4 sm:mb-6 tracking-wide hero-subtext-shadow line-clamp-3 sm:line-clamp-none">
+                                        <p class="text-[11px] sm:text-xs md:text-base text-white/95 max-w-xl sm:max-w-2xl mx-auto font-light leading-relaxed mb-3 sm:mb-5 tracking-wide hero-subtext-shadow line-clamp-2 sm:line-clamp-none">
                                             {{ $slide->text }}
                                         </p>
                                     @endif
 
                                     {{-- Button --}}
                                     @if($slide->button_text)
-                                        <div>
-                                            <a href="{{ $slide->button_link ?: '#' }}"
-                                               class="inline-block bg-black text-white px-6 py-2.5 sm:px-10 sm:py-3.5 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] hover:bg-gray-800 transition-all duration-300 shadow-xl border border-white/20">
+                                        <div class="pt-0.5">
+                                            <a href="{{ $slide->button_link ?: '#' }}" class="hero-btn">
                                                 {{ $slide->button_text }}
                                             </a>
                                         </div>
@@ -79,23 +78,61 @@
         </div>
 
         <style>
-            .hero-slider-section {
+            .hero-slider-section,
+            .hero-swiper,
+            .hero-swiper .swiper-wrapper,
+            .hero-swiper .swiper-slide,
+            .hero-slide-inner {
                 width: 100% !important;
+                height: 280px !important;
+                min-height: 280px !important;
                 position: relative !important;
-                display: block !important;
-                height: auto !important;
-                min-height: 0 !important;
             }
-            .hero-swiper {
-                width: 100% !important;
-                height: auto !important;
+            @media (min-width: 640px) {
+                .hero-slider-section,
+                .hero-swiper,
+                .hero-swiper .swiper-wrapper,
+                .hero-swiper .swiper-slide,
+                .hero-slide-inner {
+                    height: 420px !important;
+                    min-height: 420px !important;
+                }
             }
-            .hero-swiper .swiper-slide {
-                height: auto !important;
+            @media (min-width: 768px) {
+                .hero-slider-section,
+                .hero-swiper,
+                .hero-swiper .swiper-wrapper,
+                .hero-swiper .swiper-slide,
+                .hero-slide-inner {
+                    height: 500px !important;
+                    min-height: 500px !important;
+                }
+            }
+            @media (min-width: 1024px) {
+                .hero-slider-section,
+                .hero-swiper,
+                .hero-swiper .swiper-wrapper,
+                .hero-swiper .swiper-slide,
+                .hero-slide-inner {
+                    height: 580px !important;
+                    min-height: 580px !important;
+                }
+            }
+            @media (min-width: 1280px) {
+                .hero-slider-section,
+                .hero-swiper,
+                .hero-swiper .swiper-wrapper,
+                .hero-swiper .swiper-slide,
+                .hero-slide-inner {
+                    height: 640px !important;
+                    min-height: 640px !important;
+                }
             }
             .hero-slide-img {
                 width: 100% !important;
-                height: auto !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                object-position: center !important;
                 display: block !important;
             }
             .hero-slide-scrim {
@@ -106,7 +143,6 @@
                 bottom: 0;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.72) 100%);
                 pointer-events: none;
                 z-index: 2;
             }
@@ -138,8 +174,12 @@
                 font-size: 16px;
                 font-weight: 700;
             }
+            .hero-swiper .swiper-pagination {
+                bottom: 8px !important;
+                z-index: 20 !important;
+            }
             .hero-swiper .swiper-pagination-bullet {
-                width: 24px;
+                width: 20px;
                 height: 3px;
                 border-radius: 0;
                 background: rgba(255,255,255,0.5);
@@ -148,12 +188,48 @@
             }
             .hero-swiper .swiper-pagination-bullet-active {
                 background: #fff;
-                width: 40px;
+                width: 34px;
             }
             @media (max-width: 640px) {
                 .hero-swiper .swiper-button-next,
                 .hero-swiper .swiper-button-prev {
                     display: none !important;
+                }
+            }
+            .hero-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background-color: #000000 !important;
+                color: #ffffff !important;
+                padding: 9px 24px !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.18em !important;
+                text-indent: 0.18em !important;
+                text-transform: uppercase !important;
+                border: 1px solid rgba(255, 255, 255, 0.35) !important;
+                border-radius: 0px !important;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7) !important;
+                transition: all 0.3s ease !important;
+                text-decoration: none !important;
+                line-height: 1.2 !important;
+                white-space: nowrap !important;
+                box-sizing: border-box !important;
+            }
+            .hero-btn:hover {
+                background-color: #1f2937 !important;
+                border-color: #ffffff !important;
+                color: #ffffff !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 14px 28px -4px rgba(0, 0, 0, 0.8) !important;
+            }
+            @media (min-width: 640px) {
+                .hero-btn {
+                    padding: 14px 40px !important;
+                    font-size: 14px !important;
+                    letter-spacing: 0.22em !important;
+                    text-indent: 0.22em !important;
                 }
             }
         </style>
@@ -174,7 +250,6 @@
                     const heroSwiper = new Swiper('.hero-swiper', {
                         loop: {{ $sliderBanners->count() > 1 ? 'true' : 'false' }},
                         speed: 800,
-                        autoHeight: true,
                         observer: true,
                         observeParents: true,
                         autoplay: {
@@ -191,31 +266,6 @@
                             el: '.hero-swiper-pagination',
                             clickable: true,
                         },
-                        on: {
-                            init: function() {
-                                this.updateAutoHeight(100);
-                            },
-                            imagesReady: function() {
-                                this.updateAutoHeight(100);
-                            }
-                        }
-                    });
-
-                    // Update Swiper height as soon as images finish downloading
-                    const images = swiperEl.querySelectorAll('.hero-slide-img');
-                    images.forEach(function(img) {
-                        if (img.complete) {
-                            heroSwiper.updateAutoHeight(100);
-                        } else {
-                            img.addEventListener('load', function() {
-                                heroSwiper.updateAutoHeight(100);
-                                heroSwiper.update();
-                            });
-                        }
-                    });
-
-                    window.addEventListener('resize', function() {
-                        heroSwiper.updateAutoHeight(100);
                     });
                 }
             });
@@ -223,7 +273,7 @@
     </section>
     @else
     {{-- Fallback: Static hero when no slider banners configured --}}
-    <section class="relative w-full overflow-hidden" style="height: 800px; min-height: 800px;">
+    <section class="relative w-full overflow-hidden hero-slider-section">
         <div class="absolute inset-0">
             <img src="{{ asset('images/hero_banner.png') }}" alt="Velto Luxury Collection" class="w-full h-full object-cover object-center transform scale-105">
             <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
