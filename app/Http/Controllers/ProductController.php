@@ -11,7 +11,7 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['category', 'images', 'variants' => function ($query) {
+            ->with(['category', 'images', 'approvedReviews', 'variants' => function ($query) {
                 $query->where('is_available', true)->where('stock_quantity', '>', 0);
             }])
             ->firstOrFail();
@@ -23,7 +23,46 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('products.show', compact('product', 'relatedProducts'));
+        $reviews = $product->approvedReviews;
+        $averageRating = $product->averageRating();
+        $ratingBreakdown = $product->ratingBreakdown();
+        $reviewsCount = $reviews->count();
+
+        return view('products.show', compact('product', 'relatedProducts', 'reviews', 'averageRating', 'ratingBreakdown', 'reviewsCount'));
+    }
+
+    public function storeReview(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'rating'          => 'required|integer|min:1|max:5',
+            'customer_name'   => 'required|string|max:255',
+            'customer_email'  => 'nullable|email|max:255',
+            'title'           => 'required|string|max:255',
+            'description'     => 'required|string|max:3000',
+        ]);
+
+        $review = $product->reviews()->create([
+            'rating'            => $validated['rating'],
+            'customer_name'     => $validated['customer_name'],
+            'customer_email'    => $validated['customer_email'] ?? null,
+            'title'             => $validated['title'],
+            'description'       => $validated['description'],
+            'status'            => 'pending', // Pending admin approval before publishing
+            'verified_purchase' => true,
+            'is_featured'       => false,
+        ]);
+
+        $pendingMessage = 'Thank you! Your review has been submitted and is currently pending review. It will be published as soon as our team approves it.';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $pendingMessage,
+                'review'  => $review,
+            ]);
+        }
+
+        return back()->with('success', $pendingMessage);
     }
 
     public function quickView($id)

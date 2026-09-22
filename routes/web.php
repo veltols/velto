@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,6 +31,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{category}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
+Route::post('/product/{product}/reviews', [ProductController::class, 'storeReview'])->name('product.reviews.store');
 Route::get('/products/{id}/quick-view', [ProductController::class, 'quickView'])->name('product.quick-view');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -67,6 +69,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('customers', CustomerController::class);
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
         Route::resource('banners', BannerController::class);
+        Route::resource('reviews', AdminReviewController::class);
+        Route::patch('reviews/{review}/toggle-status', [AdminReviewController::class, 'toggleStatus'])->name('reviews.toggle-status');
         
         // Product Images
         Route::delete('/products/{product}/images/{image}', [AdminProductController::class, 'destroyImage'])->name('products.images.destroy');

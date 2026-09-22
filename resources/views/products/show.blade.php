@@ -176,8 +176,32 @@
                                 {{ $product->category->name }}
                             </a>
                         @endif
-                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold tracking-tight text-gray-950 mb-3 leading-tight">{{ $product->name }}</h1>
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold tracking-tight text-gray-950 mb-2 leading-tight">{{ $product->name }}</h1>
                         
+                        <!-- Star Rating Summary Snippet -->
+                        <div class="mb-3 flex items-center gap-2">
+                            <a href="#customer-reviews" class="inline-flex items-center gap-1.5 group">
+                                <div class="flex items-center gap-0.5">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= round($averageRating))
+                                            <svg class="w-4 h-4 text-black fill-current" viewBox="0 0 24 24">
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                            </svg>
+                                        @else
+                                            <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                            </svg>
+                                        @endif
+                                    @endfor
+                                </div>
+                                <span class="text-xs font-semibold text-gray-800 group-hover:text-black transition ml-1">
+                                    {{ $averageRating }} ({{ $reviewsCount }} {{ Str::plural('review', $reviewsCount) }})
+                                </span>
+                            </a>
+                            <span class="text-xs text-gray-300">·</span>
+                            <a href="#write-review-form" @click="$dispatch('open-review-form')" class="text-xs font-medium text-gray-500 hover:text-black underline underline-offset-2">Write a review</a>
+                        </div>
+
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
                             <div class="flex items-baseline space-x-3">
                                 <!-- Static Blade view for SEO/Initial load -->
@@ -366,6 +390,398 @@
                 </div>
             </div>
             
+            <!-- Customer Reviews Section -->
+            <section id="customer-reviews" class="mt-20 border-t border-gray-200 pt-16 scroll-mt-24" 
+                x-data="reviewsManager()"
+                @open-review-form.window="showReviewForm = true; $nextTick(() => { document.getElementById('write-review-form')?.scrollIntoView({behavior: 'smooth'}) })">
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-[0.25em] text-gray-400 mb-2 block">Real Experiences</span>
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-gray-950">Customer Reviews</h2>
+                            <span class="rounded-full bg-black text-white text-xs font-bold px-2.5 py-0.5" x-text="allReviews.length"></span>
+                        </div>
+                    </div>
+                    <button type="button" 
+                            @click="showReviewForm = !showReviewForm; $nextTick(() => { if(showReviewForm) document.getElementById('write-review-form')?.scrollIntoView({behavior: 'smooth'}) })" 
+                            class="inline-flex items-center gap-2 rounded-none bg-black text-white px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition shadow-sm cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        <span x-text="showReviewForm ? 'Cancel Review' : 'Write a Review'">Write a Review</span>
+                    </button>
+                </div>
+
+                @if(session('success'))
+                    <div class="mb-8 rounded-none bg-amber-50 border border-amber-300 p-5 text-sm text-amber-950 flex items-start gap-3 shadow-xs">
+                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div>
+                            <h4 class="font-bold text-amber-900 text-sm">Review Submitted (Pending Moderation)</h4>
+                            <p class="text-xs text-amber-800 mt-0.5 leading-relaxed">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Dynamic Success Message (AJAX) -->
+                <div id="review-success-banner" x-show="formSuccess" x-cloak class="mb-8 rounded-none bg-amber-50 border border-amber-300 p-5 text-sm text-amber-950 flex items-start justify-between gap-3 shadow-xs">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div>
+                            <h4 class="font-bold text-amber-900 text-sm">Review Submitted (Pending Moderation)</h4>
+                            <p class="text-xs text-amber-800 mt-0.5 leading-relaxed" x-text="formMessage"></p>
+                        </div>
+                    </div>
+                    <button type="button" @click="formSuccess = false" class="text-amber-700 hover:text-amber-950 text-xs font-bold uppercase p-1">✕</button>
+                </div>
+
+                <!-- Write a Review Form Panel -->
+                <div id="write-review-form" x-show="showReviewForm" x-collapse x-cloak class="mb-14">
+                    <div class="bg-[#faf9f6] border border-gray-200 p-6 sm:p-8 rounded-none shadow-sm">
+                        <div class="border-b border-gray-200 pb-4 mb-6">
+                            <h3 class="text-xl font-serif font-bold text-gray-900">Share Your Experience</h3>
+                            <p class="text-xs text-gray-500 mt-1">Help other gentlemen choose the perfect pair. Your feedback is appreciated.</p>
+                        </div>
+
+                        <form action="{{ route('product.reviews.store', $product) }}" 
+                              method="POST" 
+                              @submit.prevent="
+                                submittingReview = true;
+                                const formData = new FormData($el);
+                                const formEl = $el;
+                                fetch('{{ route('product.reviews.store', $product) }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'Accept': 'application/json'
+                                    },
+                                    body: formData
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    submittingReview = false;
+                                    if(data.success) {
+                                        formSuccess = true;
+                                        formMessage = data.message;
+                                        showReviewForm = false;
+                                        formEl.reset();
+                                        userRating = 5;
+                                        $nextTick(() => {
+                                            document.getElementById('review-success-banner')?.scrollIntoView({behavior: 'smooth'});
+                                        });
+                                    } else {
+                                        alert(data.message || 'Error submitting review. Please check all fields.');
+                                    }
+                                })
+                                .catch(() => {
+                                    formEl.submit();
+                                });
+                              " 
+                              class="space-y-6">
+                            @csrf
+
+                            <!-- Interactive Rating Selector -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-900 mb-2">Overall Rating <span class="text-red-500">*</span></label>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center space-x-1" @mouseleave="hoverRating = 0">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <button type="button" 
+                                                    @mouseenter="hoverRating = {{ $i }}" 
+                                                    @click="userRating = {{ $i }}" 
+                                                    class="p-1 hover:scale-115 transition-all focus:outline-none cursor-pointer"
+                                                    :title="'{{ $i }} Stars'">
+                                                <svg class="w-7 h-7 sm:w-8 sm:h-8 text-black transition-colors" 
+                                                     :fill="(hoverRating ? hoverRating >= {{ $i }} : userRating >= {{ $i }}) ? 'currentColor' : 'none'" 
+                                                     stroke="currentColor" 
+                                                     stroke-width="1.8" 
+                                                     stroke-linecap="round" 
+                                                     stroke-linejoin="round" 
+                                                     viewBox="0 0 24 24">
+                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                                </svg>
+                                            </button>
+                                        @endfor
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-800" x-text="(hoverRating || userRating) + ' / 5 Stars'"></span>
+                                    <input type="hidden" name="rating" :value="userRating">
+                                </div>
+                            </div>
+
+                            <!-- Customer Name & Email -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label for="customer_name" class="block text-xs font-bold uppercase tracking-wider text-gray-900 mb-1.5">Your Name <span class="text-red-500">*</span></label>
+                                    <input type="text" name="customer_name" id="customer_name" required placeholder="e.g. Tariq Mehmood" class="w-full bg-white border border-gray-300 px-4 py-2.5 text-sm focus:border-black focus:ring-black">
+                                </div>
+                                <div>
+                                    <label for="customer_email" class="block text-xs font-bold uppercase tracking-wider text-gray-900 mb-1.5">Email Address (Optional)</label>
+                                    <input type="email" name="customer_email" id="customer_email" placeholder="e.g. tariq@example.com" class="w-full bg-white border border-gray-300 px-4 py-2.5 text-sm focus:border-black focus:ring-black">
+                                </div>
+                            </div>
+
+                            <!-- Review Headline / Title -->
+                            <div>
+                                <label for="review_title" class="block text-xs font-bold uppercase tracking-wider text-gray-900 mb-1.5">Review Headline / Title <span class="text-red-500">*</span></label>
+                                <input type="text" name="title" id="review_title" required placeholder="e.g. Supremely comfortable and exquisite finish" class="w-full bg-white border border-gray-300 px-4 py-2.5 text-sm focus:border-black focus:ring-black">
+                            </div>
+
+                            <!-- Review Description -->
+                            <div>
+                                <label for="review_description" class="block text-xs font-bold uppercase tracking-wider text-gray-900 mb-1.5">Your Review / Experience <span class="text-red-500">*</span></label>
+                                <textarea name="description" id="review_description" rows="4" required placeholder="Tell us about the craftsmanship, comfort, sole flexibility, and sizing fit..." class="w-full bg-white border border-gray-300 px-4 py-2.5 text-sm focus:border-black focus:ring-black"></textarea>
+                            </div>
+
+                            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                                <button type="button" @click="showReviewForm = false" class="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-600 hover:text-black transition cursor-pointer">Cancel</button>
+                                <button type="submit" :disabled="submittingReview" class="bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 disabled:opacity-50 transition flex items-center gap-2 cursor-pointer">
+                                    <span x-text="submittingReview ? 'Submitting...' : 'Submit Review'">Submit Review</span>
+                                    <svg x-show="!submittingReview" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Reviews Layout: Left Column (Sticky Sidebar) & Right Column (Feed + Toolbar) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+                    
+                    <!-- Left: Rating Overview Card (Sticky Sidebar on Desktop) -->
+                    <div class="lg:col-span-4 lg:sticky lg:top-28 lg:self-start space-y-5">
+                        <div class="bg-[#faf9f6] border border-gray-200 p-6 sm:p-7">
+                            <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-4">Overall Score</h3>
+                            
+                            <div class="flex items-baseline gap-3 mb-2">
+                                <span class="text-5xl font-serif font-bold text-gray-950">{{ number_format($averageRating, 1) }}</span>
+                                <span class="text-sm font-medium text-gray-500">out of 5.0</span>
+                            </div>
+
+                            <!-- Stars -->
+                            <div class="flex items-center gap-0.5 mb-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= round($averageRating))
+                                        <svg class="w-5 h-5 text-black fill-current" viewBox="0 0 24 24">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                    @else
+                                        <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                    @endif
+                                @endfor
+                            </div>
+
+                            <p class="text-xs text-gray-600 mb-5">Based on {{ $reviewsCount }} {{ Str::plural('verified review', $reviewsCount) }}</p>
+
+                            <!-- Breakdown bars (Click to filter) -->
+                            <div class="space-y-1.5 pt-4 border-t border-gray-200 text-xs">
+                                <div class="flex items-center justify-between text-[11px] text-gray-400 font-semibold mb-2">
+                                    <span>Click star to filter</span>
+                                    <button type="button" x-show="starFilter !== 'all'" @click="clearFilter()" class="text-black font-bold hover:underline cursor-pointer">
+                                        Reset
+                                    </button>
+                                </div>
+
+                                @foreach([5, 4, 3, 2, 1] as $star)
+                                    @php
+                                        $item = $ratingBreakdown[$star] ?? ['count' => 0, 'percentage' => 0];
+                                    @endphp
+                                    <button type="button" 
+                                            @click="setFilter(starFilter === {{ $star }} ? 'all' : {{ $star }})" 
+                                            class="w-full group flex items-center gap-3 py-1.5 px-2 -mx-2 rounded transition text-left cursor-pointer"
+                                            :class="starFilter === {{ $star }} ? 'bg-black/10 ring-1 ring-black/20 font-bold' : 'hover:bg-gray-200/60'">
+                                        <span class="w-12 text-gray-700 font-semibold flex items-center gap-1 group-hover:text-black">
+                                            {{ $star }} <span class="text-black text-sm">★</span>
+                                        </span>
+                                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-black rounded-full transition-all duration-500" style="width: {{ $item['percentage'] }}%;"></div>
+                                        </div>
+                                        <span class="w-10 text-right text-gray-500 text-[11px] font-medium" :class="starFilter === {{ $star }} ? 'text-black font-bold' : ''">{{ $item['count'] }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+
+                            <!-- Trust Highlights -->
+                            <div class="mt-7 pt-6 border-t border-gray-200 space-y-3">
+                                <div class="flex items-center gap-2.5 text-xs text-gray-700">
+                                    <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <span>100% Genuine Full-Grain Leather</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 text-xs text-gray-700">
+                                    <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Verified Buyers across Pakistan</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 text-xs text-gray-700">
+                                    <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <span>7-Day Hassle-Free Exchange</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Sticky Trigger -->
+                        <button type="button" 
+                                @click="showReviewForm = true; $nextTick(() => { document.getElementById('write-review-form')?.scrollIntoView({behavior: 'smooth'}) })"
+                                class="w-full text-center py-3 px-4 border border-black text-black hover:bg-black hover:text-white transition text-xs font-bold uppercase tracking-[0.18em] cursor-pointer">
+                            Write a Review
+                        </button>
+                    </div>
+
+                    <!-- Right: Reviews Feed & Controls (8 cols on lg) -->
+                    <div class="lg:col-span-8 space-y-6">
+
+                        <!-- Filter & Sort Toolbar -->
+                        <div x-show="allReviews.length > 0" class="bg-[#faf9f6] border border-gray-200 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <!-- Star Filter Pills -->
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mr-1 hidden sm:inline">Filter:</span>
+                                <button type="button" 
+                                        @click="setFilter('all')" 
+                                        :class="starFilter === 'all' ? 'bg-black text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'"
+                                        class="px-3 py-1 text-xs font-semibold rounded-none transition cursor-pointer">
+                                    All (<span x-text="allReviews.length"></span>)
+                                </button>
+                                <template x-for="star in [5, 4, 3, 2, 1]" :key="star">
+                                    <button type="button" 
+                                            @click="setFilter(star)" 
+                                            :class="starFilter === star ? 'bg-black text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'"
+                                            class="px-2.5 py-1 text-xs font-semibold rounded-none transition flex items-center gap-1 cursor-pointer">
+                                        <span x-text="star"></span>★
+                                        <span class="text-[10px] opacity-75" x-text="'(' + countForStar(star) + ')'"></span>
+                                    </button>
+                                </template>
+                            </div>
+
+                            <!-- Sort Dropdown -->
+                            <div class="flex items-center gap-2 self-end sm:self-auto">
+                                <label for="review-sort" class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Sort:</label>
+                                <select id="review-sort" 
+                                        x-model="sortBy" 
+                                        class="bg-white border border-gray-300 text-xs font-medium text-gray-800 py-1.5 pl-3 pr-8 focus:border-black focus:ring-black rounded-none">
+                                    <option value="recent">Most Recent</option>
+                                    <option value="highest">Highest Rating</option>
+                                    <option value="lowest">Lowest Rating</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Active Filter Status Banner -->
+                        <div x-show="starFilter !== 'all'" x-cloak class="flex items-center justify-between bg-black/5 border border-black/10 px-4 py-2 text-xs text-gray-800">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium text-gray-500">Filtered by:</span>
+                                <span class="font-bold text-black" x-text="starFilter + ' Star Reviews (' + totalFiltered + ')'"></span>
+                            </div>
+                            <button type="button" @click="clearFilter()" class="text-xs font-bold text-black hover:underline flex items-center gap-1 cursor-pointer">
+                                <span>Show all reviews</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Dynamic Reviews List -->
+                        <div class="space-y-4">
+                            <template x-for="review in visibleReviews" :key="review.id">
+                                <div class="bg-white border border-gray-200 p-6 sm:p-7 shadow-xs hover:border-gray-300 transition">
+                                    <!-- Reviewer Header -->
+                                    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-black text-white font-bold text-xs flex items-center justify-center flex-shrink-0" x-text="review.initials || 'C'">
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <h4 class="text-sm font-bold text-gray-950" x-text="review.customer_name"></h4>
+                                                    <span x-show="review.verified_purchase" class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+                                                        <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                                        Verified Buyer
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center gap-2 mt-0.5 text-[11px] text-gray-400">
+                                                    <span x-text="review.formatted_date || 'Recent'"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Stars -->
+                                        <div class="flex items-center gap-0.5">
+                                            <template x-for="s in [1, 2, 3, 4, 5]" :key="s">
+                                                <span>
+                                                    <svg x-show="s <= review.rating" class="w-4 h-4 text-black fill-current" viewBox="0 0 24 24">
+                                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                                    </svg>
+                                                    <svg x-show="s > review.rating" class="w-4 h-4 text-black" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                                    </svg>
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Review Title -->
+                                    <h5 class="text-base font-bold text-gray-900 mb-2 leading-snug" x-text="review.title"></h5>
+
+                                    <!-- Review Description -->
+                                    <p class="text-sm text-gray-600 leading-relaxed font-normal whitespace-pre-line" x-text="review.description"></p>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Empty Filter State -->
+                        <div x-show="totalFiltered === 0 && allReviews.length > 0" x-cloak class="bg-[#faf9f6] border border-dashed border-gray-300 p-8 text-center">
+                            <p class="text-sm font-semibold text-gray-800">No reviews found matching <span x-text="starFilter"></span> stars.</p>
+                            <button type="button" @click="clearFilter()" class="mt-3 inline-flex items-center gap-1.5 bg-black text-white px-4 py-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition cursor-pointer">
+                                Show All Reviews
+                            </button>
+                        </div>
+
+                        <!-- Zero Reviews Overall State -->
+                        <div x-show="allReviews.length === 0" class="text-center py-14 px-4 bg-[#faf9f6] border border-dashed border-gray-300">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-black text-white flex items-center justify-center mb-3">
+                                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            </div>
+                            <h4 class="text-base font-serif font-bold text-gray-900">Be the First to Review</h4>
+                            <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Have you ordered this pair? Let fellow gentlemen know about the craftsmanship and fit.</p>
+                            <button type="button" @click="showReviewForm = true; $nextTick(() => document.getElementById('write-review-form')?.scrollIntoView({behavior: 'smooth'}))" class="mt-4 inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition cursor-pointer">
+                                Write a Review
+                            </button>
+                        </div>
+
+                        <!-- Load More Bar & Pagination (for scalable large review lists) -->
+                        <div x-show="allReviews.length > 0" class="pt-6 border-t border-gray-200">
+                            <div class="flex flex-col items-center justify-center text-center gap-3">
+                                <!-- Progress Counter -->
+                                <p class="text-xs text-gray-500 font-medium">
+                                    Showing <span class="font-bold text-gray-900" x-text="Math.min(visibleCount, totalFiltered)"></span> of <span class="font-bold text-gray-900" x-text="totalFiltered"></span> reviews
+                                </p>
+
+                                <!-- Progress Bar -->
+                                <div class="w-48 sm:w-64 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-black transition-all duration-300 rounded-full" 
+                                         :style="'width: ' + (totalFiltered > 0 ? Math.min(100, Math.round((Math.min(visibleCount, totalFiltered) / totalFiltered) * 100)) : 0) + '%'"></div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex items-center gap-3 mt-2" x-show="hasMore">
+                                    <button type="button" 
+                                            @click="loadMore()" 
+                                            class="bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition shadow-sm flex items-center gap-2 cursor-pointer">
+                                        <span>Load More Reviews</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                    </button>
+                                    <button type="button" 
+                                            @click="showAll()" 
+                                            class="border border-gray-300 bg-white text-gray-800 px-5 py-3 text-xs font-bold uppercase tracking-[0.15em] hover:border-black transition cursor-pointer">
+                                        Show All (<span x-text="totalFiltered"></span>)
+                                    </button>
+                                </div>
+
+                                <!-- All Loaded Message -->
+                                <p x-show="!hasMore && totalFiltered > 0" class="text-xs text-gray-400 italic mt-1">
+                                    You have viewed all reviews in this view.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
             <!-- Related Products -->
              @if($relatedProducts->isNotEmpty())
             <section class="mt-24 border-t border-gray-200 pt-16">
@@ -664,6 +1080,87 @@
                         });
                 }
             }
+        }
+
+        function reviewsManager() {
+            return {
+                allReviews: @json($reviews) || [],
+                starFilter: 'all',
+                sortBy: 'recent',
+                visibleCount: 5,
+                perPage: 5,
+                showReviewForm: false,
+                submittingReview: false,
+                userRating: 5,
+                hoverRating: 0,
+                formSuccess: false,
+                formMessage: '',
+
+                get filteredReviews() {
+                    let list = Array.isArray(this.allReviews) ? [...this.allReviews] : [];
+                    if (this.starFilter !== 'all') {
+                        const s = parseInt(this.starFilter);
+                        list = list.filter(r => parseInt(r.rating) === s);
+                    }
+                    if (this.sortBy === 'recent') {
+                        list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                    } else if (this.sortBy === 'highest') {
+                        list.sort((a, b) => (b.rating - a.rating) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
+                    } else if (this.sortBy === 'lowest') {
+                        list.sort((a, b) => (a.rating - b.rating) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
+                    }
+                    return list;
+                },
+
+                get visibleReviews() {
+                    return this.filteredReviews.slice(0, this.visibleCount);
+                },
+
+                get totalFiltered() {
+                    return this.filteredReviews.length;
+                },
+
+                get hasMore() {
+                    return this.visibleCount < this.totalFiltered;
+                },
+
+                loadMore() {
+                    this.visibleCount += this.perPage;
+                },
+
+                showAll() {
+                    this.visibleCount = this.totalFiltered;
+                },
+
+                setFilter(star) {
+                    this.starFilter = star;
+                    this.visibleCount = this.perPage;
+                },
+
+                clearFilter() {
+                    this.starFilter = 'all';
+                    this.visibleCount = this.perPage;
+                },
+
+                countForStar(star) {
+                    if (!Array.isArray(this.allReviews)) return 0;
+                    return this.allReviews.filter(r => parseInt(r.rating) === star).length;
+                }
+            };
+        }
+
+        // Expose to window for Alpine
+        window.productDetail = productDetail;
+        window.reviewsManager = reviewsManager;
+
+        if (window.Alpine) {
+            window.Alpine.data('productDetail', productDetail);
+            window.Alpine.data('reviewsManager', reviewsManager);
+        } else {
+            document.addEventListener('alpine:init', () => {
+                window.Alpine.data('productDetail', productDetail);
+                window.Alpine.data('reviewsManager', reviewsManager);
+            });
         }
     </script>
 </x-app-layout>

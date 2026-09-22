@@ -575,7 +575,112 @@
         </div>
     </section>
 
+    <!-- Elegant Customer Reviews Section -->
+    <section class="py-20 sm:py-28 bg-[#faf9f6] border-t border-gray-200">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
+            
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <div class="flex items-center justify-center gap-3 mb-3">
+                    <span class="w-8 h-[2px] bg-black"></span>
+                    <span class="text-xs font-bold uppercase tracking-[0.3em] text-gray-500">Testimonials</span>
+                    <span class="w-8 h-[2px] bg-black"></span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-gray-950 mb-4 tracking-tight">
+                    What Our Gentlemen Say
+                </h2>
+                <p class="text-sm sm:text-base text-gray-600 font-light leading-relaxed mb-6">
+                    Handcrafted comfort and uncompromising quality. Genuine impressions from discerning buyers across Pakistan.
+                </p>
 
+                <!-- Trust Metric Badge -->
+                <div class="inline-flex flex-wrap items-center justify-center gap-3 bg-white px-5 py-2.5 border border-gray-200 shadow-xs">
+                    <div class="flex items-center gap-0.5">
+                        @for($i = 1; $i <= 5; $i++)
+                            <svg class="w-4 h-4 text-black fill-current" viewBox="0 0 24 24">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                        @endfor
+                    </div>
+                    <span class="text-xs font-bold text-gray-900 tracking-wider uppercase">4.9 / 5.0 Rating</span>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-xs text-gray-600 font-medium">1,000+ Satisfied Customers Nationwide</span>
+                </div>
+            </div>
+
+            <!-- Reviews Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                @forelse($reviews as $review)
+                    <div class="bg-white border border-gray-200/90 p-7 sm:p-8 flex flex-col justify-between shadow-xs hover:border-black transition-all duration-300 group">
+                        <div>
+                            <!-- Star Rating & Quote mark -->
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-0.5">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $review->rating)
+                                            <svg class="w-4 h-4 text-black fill-current" viewBox="0 0 24 24">
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                            </svg>
+                                        @else
+                                            <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                            </svg>
+                                        @endif
+                                    @endfor
+                                    <span class="ml-2 text-xs font-bold text-gray-800">{{ $review->rating }}.0</span>
+                                </div>
+                                <svg class="w-7 h-7 text-gray-200 group-hover:text-black/20 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                            </div>
+
+                            <!-- Review Title -->
+                            <h3 class="text-base font-bold text-gray-950 mb-3 leading-snug">
+                                "{{ $review->title }}"
+                            </h3>
+
+                            <!-- Review Description -->
+                            <p class="text-sm text-gray-600 leading-relaxed font-light mb-6 line-clamp-4">
+                                {{ $review->description }}
+                            </p>
+                        </div>
+
+                        <!-- Author & Product Footer -->
+                        <div class="pt-5 border-t border-gray-100">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-full bg-black text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
+                                        {{ $review->initials }}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-gray-900">{{ $review->customer_name }}</h4>
+                                        @if($review->verified_purchase)
+                                            <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+                                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                                Verified Buyer
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if($review->product)
+                                <div class="mt-3 pt-3 border-t border-gray-100/70 flex items-center justify-between text-[11px]">
+                                    <span class="text-gray-400">Purchased:</span>
+                                    <a href="{{ route('product.show', $review->product->slug) }}" class="font-medium text-gray-700 hover:text-black transition truncate max-w-[200px] underline underline-offset-2">
+                                        {{ $review->product->name }}
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-3 text-center py-12 bg-white border border-gray-200">
+                        <p class="text-sm text-gray-500">Reviews will be shown here once published.</p>
+                    </div>
+                @endforelse
+            </div>
+
+        </div>
+    </section>
 
     <!-- Services -->
     <section class="py-20 border-t border-gray-100">

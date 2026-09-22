@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->decimal('advance_amount', 10, 2)->default(0)->after('total');
-        });
+        if (!Schema::hasColumn('orders', 'advance_amount')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->decimal('advance_amount', 10, 2)->default(0)->after('total');
+            });
+        }
     }
 
     /**

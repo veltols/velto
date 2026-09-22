@@ -9,8 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->boolean('is_slider')->default(false)->after('is_active');
-            $table->unsignedSmallInteger('sort_order')->default(0)->after('is_slider');
+            if (!Schema::hasColumn('banners', 'is_slider')) {
+                $table->boolean('is_slider')->default(false)->after('is_active');
+            }
+            if (!Schema::hasColumn('banners', 'sort_order')) {
+                $table->unsignedSmallInteger('sort_order')->default(0)->after('is_slider');
+            }
         });
     }
 
