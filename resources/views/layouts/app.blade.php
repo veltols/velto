@@ -137,7 +137,7 @@ src="https://www.facebook.com/tr?id=2259213124835399&ev=PageView&noscript=1"
                 </div>
 
                 <!-- Right Actions -->
-                <div class="flex items-center space-x-6 lg:space-x-8">
+                <div class="flex items-center  lg:space-x-8">
                      @auth
                         <div class="relative" x-data="{ userOpen: false }">
                             <button @click="userOpen = !userOpen" class="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition">
