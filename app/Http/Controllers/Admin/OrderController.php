@@ -59,8 +59,16 @@ class OrderController extends Controller
             $validated['advance_amount'] = 0;
         }
 
+        $oldStatus = $order->status;
         $order->update($validated);
 
-        return back()->with('success', 'Order updated successfully.');
+        $message = 'Order updated successfully.';
+        if ($oldStatus !== 'cancelled' && $validated['status'] === 'cancelled') {
+            $message = 'Order cancelled and item quantities have been restocked successfully.';
+        } elseif ($oldStatus === 'cancelled' && $validated['status'] !== 'cancelled') {
+            $message = 'Order status updated and item quantities have been re-allocated.';
+        }
+
+        return back()->with('success', $message);
     }
 }
