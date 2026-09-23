@@ -71,7 +71,7 @@ class CartController extends Controller
         // Check availability with total quantity
         if ($request->variant_id) {
             $variant = ProductVariant::find($request->variant_id);
-            if ($variant->stock_quantity < $newQuantity) {
+            if ($variant && $variant->stock_quantity > 0 && $variant->stock_quantity < $newQuantity) {
                 return response()->json(['success' => false, 'message' => 'Not enough stock. You already have ' . ($cartItem ? $cartItem->quantity : 0) . ' in cart.'], 422);
             }
         } else {
@@ -141,7 +141,7 @@ class CartController extends Controller
         // Check stock
         if ($cartItem->product_variant_id) {
             $variant = ProductVariant::find($cartItem->product_variant_id);
-            if ($variant->stock_quantity < $request->quantity) {
+            if ($variant && $variant->stock_quantity > 0 && $variant->stock_quantity < $request->quantity) {
                  return response()->json(['success' => false, 'message' => 'Stock limit reached.']);
             }
         }

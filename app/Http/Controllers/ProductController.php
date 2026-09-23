@@ -12,7 +12,7 @@ class ProductController extends Controller
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
             ->with(['category', 'images', 'approvedReviews', 'variants' => function ($query) {
-                $query->where('is_available', true)->where('stock_quantity', '>', 0);
+                $query->where('is_available', true);
             }])
             ->firstOrFail();
 

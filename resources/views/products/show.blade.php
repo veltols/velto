@@ -249,92 +249,136 @@
                     @endif
 
                     <form @submit.prevent="addToBag">
-                        <!-- Color Selector -->
-                        <div class="mb-6" x-show="uniqueColors.length > 0">
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs font-bold uppercase tracking-wider text-gray-900">Color: <span class="font-normal text-gray-600 normal-case" x-text="selectedColor || 'Choose a color'"></span></span>
+                        <!-- Color Selector (Shown only when product has 2 or more colors) -->
+                        <div class="mb-5" x-show="uniqueColors.length > 1">
+                            <div class="flex items-center justify-between mb-2.5">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-900">
+                                    Color: <span class="font-semibold text-stone-600 normal-case ml-1" x-text="selectedColor"></span>
+                                </span>
                             </div>
-                            <div class="flex flex-wrap gap-2.5">
+                            <div class="flex flex-wrap items-center gap-2.5">
                                 <template x-for="color in uniqueColors" :key="color">
                                     <button type="button" 
                                             @click="selectColor(color)"
-                                            class="px-4 py-2 border rounded-sm text-xs font-semibold uppercase tracking-wider transition-all duration-200"
+                                            class="group relative flex items-center gap-2 px-3 py-2 border rounded-md text-xs transition-all duration-150 select-none focus:outline-none"
                                             :class="selectedColor === color 
                                                 ? 'border-black bg-black text-white shadow-sm ring-1 ring-black' 
-                                                : 'border-gray-200 text-gray-700 hover:border-gray-900 hover:text-black bg-white'">
-                                        <span x-text="color"></span>
+                                                : 'border-gray-200 text-gray-800 hover:border-gray-400 bg-gray-50/70 hover:bg-gray-100/70'">
+                                        <!-- Visual Color Dot -->
+                                        <span class="w-3.5 h-3.5 rounded-full border border-gray-300 shadow-xs flex-shrink-0"
+                                              :style="'background: ' + getColorHex(color)"></span>
+                                        <span class="font-bold tracking-wide uppercase text-[11px]" x-text="color"></span>
                                     </button>
                                 </template>
+                            </div>
+                        </div>
+
+                        <!-- Colour & Texture Note Accordion -->
+                        <div class="border-t border-b border-gray-200 py-3.5 my-6" x-data="{ openNote: true }">
+                            <button type="button" @click="openNote = !openNote" class="w-full flex items-center justify-between text-left focus:outline-none select-none group">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-stone-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" stroke-width="1.8"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 16v-4m0-4h.01"/>
+                                    </svg>
+                                    <span class="text-xs font-semibold uppercase tracking-wider text-stone-900">Colour &amp; Texture</span>
+                                </div>
+                                <svg class="w-3.5 h-3.5 text-stone-400 transform transition-transform duration-200" :class="openNote ? 'rotate-180' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div x-show="openNote" x-collapse>
+                                <p class="mt-2.5 pl-6 text-[11px] sm:text-xs text-stone-500 uppercase tracking-wide leading-relaxed font-normal">
+                                    PLEASE NOTE: LEATHER IS A NATURAL MATERIAL, AND PRODUCT PHOTOS ARE TAKEN UNDER STUDIO LIGHTING. COLOUR AND TEXTURE MAY APPEAR SLIGHTLY DIFFERENT IN PERSON DUE TO LIGHTING, SCREEN SETTINGS, AND NATURAL VARIATIONS IN THE LEATHER.
+                                </p>
                             </div>
                         </div>
 
                         <!-- Size Selector -->
                         <div class="mb-6" x-show="availableSizes.length > 0">
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs font-bold uppercase tracking-wider text-gray-900">
-                                    Size: 
-                                    <span class="font-normal text-gray-600" x-text="selectedVariant ? selectedVariant.size : 'Choose size'"></span>
+                            <div class="flex items-center justify-between mb-3.5">
+                                <span class="text-xs sm:text-[13px] font-bold uppercase tracking-wider text-gray-900">
+                                    Select Size
                                 </span>
-                                <button type="button" @click="showSizeGuide = true" class="text-xs font-semibold text-gray-700 underline hover:text-black flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                    Size Guide
+                                <button type="button" @click="showSizeGuide = true" class="inline-flex items-center gap-1.5 pb-0.5 border-b-2 border-black text-xs font-bold uppercase tracking-wider text-gray-900 hover:opacity-75 transition cursor-pointer">
+                                    <!-- Table / Grid Icon -->
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="1.8"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M10 3v18"/>
+                                    </svg>
+                                    <span>Size Guide</span>
+                                    <svg class="w-3 h-3 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                                    </svg>
                                 </button>
                             </div>
                             
-                            <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                            <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
                                 <template x-for="variant in availableSizes" :key="variant.id">
                                     <button type="button" 
                                             @click="selectedVariant = variant"
-                                            class="group relative flex flex-col items-center justify-center py-2.5 px-2 border rounded-sm text-xs font-bold uppercase tracking-wide focus:outline-none transition-all duration-150"
+                                            class="group relative flex flex-col items-center justify-center py-3 px-2 border rounded-md text-xs transition-all duration-150 focus:outline-none select-none min-h-[58px]"
                                             :class="selectedVariant && selectedVariant.id === variant.id 
-                                                ? 'ring-2 ring-black border-black bg-black text-white' 
-                                                : (variant.stock_quantity <= 0 ? 'border-gray-100 text-gray-300 bg-gray-50 cursor-not-allowed line-through' : 'border-gray-200 text-gray-900 hover:border-black bg-white shadow-xs')">
-                                        <span x-text="variant.size"></span>
-                                        <span class="text-[9px] font-normal" :class="selectedVariant && selectedVariant.id === variant.id ? 'text-gray-300' : 'text-gray-400'" x-text="variant.stock_quantity > 0 ? '' : 'Sold'"></span>
+                                                ? 'border-black bg-black text-white shadow-sm ring-1 ring-black' 
+                                                : 'border-gray-200 text-gray-800 hover:border-gray-400 bg-gray-50/70 hover:bg-gray-100/70'">
+                                        <!-- Dual Size Label: PK X | EU Y -->
+                                        <span class="font-bold tracking-wide text-xs sm:text-[13px]" 
+                                              :class="selectedVariant && selectedVariant.id === variant.id ? 'text-white' : 'text-gray-900'"
+                                              x-text="formatSizeLabel(variant.size)"></span>
+
+                                        <!-- Subtext: PRE-ORDER or status -->
+                                        <template x-if="getVariantStatus(variant)">
+                                            <span class="text-[9px] sm:text-[10px] tracking-wider uppercase font-semibold mt-0.5 leading-tight" 
+                                                  :class="selectedVariant && selectedVariant.id === variant.id ? 'text-amber-500' : 'text-gray-400'"
+                                                  x-text="getVariantStatus(variant)"></span>
+                                        </template>
                                     </button>
                                 </template>
                             </div>
-                            <p x-show="!selectedColor && uniqueColors.length > 0" class="text-xs text-amber-700 mt-2">Please select a color first.</p>
                         </div>
 
                         <!-- Actions Container -->
-                        <div class="flex flex-col gap-2.5 mb-6 w-full">
-                            <!-- Quantity & Add to Cart Row -->
-                            <div class="flex flex-row gap-2.5 w-full">
-                                <!-- Modern Quantity Selector -->
-                                <div class="flex items-center border border-gray-300 rounded-sm w-28 sm:w-32 h-11 sm:h-12 flex-shrink-0 bg-white">
-                                    <button type="button" class="w-9 h-full flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 font-bold transition text-sm select-none" @click="if(quantity > 1) quantity--">−</button>
-                                    <input type="number" x-model="quantity" class="w-full h-full text-center border-none focus:ring-0 text-gray-900 font-bold text-sm bg-transparent p-0" min="1" readonly>
-                                    <button type="button" class="w-9 h-full flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 font-bold transition text-sm select-none" @click="incrementQuantity()">+</button>
+                        <div class="flex flex-col mb-6 w-full">
+                            <!-- Quantity Selector -->
+                            <div class="flex items-center gap-3 mb-3.5">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-900">Quantity:</span>
+                                <div class="flex items-center border border-gray-300 rounded-md w-28 h-9 bg-white">
+                                    <button type="button" class="w-8 h-full flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 font-bold transition text-sm select-none" @click="if(quantity > 1) quantity--">−</button>
+                                    <input type="number" x-model="quantity" class="w-full h-full text-center border-none focus:ring-0 text-gray-900 font-bold text-xs bg-transparent p-0" min="1" readonly>
+                                    <button type="button" class="w-8 h-full flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 font-bold transition text-sm select-none" @click="incrementQuantity()">+</button>
                                 </div>
-                                
+                            </div>
+
+                            <!-- Action Buttons Row: Add to Bag, Buy Now, WhatsApp in Single Row -->
+                            <div class="grid grid-cols-3 gap-2 sm:gap-2.5 w-full">
                                 <!-- Add to Bag -->
                                 <button type="submit" 
                                         :disabled="loading || buyLoading || !canAddToCart"
-                                        class="flex-1 bg-white border-2 border-black text-black h-11 sm:h-12 px-4 sm:px-6 text-xs sm:text-sm font-bold uppercase tracking-[0.12em] hover:bg-gray-900 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 rounded-sm shadow-xs active:scale-[0.99] whitespace-nowrap">
-                                    <svg x-show="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                                    <span x-text="loading ? 'Adding...' : (checkStockStatus().text === 'Out of Stock' ? 'Out of Stock' : 'Add to Bag')"></span>
+                                        class="bg-white border-2 border-black text-black h-11 sm:h-12 px-2 sm:px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider hover:bg-black hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-1.5 rounded-md shadow-xs active:scale-[0.98]">
+                                    <svg x-show="!loading" class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                                    <span class="truncate" x-text="loading ? 'Adding...' : (selectedVariant && selectedVariant.stock_quantity <= 0 ? 'Pre-Order' : 'Add to Bag')"></span>
                                 </button>
+
+                                <!-- Buy Now Button -->
+                                <button type="button" 
+                                        @click="buyNow()"
+                                        :disabled="loading || buyLoading || !canAddToCart"
+                                        class="bg-black border-2 border-black text-white h-11 sm:h-12 px-2 sm:px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-1.5 rounded-md shadow-sm active:scale-[0.98]">
+                                    <span class="truncate" x-text="buyLoading ? 'Redirecting...' : (selectedVariant && selectedVariant.stock_quantity <= 0 ? 'Pre-Order' : 'Buy Now')"></span>
+                                    <svg x-show="!buyLoading" class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                    </svg>
+                                </button>
+
+                                <!-- WhatsApp Order Button -->
+                                <a :href="generateWhatsAppLink()" target="_blank" 
+                                   class="bg-[#25D366] hover:bg-[#128C7E] text-white h-11 sm:h-12 px-2 sm:px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 rounded-md shadow-xs active:scale-[0.98]">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                                    </svg>
+                                    <span class="truncate"><span class="hidden sm:inline">Order via </span>WhatsApp</span>
+                                </a>
                             </div>
-
-                            <!-- Buy Now Button (High Priority Conversion) -->
-                            <button type="button" 
-                                    @click="buyNow()"
-                                    :disabled="loading || buyLoading || !canAddToCart"
-                                    class="w-full bg-black text-white h-11 sm:h-12 px-6 text-xs sm:text-sm font-bold uppercase tracking-[0.12em] hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 rounded-sm shadow-md active:scale-[0.99]">
-                                <span x-text="buyLoading ? 'Redirecting to Checkout...' : 'Buy Now'"></span>
-                                <svg x-show="!buyLoading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                </svg>
-                            </button>
-
-                            <!-- WhatsApp Order Button -->
-                            <a :href="generateWhatsAppLink()" target="_blank" class="w-full bg-[#25D366] hover:bg-[#128C7E] text-white h-11 sm:h-12 px-6 text-xs sm:text-sm font-bold uppercase tracking-[0.12em] transition-all duration-200 flex items-center justify-center gap-2 rounded-sm shadow-xs active:scale-[0.99]">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                                </svg>
-                                Order via WhatsApp
-                            </a>
                         </div>
                     </form>
 
@@ -834,24 +878,36 @@
                             <table class="w-full text-center border-collapse border border-gray-200">
                                 <thead>
                                     <tr class="bg-gray-50">
-                                        <th class="border border-gray-200 p-3 text-sm font-bold text-gray-900 uppercase">US</th>
-                                        <th class="border border-gray-200 p-3 text-sm font-medium text-gray-700">7</th>
-                                        <th class="border border-gray-200 p-3 text-sm font-medium text-gray-700">8</th>
-                                        <th class="border border-gray-200 p-3 text-sm font-medium text-gray-700">9</th>
-                                        <th class="border border-gray-200 p-3 text-sm font-medium text-gray-700">10</th>
-                                        <th class="border border-gray-200 p-3 text-sm font-medium text-gray-700">11</th>
-                                        <th class="border border-gray-200 p-3 text-sm font-medium text-gray-700">12</th>
+                                        <th class="border border-gray-200 p-3 text-sm font-bold text-gray-900 uppercase">PK / UK</th>
+                                        <th class="border border-gray-200 p-3 text-sm font-semibold text-gray-800">5</th>
+                                        <th class="border border-gray-200 p-3 text-sm font-semibold text-gray-800">6</th>
+                                        <th class="border border-gray-200 p-3 text-sm font-semibold text-gray-800">7</th>
+                                        <th class="border border-gray-200 p-3 text-sm font-semibold text-gray-800">8</th>
+                                        <th class="border border-gray-200 p-3 text-sm font-semibold text-gray-800">9</th>
+                                        <th class="border border-gray-200 p-3 text-sm font-semibold text-gray-800">10</th>
+                                        <th class="border border-gray-200 p-3 text-sm font-semibold text-gray-800">11</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td class="border border-gray-200 p-3 text-sm font-bold text-gray-900 uppercase bg-gray-50">EURO</td>
+                                        <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">39</td>
                                         <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">40</td>
                                         <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">41</td>
                                         <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">42</td>
                                         <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">43</td>
                                         <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">44</td>
                                         <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">45</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-200 p-3 text-sm font-bold text-gray-900 uppercase bg-gray-50">US</td>
+                                        <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">6</td>
+                                        <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">7</td>
+                                        <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">8</td>
+                                        <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">9</td>
+                                        <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">10</td>
+                                        <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">11</td>
+                                        <td class="border border-gray-200 p-3 text-sm font-medium text-gray-700">12</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -904,13 +960,15 @@
                             });
                         }
                     @endif
-                    // Auto-select first color and first available size
-                    if (this.uniqueColors.length > 0) {
+                    // Auto-select initial color if multiple, or auto-select first in-stock variant
+                    if (this.uniqueColors.length > 1) {
                         this.selectColor(this.uniqueColors[0]);
-                    } else if (this.variants.length > 0) {
-                        // No color variants, auto-select first in-stock size
+                    } else if (this.variants && this.variants.length > 0) {
                         const firstAvailable = this.variants.find(v => v.stock_quantity > 0) || this.variants[0];
-                        if (firstAvailable) this.selectedVariant = firstAvailable;
+                        if (firstAvailable) {
+                            this.selectedVariant = firstAvailable;
+                            this.selectedColor = firstAvailable.color || null;
+                        }
                     }
 
                     // Initialize Swipers safely after Alpine renders and scripts load
@@ -949,22 +1007,99 @@
                 },
 
                 get uniqueColors() {
-                    const colors = this.variants.map(v => v.color).filter(c => c);
+                    if (!this.variants) return [];
+                    const colors = this.variants.map(v => v.color).filter(c => c && c.trim() !== '');
                     return [...new Set(colors)];
                 },
 
+                getColorHex(color) {
+                    if (!color) return '#111111';
+                    const c = color.toLowerCase().trim();
+                    const map = {
+                        'black': '#111111',
+                        'dark brown': '#3e2723',
+                        'brown': '#5d4037',
+                        'chocolate brown': '#4e3629',
+                        'tan brown': '#8d6e63',
+                        'camel brown': '#a07855',
+                        'tan': '#b5835a',
+                        'camel': '#c19a6b',
+                        'beige': '#e6d7c3',
+                        'off white': '#f5f5f0',
+                        'white': '#ffffff',
+                        'blue': '#1e3a8a',
+                        'navy': '#0f172a',
+                        'olive': '#556b2f',
+                        'green': '#2e7d32',
+                        'burgundy': '#800020',
+                        'reddish': '#9b3d2b',
+                        'grey': '#78716c',
+                        'gray': '#78716c',
+                        'two-tone': 'linear-gradient(135deg, #111 50%, #5d4037 50%)',
+                    };
+                    return map[c] || '#8d6e63';
+                },
+
                 get availableSizes() {
-                    if (!this.selectedColor && this.uniqueColors.length > 0) return [];
-                    if (this.uniqueColors.length === 0) return this.variants; // Return all if no colors defined
+                    if (!this.variants || this.variants.length === 0) return [];
                     
-                    return this.variants.filter(v => v.color === this.selectedColor)
-                        .sort((a, b) => {
-                            // Try numeric sort
-                            const sizeA = parseFloat(a.size);
-                            const sizeB = parseFloat(b.size);
-                            if (!isNaN(sizeA) && !isNaN(sizeB)) return sizeA - sizeB;
-                            return a.size.localeCompare(b.size);
-                        });
+                    let list = this.variants;
+                    if (this.selectedColor && this.uniqueColors.length > 1) {
+                        list = list.filter(v => v.color === this.selectedColor);
+                    }
+                    
+                    // Deduplicate by size so a size is NEVER shown twice
+                    const seen = new Map();
+                    list.forEach(v => {
+                        const key = String(v.size).trim();
+                        // Prefer in-stock variant if there are duplicate size entries
+                        if (!seen.has(key) || (seen.get(key).stock_quantity <= 0 && v.stock_quantity > 0)) {
+                            seen.set(key, v);
+                        }
+                    });
+
+                    return Array.from(seen.values()).sort((a, b) => {
+                        const numA = parseInt(String(a.size).replace(/\D/g, ''), 10) || 0;
+                        const numB = parseInt(String(b.size).replace(/\D/g, ''), 10) || 0;
+                        if (numA && numB) return numA - numB;
+                        return String(a.size).localeCompare(String(b.size));
+                    });
+                },
+
+                selectColor(color) {
+                    this.selectedColor = color;
+                    this.selectedVariant = null;
+                    this.quantity = 1;
+                    this.$nextTick(() => {
+                        const firstAvailable = this.availableSizes.find(v => v.stock_quantity > 0) || this.availableSizes[0];
+                        if (firstAvailable) this.selectedVariant = firstAvailable;
+                    });
+                },
+
+                formatSizeLabel(rawSize) {
+                    if (!rawSize) return '';
+                    let str = String(rawSize).trim();
+                    if (str.toUpperCase().includes('PK') && str.toUpperCase().includes('EU')) {
+                        return str;
+                    }
+                    const num = parseInt(str.replace(/\D/g, ''), 10);
+                    if (!isNaN(num)) {
+                        if (num >= 35 && num <= 48) {
+                            return `PK ${num - 34} | EU ${num}`;
+                        }
+                        if (num >= 4 && num <= 14) {
+                            return `PK ${num} | EU ${num + 34}`;
+                        }
+                    }
+                    return str;
+                },
+
+                getVariantStatus(variant) {
+                    if (!variant) return '';
+                    if (variant.stock_quantity <= 0 || variant.is_preorder) {
+                        return 'PRE-ORDER';
+                    }
+                    return '';
                 },
                 
                 get currentPrice() {
@@ -984,51 +1119,40 @@
                 
                 get canAddToCart() {
                     if (this.variants.length > 0 && !this.selectedVariant) return false;
-                    if (this.selectedVariant && this.selectedVariant.stock_quantity <= 0) return false;
                     return true;
                 },
 
                 checkStockStatus() {
-                    if (this.variants.length > 0 && !this.selectedVariant) return { text: 'Select Option', class: 'text-gray-500 bg-gray-100' };
+                    if (this.variants.length > 0 && !this.selectedVariant) return { text: 'Select Size', class: 'text-gray-500 bg-gray-100' };
                     if (this.selectedVariant) {
-                        console.log('Checking variant stock:', this.selectedVariant.stock_quantity);
                         return this.selectedVariant.stock_quantity > 0 
-                            ? { text: 'In Stock', class: 'text-green-600 bg-green-50' }
-                            : { text: 'Out of Stock', class: 'text-gray-900 bg-gray-100' };
+                            ? { text: 'In Stock', class: 'text-green-700 bg-green-50' }
+                            : { text: 'Pre-Order', class: 'text-amber-800 bg-amber-50' };
                     }
                     // Fallback
                     return this.product.stock_quantity > 0 
-                        ? { text: 'In Stock', class: 'text-green-600 bg-green-50' }
-                        : { text: 'Out of Stock', class: 'text-gray-900 bg-gray-100' };
-                },
-
-                selectColor(color) {
-                    this.selectedColor = color;
-                    this.selectedVariant = null;
-                    this.quantity = 1;
-                    // Auto-select first in-stock size for chosen color
-                    this.$nextTick(() => {
-                        const firstAvailable = this.availableSizes.find(v => v.stock_quantity > 0) || this.availableSizes[0];
-                        if (firstAvailable) this.selectedVariant = firstAvailable;
-                    });
+                        ? { text: 'In Stock', class: 'text-green-700 bg-green-50' }
+                        : { text: 'Pre-Order', class: 'text-amber-800 bg-amber-50' };
                 },
 
                 incrementQuantity() {
                     const max = this.selectedVariant ? this.selectedVariant.stock_quantity : this.product.stock_quantity;
-                    if (this.quantity < max) {
+                    if (!max || max <= 0 || this.quantity < max) {
                         this.quantity++;
                     }
                 },
 
                 generateWhatsAppLink() {
                     let text = `Hello! I would like to order the following product:\n\n`;
-                    text += `*${this.product.name}*\n`;
-                    
                     if (this.selectedColor) {
                         text += `Color: ${this.selectedColor}\n`;
                     }
                     if (this.selectedVariant && this.selectedVariant.size) {
-                        text += `Size: ${this.selectedVariant.size}\n`;
+                        text += `Size: ${this.formatSizeLabel(this.selectedVariant.size)}`;
+                        if (this.getVariantStatus(this.selectedVariant)) {
+                            text += ` (${this.getVariantStatus(this.selectedVariant)})`;
+                        }
+                        text += `\n`;
                     }
                     
                     text += `Quantity: ${this.quantity}\n`;
