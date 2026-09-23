@@ -75,6 +75,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Product Images
         Route::delete('/products/{product}/images/{image}', [AdminProductController::class, 'destroyImage'])->name('products.images.destroy');
         Route::post('/products/{product}/images/{image}/primary', [AdminProductController::class, 'setPrimaryImage'])->name('products.images.primary');
+        Route::post('/products/{product}/images/{image}/color', [AdminProductController::class, 'updateImageColor'])->name('products.images.color');
         Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
     });

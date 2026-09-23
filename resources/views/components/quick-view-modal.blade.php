@@ -106,7 +106,9 @@
 
                         <!-- COLOR Selection -->
                         <div class="mb-5" x-show="uniqueColors.length > 0">
-                            <span class="text-xs font-black uppercase tracking-wider text-black block pb-1 border-b-2 border-black w-fit mb-3">COLOR</span>
+                            <span class="text-xs font-black uppercase tracking-wider text-black block pb-1 border-b-2 border-black w-fit mb-3">
+                                COLOR: <span class="font-medium text-stone-600 normal-case ml-1" x-text="selectedColor"></span>
+                            </span>
                             <div class="flex items-center gap-2 pt-1">
                                 <template x-for="color in uniqueColors" :key="color">
                                     <button 
@@ -116,7 +118,7 @@
                                         :class="selectedColor === color ? 'border-black ring-1 ring-black' : 'border-gray-300 hover:border-black'"
                                         :title="color"
                                     >
-                                        <span class="block w-full h-full rounded-full" :style="'background-color: ' + getColorHex(color)"></span>
+                                        <span class="block w-full h-full rounded-full" :style="'background: ' + getColorHex(color)"></span>
                                     </button>
                                 </template>
                             </div>
@@ -288,22 +290,48 @@
                 const sizes = this.product.variants.filter(v => v.color === color);
                 const firstAvailable = sizes.find(v => v.stock_quantity > 0) || sizes[0];
                 this.selectedVariant = firstAvailable || null;
+
+                if (this.product && this.product.images && color) {
+                    const match = this.product.images.find(img => img.color && img.color.toLowerCase().trim() === color.toLowerCase().trim());
+                    if (match) {
+                        this.activeImage = match.url;
+                    }
+                }
             },
 
             getColorHex(name) {
+                if (!name) return '#111111';
+                const c = name.toLowerCase().trim();
                 const map = {
                     'black': '#111111',
-                    'brown': '#6b3e26',
+                    'brown': '#5d4037',
                     'dark brown': '#3e2723',
-                    'tan': '#d2b48c',
-                    'burgundy': '#800020',
+                    'chocolate brown': '#4e3629',
+                    'chocolate': '#4e3629',
+                    'tan brown': '#8d6e63',
+                    'camel brown': '#a07855',
+                    'tan': '#b5835a',
+                    'camel': '#c19a6b',
+                    'beige': '#e6d7c3',
+                    'off white': '#f5f5f0',
+                    'white': '#ffffff',
                     'blue': '#1e3a8a',
                     'navy': '#0f172a',
-                    'white': '#ffffff',
-                    'grey': '#6b7280',
-                    'gray': '#6b7280'
+                    'olive': '#556b2f',
+                    'green': '#2e7d32',
+                    'burgundy': '#800020',
+                    'reddish': '#9b3d2b',
+                    'radish': '#9b3d2b',
+                    'reddish brown': '#7e2d1d',
+                    'oxblood': '#4a0e17',
+                    'maroon': '#800000',
+                    'cherry': '#722f37',
+                    'wine': '#722f37',
+                    'grey': '#78716c',
+                    'gray': '#78716c',
+                    'two-tone': 'linear-gradient(135deg, #111 50%, #5d4037 50%)',
                 };
-                return map[name.toLowerCase()] || '#111111';
+                return map[c] || '#8d6e63';
             },
 
             addToCartFromModal() {

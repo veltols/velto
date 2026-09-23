@@ -103,69 +103,75 @@
                 
                 <!-- Image Gallery -->
                 <div class="relative flex flex-col gap-3 select-none">
-                  @php
-                        // Sort so primary image appears absolutely first natively
-                        $sortedImages = collect();
-                        if ($product->images && $product->images->count() > 0) {
-                            $sortedImages = $product->images->sort(function ($a, $b) {
-                                if ($a->is_primary && !$b->is_primary) return -1;
-                                if (!$a->is_primary && $b->is_primary) return 1;
-                                return ($a->display_order ?? 0) <=> ($b->display_order ?? 0);
-                            })->values();
-                        } elseif ($product->primary_image) {
-                            $fakeImage = new \stdClass();
-                            $fakeImage->image_path = $product->primary_image;
-                            $sortedImages = collect([$fakeImage]);
-                        } else {
-                            $fakeImage = new \stdClass();
-                            $fakeImage->image_path = 'https://placehold.co/400x500?text=No+Image';
-                            $sortedImages = collect([$fakeImage]);
+                    @php
+                        // Sort so primary image appears first, then display_order
+                        $productImagesData = $product->images->sortBy([
+                            ['is_primary', 'desc'],
+                            ['display_order', 'asc'],
+                            ['id', 'asc'],
+                        ])->values()->map(function ($img) use ($product) {
+                            $path = $img->image_path;
+                            $url = \Illuminate\Support\Str::startsWith($path, 'http') ? $path : asset('storage/' . $path);
+                            return [
+                                'id' => $img->id,
+                                'url' => $url,
+                                'color' => $img->color ? trim($img->color) : null,
+                                'is_primary' => (bool) $img->is_primary,
+                                'display_order' => (int) $img->display_order,
+                                'alt' => $product->name . ($img->color ? ' - ' . $img->color : ''),
+                            ];
+                        });
+
+                        if ($productImagesData->isEmpty()) {
+                            $defaultUrl = $product->primary_image 
+                                ? (\Illuminate\Support\Str::startsWith($product->primary_image, 'http') ? $product->primary_image : asset('storage/' . $product->primary_image)) 
+                                : asset('images/hero-shoes.png');
+
+                            $productImagesData = collect([[
+                                'id' => 0,
+                                'url' => $defaultUrl,
+                                'color' => null,
+                                'is_primary' => true,
+                                'display_order' => 0,
+                                'alt' => $product->name,
+                            ]]);
                         }
                     @endphp 
 
                     <!-- Main Slider Area (object-contain with white background so images don't get cropped) -->
                     <div class="swiper main-swiper w-full aspect-square md:aspect-[4/5] bg-white border border-gray-100 overflow-hidden rounded-md group relative">
                         <div class="swiper-wrapper">
-                            @foreach($sortedImages as $image)
+                            <template x-for="(image, idx) in currentImages" :key="image.id || image.url">
                                 <div class="swiper-slide w-full h-full flex items-center justify-center p-4">
-                                    @php
-                                        $path = is_object($image) ? $image->image_path : $image['image_path'];
-                                        $url = Str::startsWith($path, 'http') ? $path : asset('storage/' . $path);
-                                    @endphp
-                                    <img src="{{ $url }}" class="w-full h-full object-contain object-center block" alt="{{ $product->name }} - Men's leather shoes Pakistan" onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
+                                    <img :src="image.url" 
+                                         class="w-full h-full object-contain object-center block" 
+                                         :alt="image.alt || '{{ $product->name }}'" 
+                                         onerror="this.onerror=null;this.src='https://placehold.co/400x500?text=Image+Not+Found';">
                                 </div>
-                            @endforeach
+                            </template>
                         </div>
 
                         @if($product->isOnSale())
-                            <span class="absolute top-4 left-4 z-10 bg-black text-white text-[11px] font-bold px-3 py-1 uppercase tracking-wider shadow-sm rounded-none">
+                            <span class="absolute top-4 left-4 z-10 bg-black text-white text-[11px] font-bold px-3 py-1 uppercase tracking-wider shadow-sm rounded-none pointer-events-none">
                                 Sale
                             </span>
                         @endif
                         
                         <!-- Navigation Arrows (Hidden if single image) -->
-                        @if($sortedImages->count() > 1)
-                            <div class="swiper-button-next !text-black !w-10 !h-10 !bg-white/90 hover:!bg-white !rounded-full !shadow-md transition transform hover:scale-110 after:!text-sm after:!font-bold"></div>
-                            <div class="swiper-button-prev !text-black !w-10 !h-10 !bg-white/90 hover:!bg-white !rounded-full !shadow-md transition transform hover:scale-110 after:!text-sm after:!font-bold"></div>
-                        @endif
+                        <div x-show="currentImages.length > 1" class="swiper-button-next !text-black !w-10 !h-10 !bg-white/90 hover:!bg-white !rounded-full !shadow-md transition transform hover:scale-110 after:!text-sm after:!font-bold"></div>
+                        <div x-show="currentImages.length > 1" class="swiper-button-prev !text-black !w-10 !h-10 !bg-white/90 hover:!bg-white !rounded-full !shadow-md transition transform hover:scale-110 after:!text-sm after:!font-bold"></div>
                     </div>
 
                     <!-- Thumbnails -->
-                    @if($sortedImages->count() > 1)
-                        <div class="swiper thumb-swiper w-full overflow-hidden pt-1">
-                            <div class="swiper-wrapper">
-                                @foreach($sortedImages as $image)
-                                    <div class="swiper-slide !w-20 !h-20 sm:!w-24 sm:!h-24 aspect-square bg-white border-2 border-gray-200 transition-all duration-200 cursor-pointer overflow-hidden rounded-md opacity-60 hover:opacity-100 [&.swiper-slide-thumb-active]:border-black [&.swiper-slide-thumb-active]:opacity-100 p-1 flex items-center justify-center">
-                                        @php
-                                            $path = is_object($image) ? $image->image_path : $image['image_path'];
-                                            $url = Str::startsWith($path, 'http') ? $path : asset('storage/' . $path);
-                                        @endphp
-                                        <img src="{{ $url }}" class="w-full h-full object-contain object-center" onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=Error';">
-                                    </div>
-                                @endforeach
-                            </div>
+                    <div x-show="currentImages.length > 1" class="swiper thumb-swiper w-full overflow-hidden pt-1">
+                        <div class="swiper-wrapper">
+                            <template x-for="(image, idx) in currentImages" :key="'thumb-' + (image.id || image.url)">
+                                <div class="swiper-slide !w-20 !h-20 sm:!w-24 sm:!h-24 aspect-square bg-white border-2 border-gray-200 transition-all duration-200 cursor-pointer overflow-hidden rounded-md opacity-60 hover:opacity-100 [&.swiper-slide-thumb-active]:border-black [&.swiper-slide-thumb-active]:opacity-100 p-1 flex items-center justify-center">
+                                    <img :src="image.url" class="w-full h-full object-contain object-center" onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=Error';">
+                                </div>
+                            </template>
                         </div>
-                    @endif
+                    </div>
                 </div>
 
                 <!-- Product Info -->
@@ -927,6 +933,9 @@
             return {
                 product: @json($product),
                 variants: @json($product->variants),
+                allImages: @json($productImagesData),
+                mainSwiperInstance: null,
+                thumbSwiperInstance: null,
                 
                 showSizeGuide: false,
                 selectedColor: null,
@@ -934,6 +943,70 @@
                 quantity: 1,
                 loading: false,
                 buyLoading: false,
+
+                get currentImages() {
+                    if (!this.allImages || this.allImages.length === 0) return [];
+
+                    if (this.selectedColor && this.selectedColor.trim() !== '') {
+                        const targetColor = this.selectedColor.toLowerCase().trim();
+
+                        // 1. Find images matching this color specifically
+                        const colorMatches = this.allImages.filter(img => 
+                            img.color && img.color.toLowerCase().trim() === targetColor
+                        );
+
+                        if (colorMatches.length > 0) {
+                            // Color-specific photos + general photos (where color is null/empty)
+                            const generalPhotos = this.allImages.filter(img => !img.color || img.color.trim() === '');
+                            return [...colorMatches, ...generalPhotos];
+                        }
+                    }
+
+                    // Fallback: If no photos are tagged for this color yet, return all images
+                    return this.allImages;
+                },
+
+                initSwipers() {
+                    this.$nextTick(() => {
+                        if (this.mainSwiperInstance) {
+                            try { this.mainSwiperInstance.destroy(true, true); } catch(e) {}
+                            this.mainSwiperInstance = null;
+                        }
+                        if (this.thumbSwiperInstance) {
+                            try { this.thumbSwiperInstance.destroy(true, true); } catch(e) {}
+                            this.thumbSwiperInstance = null;
+                        }
+
+                        // Initialize Thumbnails
+                        const thumbEl = document.querySelector('.thumb-swiper');
+                        if (thumbEl && this.currentImages.length > 1) {
+                            this.thumbSwiperInstance = new Swiper(thumbEl, {
+                                spaceBetween: 16,
+                                slidesPerView: 5,
+                                freeMode: true,
+                                watchSlidesProgress: true,
+                                observer: true,
+                                observeParents: true,
+                            });
+                        }
+
+                        // Initialize Main Gallery
+                        const mainEl = document.querySelector('.main-swiper');
+                        if (mainEl) {
+                            this.mainSwiperInstance = new Swiper(mainEl, {
+                                spaceBetween: 10,
+                                navigation: {
+                                    nextEl: ".swiper-button-next",
+                                    prevEl: ".swiper-button-prev",
+                                },
+                                thumbs: (this.thumbSwiperInstance && this.currentImages.length > 1) ? { swiper: this.thumbSwiperInstance } : {},
+                                grabCursor: true,
+                                observer: true,
+                                observeParents: true,
+                            });
+                        }
+                    });
+                },
 
                 init() {
                     // Ensure stock is number
@@ -960,8 +1033,14 @@
                             });
                         }
                     @endif
-                    // Auto-select initial color if multiple, or auto-select first in-stock variant
-                    if (this.uniqueColors.length > 1) {
+
+                    // Prefer color of primary image if assigned, otherwise first available color
+                    const primaryImg = this.allImages.find(img => img.is_primary && img.color);
+                    const matchedPrimaryColor = primaryImg ? this.uniqueColors.find(c => c.toLowerCase().trim() === primaryImg.color.toLowerCase().trim()) : null;
+
+                    if (matchedPrimaryColor) {
+                        this.selectColor(matchedPrimaryColor);
+                    } else if (this.uniqueColors.length > 1) {
                         this.selectColor(this.uniqueColors[0]);
                     } else if (this.variants && this.variants.length > 0) {
                         const firstAvailable = this.variants.find(v => v.stock_quantity > 0) || this.variants[0];
@@ -969,33 +1048,13 @@
                             this.selectedVariant = firstAvailable;
                             this.selectedColor = firstAvailable.color || null;
                         }
+                        this.initSwipers();
+                    } else {
+                        this.initSwipers();
                     }
 
-                    // Initialize Swipers safely after Alpine renders and scripts load
+                    // Override Global WhatsApp button to send current Product details
                     this.$nextTick(() => {
-                        let thumbSwiper = null;
-                        if (document.querySelector('.thumb-swiper')) {
-                            thumbSwiper = new Swiper(".thumb-swiper", {
-                                spaceBetween: 16,
-                                slidesPerView: 5,
-                                freeMode: true,
-                                watchSlidesProgress: true,
-                            });
-                        }
-
-                        if (document.querySelector('.main-swiper')) {
-                            new Swiper(".main-swiper", {
-                                spaceBetween: 10,
-                                navigation: {
-                                    nextEl: ".swiper-button-next",
-                                    prevEl: ".swiper-button-prev",
-                                },
-                                thumbs: thumbSwiper ? { swiper: thumbSwiper } : {},
-                                grabCursor: true,
-                            });
-                        }
-
-                        // Override Global WhatsApp button to send current Product details
                         const globalWaBtn = document.getElementById('global-whatsapp-btn');
                         if (globalWaBtn) {
                             globalWaBtn.addEventListener('click', (e) => {
@@ -1033,6 +1092,12 @@
                         'green': '#2e7d32',
                         'burgundy': '#800020',
                         'reddish': '#9b3d2b',
+                        'radish': '#9b3d2b',
+                        'reddish brown': '#7e2d1d',
+                        'oxblood': '#4a0e17',
+                        'maroon': '#800000',
+                        'cherry': '#722f37',
+                        'wine': '#722f37',
                         'grey': '#78716c',
                         'gray': '#78716c',
                         'two-tone': 'linear-gradient(135deg, #111 50%, #5d4037 50%)',
@@ -1073,6 +1138,7 @@
                     this.$nextTick(() => {
                         const firstAvailable = this.availableSizes.find(v => v.stock_quantity > 0) || this.availableSizes[0];
                         if (firstAvailable) this.selectedVariant = firstAvailable;
+                        this.initSwipers();
                     });
                 },
 

@@ -71,40 +71,89 @@
 
             <!-- Images -->
             <div class="bg-white shadow rounded-lg p-6 mb-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Current Images</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    @foreach($product->images as $image)
-                        <div class="relative group group-hover:shadow-md transition rounded overflow-hidden border border-gray-200">
-                            <img src="{{ $image->url }}" class="h-32 w-full object-cover">
-                            
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center space-x-2">
-                                @if(!$image->is_primary)
-                                    <button type="button" 
-                                            onclick="event.preventDefault(); submitImageAction('{{ route('admin.products.images.primary', [$product, $image]) }}', 'primary')"
-                                            class="p-2 bg-white rounded-full hover:bg-gray-100 text-green-600" title="Make Primary">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    </button>
-                                @endif
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Product Images & Color Association</h3>
+                        <p class="text-xs text-gray-500">Assign colors to images so the detail page slider switches images when a customer chooses that color.</p>
+                    </div>
+                </div>
+
+                @php
+                    $availableColors = $product->variants->pluck('color')->filter()->map(fn($c) => trim($c))
+                        ->merge($product->images->pluck('color')->filter()->map(fn($c) => trim($c)))
+                        ->unique()->values();
+                @endphp
+
+                <datalist id="product-colors-list">
+                    @foreach($availableColors as $col)
+                        <option value="{{ $col }}">{{ $col }}</option>
+                    @endforeach
+                </datalist>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+                    @forelse($product->images as $image)
+                        <div class="relative group bg-white shadow-xs rounded-lg overflow-hidden border border-gray-200 flex flex-col transition hover:shadow-md">
+                            <div class="relative h-36 w-full bg-gray-50 flex items-center justify-center overflow-hidden">
+                                <img src="{{ $image->url }}" class="h-full w-full object-contain p-1.5" alt="Product Image">
                                 
-                                <button type="button" 
-                                        onclick="event.preventDefault(); if(confirm('Delete this image?')) submitImageAction('{{ route('admin.products.images.destroy', [$product, $image]) }}', 'destroy')"
-                                        class="p-2 bg-white rounded-full hover:bg-gray-100 text-red-600" title="Delete">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
+                                {{-- Actions Overlay --}}
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center space-x-2">
+                                    @if(!$image->is_primary)
+                                        <button type="button" 
+                                                onclick="event.preventDefault(); submitImageAction('{{ route('admin.products.images.primary', [$product, $image]) }}', 'primary')"
+                                                class="p-2 bg-white rounded-full hover:bg-gray-100 text-green-600 shadow-sm transition transform hover:scale-110" title="Make Primary">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        </button>
+                                    @endif
+                                    
+                                    <button type="button" 
+                                            onclick="event.preventDefault(); if(confirm('Delete this image?')) submitImageAction('{{ route('admin.products.images.destroy', [$product, $image]) }}', 'destroy')"
+                                            class="p-2 bg-white rounded-full hover:bg-gray-100 text-red-600 shadow-sm transition transform hover:scale-110" title="Delete">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
+
+                                @if($image->is_primary)
+                                    <span class="absolute top-2 right-2 bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm uppercase tracking-wide">Primary</span>
+                                @endif
+
+                                @if($image->color)
+                                    <span class="absolute top-2 left-2 bg-black/85 text-white text-[10px] font-semibold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider">
+                                        {{ $image->color }}
+                                    </span>
+                                @endif
                             </div>
 
-                            @if($image->is_primary)
-                                <span class="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wide">Primary</span>
-                            @endif
+                            {{-- Color Assignment Field --}}
+                            <div class="p-2.5 bg-gray-50/70 border-t border-gray-100">
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Color Variant</label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        list="product-colors-list"
+                                        name="existing_images[{{ $image->id }}][color]" 
+                                        value="{{ old('existing_images.'.$image->id.'.color', $image->color) }}" 
+                                        placeholder="All Colors / Default" 
+                                        data-image-id="{{ $image->id }}"
+                                        data-update-url="{{ route('admin.products.images.color', [$product, $image]) }}"
+                                        class="existing-image-color-input block w-full text-xs border-gray-300 rounded px-2 py-1 shadow-xs focus:border-black focus:ring-black bg-white"
+                                    >
+                                    <span class="save-status-indicator hidden text-[10px] font-bold text-green-600 mt-1 block">✓ Saved</span>
+                                </div>
+                            </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <p class="text-sm text-gray-400 col-span-full">No images uploaded for this product yet.</p>
+                    @endforelse
                 </div>
                 
-                <label class="block text-sm font-medium text-gray-700 mt-4">Add New Images</label>
-                <input type="hidden" name="new_primary_image_index" id="new_primary_image_index" value="">
-                <input type="file" name="new_images[]" id="new-images" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
-                <div id="new-image-preview" class="flex flex-wrap gap-4 mt-4 hidden"></div>
-                <p class="text-xs text-gray-500 mt-2">Upload multiple images. Click on a new image preview to set it as Primary.</p>
+                <div class="border-t border-gray-200 pt-4">
+                    <label class="block text-sm font-medium text-gray-700">Add New Images</label>
+                    <input type="hidden" name="new_primary_image_index" id="new_primary_image_index" value="">
+                    <input type="file" name="new_images[]" id="new-images" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 mt-1">
+                    <div id="new-image-preview" class="flex flex-wrap gap-4 mt-4 hidden"></div>
+                    <p class="text-xs text-gray-500 mt-2">Upload multiple images. Click on a preview to set as Primary, and specify the color for each photo below its thumbnail.</p>
+                </div>
             </div>
 
             <!-- Bulk Variant Generator -->
@@ -225,36 +274,38 @@
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             const container = document.createElement('div');
-                            container.className = 'relative flex-shrink-0 cursor-pointer group rounded shadow-sm border-2 border-transparent transition-all overflow-hidden';
-                            container.dataset.index = index;
+                            container.className = 'flex flex-col bg-white border border-gray-200 rounded-md p-1.5 shadow-xs items-center';
+
+                            const imgWrap = document.createElement('div');
+                            imgWrap.className = 'relative cursor-pointer group rounded overflow-hidden h-24 w-24 border-2 border-transparent transition-all bg-gray-50';
+                            imgWrap.dataset.index = index;
 
                             const img = document.createElement('img');
                             img.src = e.target.result;
-                            img.className = 'h-24 w-24 object-cover';
-                            container.appendChild(img);
+                            img.className = 'h-full w-full object-contain';
+                            imgWrap.appendChild(img);
 
                             const badge = document.createElement('div');
                             badge.className = 'new-primary-badge absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-[10px] uppercase font-bold text-center py-1';
 
                             if (index === 0 && primaryInput.value === '') {
-                                // First image auto-selected as primary for new uploads
                                 primaryInput.value = index;
                                 badge.innerText = 'Primary';
-                                container.classList.add('border-black', 'shadow-md');
+                                imgWrap.classList.add('border-black', 'shadow-md');
                             } else if (parseInt(primaryInput.value) === index) {
                                 badge.innerText = 'Primary';
-                                container.classList.add('border-black', 'shadow-md');
+                                imgWrap.classList.add('border-black', 'shadow-md');
                             } else {
                                 badge.innerText = 'Make Primary';
                                 badge.classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity');
                             }
 
-                            container.appendChild(badge);
+                            imgWrap.appendChild(badge);
 
-                            container.addEventListener('click', function() {
+                            imgWrap.addEventListener('click', function() {
                                 primaryInput.value = index;
                                 // Reset all previews
-                                Array.from(preview.children).forEach(child => {
+                                Array.from(preview.querySelectorAll('.relative.cursor-pointer')).forEach(child => {
                                     child.classList.remove('border-black', 'shadow-md');
                                     child.classList.add('border-transparent');
                                     const childBadge = child.querySelector('.new-primary-badge');
@@ -273,9 +324,49 @@
                                 }
                             });
 
+                            container.appendChild(imgWrap);
+
+                            // Color selection input for this new image
+                            const colorInput = document.createElement('input');
+                            colorInput.type = 'text';
+                            colorInput.setAttribute('list', 'product-colors-list');
+                            colorInput.name = `new_images_color[${index}]`;
+                            colorInput.placeholder = 'Color (Opt)';
+                            colorInput.title = 'Specify color variant for this image';
+                            colorInput.className = 'mt-1.5 block w-24 text-[11px] border border-gray-300 rounded px-1.5 py-0.5 text-center focus:border-black focus:ring-black bg-white shadow-2xs';
+                            container.appendChild(colorInput);
+
                             preview.appendChild(container);
                         }
                         reader.readAsDataURL(file);
+                    });
+                });
+
+                // Auto-save existing image colors via AJAX
+                document.querySelectorAll('.existing-image-color-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const url = this.dataset.updateUrl;
+                        const val = this.value;
+                        const container = this.closest('.relative');
+                        const status = container ? container.querySelector('.save-status-indicator') : null;
+
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ color: val })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (status) {
+                                status.classList.remove('hidden');
+                                setTimeout(() => status.classList.add('hidden'), 2000);
+                            }
+                        })
+                        .catch(err => console.error('Color save error:', err));
                     });
                 });
             </script>

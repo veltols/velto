@@ -89,6 +89,7 @@ class ProductController extends Controller
                     return [
                         'id' => $img->id,
                         'url' => str_starts_with($img->image_path, 'http') ? $img->image_path : asset('storage/' . $img->image_path),
+                        'color' => $img->color ? trim($img->color) : null,
                         'is_primary' => (bool)$img->is_primary,
                     ];
                 }),

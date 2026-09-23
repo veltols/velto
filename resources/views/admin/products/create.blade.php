@@ -211,31 +211,34 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const container = document.createElement('div');
-                    container.className = 'relative flex-shrink-0 cursor-pointer group rounded shadow-sm border-2 border-transparent transition-all overflow-hidden';
-                    container.dataset.index = index;
+                    container.className = 'flex flex-col bg-white border border-gray-200 rounded-md p-1.5 shadow-xs items-center';
+
+                    const imgWrap = document.createElement('div');
+                    imgWrap.className = 'relative cursor-pointer group rounded overflow-hidden h-24 w-24 border-2 border-transparent transition-all bg-gray-50';
+                    imgWrap.dataset.index = index;
                     
                     const img = document.createElement('img');
                     img.src = e.target.result;
-                    img.className = 'h-24 w-24 object-cover';
-                    container.appendChild(img);
+                    img.className = 'h-full w-full object-contain';
+                    imgWrap.appendChild(img);
                     
                     const badge = document.createElement('div');
                     badge.className = 'primary-badge absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-[10px] uppercase font-bold text-center py-1';
                     
                     if (index === parseInt(primaryInput.value)) {
                         badge.innerText = 'Primary';
-                        container.classList.add('border-black', 'shadow-md');
+                        imgWrap.classList.add('border-black', 'shadow-md');
                     } else {
                         badge.innerText = 'Make Primary';
                         badge.classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity');
                     }
                     
-                    container.appendChild(badge);
+                    imgWrap.appendChild(badge);
 
-                    container.addEventListener('click', function() {
+                    imgWrap.addEventListener('click', function() {
                         primaryInput.value = index;
                         // reset all badges
-                        Array.from(preview.children).forEach(child => {
+                        Array.from(preview.querySelectorAll('.relative.cursor-pointer')).forEach(child => {
                             child.classList.remove('border-black', 'shadow-md');
                             child.classList.add('border-transparent');
                             
@@ -255,6 +258,17 @@
                             currentBadge.classList.remove('opacity-0', 'group-hover:opacity-100', 'transition-opacity');
                         }
                     });
+
+                    container.appendChild(imgWrap);
+
+                    // Color assignment input for newly uploaded image
+                    const colorInput = document.createElement('input');
+                    colorInput.type = 'text';
+                    colorInput.name = `images_color[${index}]`;
+                    colorInput.placeholder = 'Color (Opt)';
+                    colorInput.title = 'Specify color variant for this image';
+                    colorInput.className = 'mt-1.5 block w-24 text-[11px] border border-gray-300 rounded px-1.5 py-0.5 text-center focus:border-black focus:ring-black bg-white shadow-2xs';
+                    container.appendChild(colorInput);
 
                     preview.appendChild(container);
                 }

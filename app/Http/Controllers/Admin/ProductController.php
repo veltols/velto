@@ -74,12 +74,15 @@ class ProductController extends Controller
 
             // Handle Images
             $primaryIndex = (int) $request->input('primary_image_index', 0);
+            $imagesColor = $request->input('images_color', []);
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $index => $image) {
                     $path = $image->store('products', 'public');
+                    $color = isset($imagesColor[$index]) && !empty($imagesColor[$index]) ? trim($imagesColor[$index]) : null;
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $path,
+                        'color' => $color,
                         'is_primary' => $index === $primaryIndex,
                         'display_order' => $index,
                     ]);
@@ -173,11 +176,22 @@ class ProductController extends Controller
 
             $product->save();
 
+            // Handle Existing Images Color Update
+            if ($request->has('existing_images')) {
+                foreach ($request->input('existing_images') as $imageId => $imageData) {
+                    $color = !empty($imageData['color']) ? trim($imageData['color']) : null;
+                    $product->images()->where('id', $imageId)->update([
+                        'color' => $color,
+                    ]);
+                }
+            }
+
             // Handle New Images
             if ($request->hasFile('new_images')) {
                 $currentOrder = $product->images()->max('display_order') ?? 0;
                 $newPrimaryIndex = $request->input('new_primary_image_index');
                 $hasNewPrimary = $newPrimaryIndex !== null && $newPrimaryIndex !== '';
+                $newImagesColor = $request->input('new_images_color', []);
 
                 // If a new image is set as primary, demote all existing primary images first
                 if ($hasNewPrimary) {
@@ -187,9 +201,11 @@ class ProductController extends Controller
                 foreach ($request->file('new_images') as $index => $image) {
                     $currentOrder++;
                     $path = $image->store('products', 'public');
+                    $color = isset($newImagesColor[$index]) && !empty($newImagesColor[$index]) ? trim($newImagesColor[$index]) : null;
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $path,
+                        'color' => $color,
                         'is_primary' => $hasNewPrimary && (int)$newPrimaryIndex === $index,
                         'display_order' => $currentOrder,
                     ]);
@@ -288,5 +304,28 @@ class ProductController extends Controller
         $image->update(['is_primary' => true]);
 
         return back()->with('success', 'Primary image updated.');
+    }
+
+    public function updateImageColor(Request $request, Product $product, ProductImage $image)
+    {
+        // Security check
+        if ($image->product_id !== $product->id) {
+            abort(403);
+        }
+
+        $color = $request->filled('color') ? trim($request->color) : null;
+        $image->update([
+            'color' => $color,
+        ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Image color updated successfully.',
+                'color' => $color,
+            ]);
+        }
+
+        return back()->with('success', 'Image color updated.');
     }
 }
