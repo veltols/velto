@@ -1,9 +1,63 @@
 <x-app-layout>
+    <!-- intl-tel-input CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/intl-tel-input/css/intlTelInput.min.css') }}">
+    <style>
+        .iti {
+            width: 100% !important;
+            display: block !important;
+        }
+        .iti input.iti__tel-input {
+            width: 100% !important;
+            height: 42px !important;
+            border-radius: 0.375rem !important;
+            border: 1px solid #d1d5db !important;
+            font-size: 0.875rem !important;
+            line-height: 1.25rem !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+        }
+        .iti input.iti__tel-input:focus {
+            border-color: #000000 !important;
+            box-shadow: 0 0 0 1px #000000 !important;
+            outline: none !important;
+        }
+        .iti input.iti__tel-input.iti__input-error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 1px #ef4444 !important;
+        }
+        .iti input.iti__tel-input.iti__input-valid {
+            border-color: #10b981 !important;
+        }
+        .iti__country-container {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
+        .iti__selected-country {
+            padding: 0 8px 0 12px !important;
+        }
+        .iti__selected-dial-code {
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-left: 6px !important;
+        }
+        .iti__country-list {
+            border-radius: 0.5rem !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+            border: 1px solid #e5e7eb !important;
+            z-index: 50 !important;
+        }
+        .iti__country-name {
+            font-size: 0.8125rem !important;
+        }
+    </style>
+
     <div class="bg-gray-50 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 class="text-3xl font-serif font-bold text-gray-900 mb-8 text-center">Checkout</h1>
             
-            <form action="{{ route('checkout.store') }}" method="POST" class="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
+            <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form" class="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
                 @csrf
                 
                 <!-- Contact & Shipping Info -->
@@ -23,10 +77,57 @@
                             @error('email') <p class="text-gray-900 font-bold text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
+                        <!-- Country / Region Field (Defaulted to Pakistan) -->
                         <div class="sm:col-span-2">
-                            <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number (0300...)</label>
-                            <input type="text" name="phone" id="phone" value="{{ old('phone', auth()->user() ? auth()->user()->phone : '') }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black sm:text-sm">
-                             @error('phone') <p class="text-gray-900 font-bold text-xs mt-1">{{ $message }}</p> @enderror
+                            <label for="country" class="block text-sm font-medium text-gray-700">Country / Region</label>
+                            <div class="mt-1 relative">
+                                <select name="country" id="country" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black sm:text-sm bg-gray-50/70 font-medium text-gray-900 cursor-default">
+                                    <option value="PK" selected>Pakistan (پاکستان)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Phone Number Field with intl-tel-input -->
+                        <div class="sm:col-span-2">
+                            <label for="phone" class="block text-sm font-medium text-gray-700">
+                                Phone Number <span class="text-xs text-gray-500 font-normal">(WhatsApp Active)</span>
+                            </label>
+                            <div class="mt-1 relative">
+                                <input type="tel" 
+                                       name="phone"
+                                       id="phone" 
+                                       value="{{ old('phone', auth()->user() ? auth()->user()->phone : '') }}" 
+                                       required 
+                                       autocomplete="tel"
+                                       maxlength="11"
+                                       placeholder="0300 1234567"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black sm:text-sm">
+                            </div>
+                            
+                            <!-- Validation Feedback Messages -->
+                            <div id="phone-feedback" class="mt-1.5 min-h-[18px]">
+                                <p id="phone-error" class="hidden text-red-600 text-xs font-semibold flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span id="phone-error-text">Please enter a valid phone number</span>
+                                </p>
+                                <p id="phone-valid" class="hidden text-emerald-600 text-xs font-semibold flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>Valid phone number</span>
+                                </p>
+                                @error('phone') 
+                                    <p class="text-red-600 text-xs font-semibold flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>{{ $message }}</span>
+                                    </p> 
+                                @enderror
+                            </div>
+                            <p class="text-gray-400 text-[11px] mt-0.5">We will send your order confirmation and dispatch updates to this number.</p>
                         </div>
 
                         <div class="sm:col-span-2">
@@ -144,4 +245,239 @@
             </form>
         </div>
     </div>
+
+    <!-- intl-tel-input JS with built-in utils/libphonenumber -->
+    <script src="{{ asset('vendor/intl-tel-input/js/intlTelInputWithUtils.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const phoneInput = document.querySelector('#phone');
+            const phoneError = document.querySelector('#phone-error');
+            const phoneErrorText = document.querySelector('#phone-error-text');
+            const phoneValid = document.querySelector('#phone-valid');
+            const checkoutForm = document.querySelector('#checkout-form');
+
+            if (!phoneInput) return;
+
+            // Resolve factory from window or local scope
+            const itiFactory = window.intlTelInput || (typeof intlTelInput !== 'undefined' ? intlTelInput : null);
+            if (!itiFactory) {
+                console.error('intl-tel-input library is not available.');
+                return;
+            }
+
+            // Initialize plugin with default country: Pakistan (pk)
+            const iti = itiFactory(phoneInput, {
+                initialCountry: "pk",
+                preferredCountries: ["pk", "ae", "sa", "gb", "us"],
+                separateDialCode: true,
+                strictMode: false,
+                countrySearch: true,
+                autoPlaceholder: "aggressive",
+                formatOnDisplay: false
+            });
+
+            // Adjust input max length based on selected country and current value
+            function getMaxDigits() {
+                const countryData = iti.getSelectedCountryData();
+                if (countryData && countryData.iso2 === 'pk') {
+                    const raw = phoneInput.value.replace(/\D/g, '');
+                    // Pakistani numbers: 11 digits if starting with 0 (03001234567), 10 digits if starting with 3 (3001234567)
+                    return raw.startsWith('0') ? 11 : 10;
+                }
+                return 15; // International E.164 max
+            }
+
+            function updateMaxLength() {
+                const max = getMaxDigits();
+                phoneInput.setAttribute('maxlength', String(max));
+            }
+
+            // 1. Prevent entering more than allowed digits & block non-numeric characters
+            phoneInput.addEventListener('keydown', function(e) {
+                // Allow control/navigation keys
+                if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
+                    e.ctrlKey || e.metaKey) {
+                    return;
+                }
+
+                // Block non-digits
+                if (!/^[0-9]$/.test(e.key)) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Check digit limit
+                const digits = phoneInput.value.replace(/\D/g, '');
+                const hasSelection = phoneInput.selectionStart !== phoneInput.selectionEnd;
+                if (!hasSelection) {
+                    const max = getMaxDigits();
+                    if (digits.length >= max) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            });
+
+            // 2. Filter input in real-time
+            phoneInput.addEventListener('input', function() {
+                let digits = phoneInput.value.replace(/\D/g, '');
+                const countryData = iti.getSelectedCountryData();
+
+                if (countryData && countryData.iso2 === 'pk') {
+                    // Convert 923... to 03... if someone types/pastes 923
+                    if (digits.startsWith('923')) {
+                        digits = '0' + digits.slice(2);
+                    }
+                    const max = digits.startsWith('0') ? 11 : 10;
+                    if (digits.length > max) {
+                        digits = digits.slice(0, max);
+                    }
+                } else {
+                    if (digits.length > 15) {
+                        digits = digits.slice(0, 15);
+                    }
+                }
+
+                if (phoneInput.value !== digits) {
+                    phoneInput.value = digits;
+                }
+                updateMaxLength();
+                validatePhone();
+            });
+
+            // 3. Handle paste cleanly
+            phoneInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pasted = (e.clipboardData || window.clipboardData).getData('text') || '';
+                let digits = pasted.replace(/\D/g, '');
+                const countryData = iti.getSelectedCountryData();
+
+                if (countryData && countryData.iso2 === 'pk') {
+                    if (digits.startsWith('923')) {
+                        digits = '0' + digits.slice(2);
+                    }
+                    const max = digits.startsWith('0') ? 11 : 10;
+                    digits = digits.slice(0, max);
+                } else {
+                    digits = digits.slice(0, 15);
+                }
+
+                phoneInput.value = digits;
+                updateMaxLength();
+                validatePhone();
+            });
+
+            // 4. Validation logic
+            function validatePhone() {
+                const val = phoneInput.value.trim();
+                const digits = val.replace(/\D/g, '');
+                phoneError.classList.add('hidden');
+                phoneValid.classList.add('hidden');
+                phoneInput.classList.remove('iti__input-error', 'iti__input-valid');
+
+                if (!digits) {
+                    phoneErrorText.textContent = "Phone number is required";
+                    phoneError.classList.remove('hidden');
+                    phoneInput.classList.add('iti__input-error');
+                    return false;
+                }
+
+                const countryData = iti.getSelectedCountryData();
+
+                // Specific validation for Pakistan (pk / +92)
+                if (countryData && countryData.iso2 === 'pk') {
+                    if (digits.startsWith('0')) {
+                        if (digits.length < 11) {
+                            phoneErrorText.textContent = `Please enter complete 11 digits (${digits.length}/11 entered)`;
+                            phoneError.classList.remove('hidden');
+                            phoneInput.classList.add('iti__input-error');
+                            return false;
+                        }
+                        if (!/^03[0-9]{9}$/.test(digits)) {
+                            phoneErrorText.textContent = "Pakistani mobile numbers must start with 03 (e.g. 0300 1234567)";
+                            phoneError.classList.remove('hidden');
+                            phoneInput.classList.add('iti__input-error');
+                            return false;
+                        }
+                    } else if (digits.startsWith('3')) {
+                        if (digits.length < 10) {
+                            phoneErrorText.textContent = `Please enter complete 10 digits (${digits.length}/10 entered)`;
+                            phoneError.classList.remove('hidden');
+                            phoneInput.classList.add('iti__input-error');
+                            return false;
+                        }
+                        if (!/^3[0-9]{9}$/.test(digits)) {
+                            phoneErrorText.textContent = "Must start with 3 (e.g. 300 1234567)";
+                            phoneError.classList.remove('hidden');
+                            phoneInput.classList.add('iti__input-error');
+                            return false;
+                        }
+                    } else {
+                        phoneErrorText.textContent = "Mobile numbers in Pakistan start with 03 (e.g. 0300 1234567)";
+                        phoneError.classList.remove('hidden');
+                        phoneInput.classList.add('iti__input-error');
+                        return false;
+                    }
+
+                    // Valid Pakistani number!
+                    phoneValid.classList.remove('hidden');
+                    phoneInput.classList.add('iti__input-valid');
+                    return true;
+                } else {
+                    // International validation
+                    if (iti.isValidNumber()) {
+                        phoneValid.classList.remove('hidden');
+                        phoneInput.classList.add('iti__input-valid');
+                        return true;
+                    } else {
+                        phoneErrorText.textContent = "Please enter a valid phone number";
+                        phoneError.classList.remove('hidden');
+                        phoneInput.classList.add('iti__input-error');
+                        return false;
+                    }
+                }
+            }
+
+            phoneInput.addEventListener('blur', validatePhone);
+
+            phoneInput.addEventListener('countrychange', function () {
+                phoneInput.value = '';
+                phoneError.classList.add('hidden');
+                phoneValid.classList.add('hidden');
+                phoneInput.classList.remove('iti__input-error', 'iti__input-valid');
+                updateMaxLength();
+                phoneInput.focus();
+            });
+
+            // 5. Form submission guard
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', function (e) {
+                    if (!validatePhone()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        phoneInput.focus();
+                        phoneInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return false;
+                    }
+
+                    // Normalize value right before submit so it's always in standard format
+                    const countryData = iti.getSelectedCountryData();
+                    const digits = phoneInput.value.replace(/\D/g, '');
+                    if (countryData && countryData.iso2 === 'pk') {
+                        // Standardize Pakistani number to 03XXXXXXXXX (11 digits)
+                        phoneInput.value = digits.startsWith('0') ? digits : ('0' + digits);
+                    } else {
+                        // International format
+                        phoneInput.value = iti.getNumber() || phoneInput.value;
+                    }
+                });
+            }
+
+            // Initial check and setup
+            updateMaxLength();
+            if (phoneInput.value.trim()) {
+                validatePhone();
+            }
+        });
+    </script>
 </x-app-layout>

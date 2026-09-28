@@ -57,11 +57,14 @@ class CheckoutController extends Controller
     {
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => ['required', 'string', 'max:25', 'regex:/^(\+?[0-9]{1,4}[\s\-]?)?(\([0-9]{1,4}\)[\s\-]?)?[0-9\s\-]{7,15}$/'],
             'email' => 'required|email|max:255',
+            'country' => 'sometimes|nullable|string|max:100',
             'shipping_address' => 'required|string',
             'city' => 'required|string|max:100',
             'postal_code' => 'sometimes|nullable|string|max:20',
+        ], [
+            'phone.regex' => 'Please enter a valid phone number (e.g. 0300 1234567).',
         ]);
 
         // Determine user (Guest or Auth)
