@@ -132,14 +132,49 @@
                                     <button 
                                         type="button" 
                                         @click="selectedVariant = variant"
-                                        class="min-w-[42px] h-10 px-2.5 flex items-center justify-center border text-xs font-bold transition-all"
+                                        class="min-w-[44px] h-10 px-2.5 flex flex-col items-center justify-center border text-xs font-bold transition-all relative"
                                         :class="selectedVariant && selectedVariant.id === variant.id 
-                                            ? 'bg-black text-white border-black' 
-                                            : (variant.stock_quantity <= 0 ? 'border-gray-200 text-gray-300 line-through bg-gray-50 cursor-not-allowed' : 'border-gray-300 text-gray-800 hover:border-black bg-white')"
+                                            ? 'bg-black text-white border-black shadow-xs' 
+                                            : (variant.stock_quantity <= 0 ? 'border-amber-200 bg-amber-50/40 text-stone-800 hover:border-black' : 'border-gray-300 text-gray-800 hover:border-black bg-white')"
                                     >
                                         <span x-text="variant.size"></span>
+                                        <template x-if="variant.stock_quantity <= 0">
+                                            <span class="text-[8px] font-semibold tracking-wider uppercase -mt-0.5"
+                                                  :class="selectedVariant && selectedVariant.id === variant.id ? 'text-amber-300' : 'text-amber-700'">
+                                                Pre-Order
+                                            </span>
+                                        </template>
                                     </button>
                                 </template>
+                            </div>
+
+                            <!-- Pre-Order Notice Banner in Quick View -->
+                            <div x-show="isPreOrder" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 -translate-y-1"
+                                 class="mt-3.5 p-3 rounded-md bg-amber-50/90 border border-amber-200/90 text-amber-950 flex items-start gap-2.5">
+                                <div class="w-6 h-6 rounded-full bg-amber-100 border border-amber-300/80 flex items-center justify-center flex-shrink-0 text-amber-800 mt-0.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-1.5 mb-0.5">
+                                        <span class="inline-block px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-amber-200/80 text-amber-900 rounded">
+                                            Pre-Order
+                                        </span>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-950">
+                                            Crafted On Demand
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-amber-900 leading-relaxed font-normal">
+                                        This size is currently made to order. Please allow <strong class="font-bold text-amber-950">2 to 4 working days</strong> for our master artisans to handcraft before dispatch.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -171,7 +206,7 @@
                                 :disabled="adding || !canAddToCart"
                                 class="flex-1 bg-black text-white h-11 px-6 text-xs sm:text-sm font-black uppercase tracking-[0.15em] hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
                             >
-                                <span x-text="adding ? 'ADDING...' : (isOutOfStock ? 'OUT OF STOCK' : 'ADD TO CART')"></span>
+                                <span x-text="adding ? 'ADDING...' : (isPreOrder ? 'PRE-ORDER' : 'ADD TO CART')"></span>
                             </button>
                         </div>
 
@@ -266,22 +301,20 @@
                 return this.product.sale_price || this.product.base_price;
             },
 
+            get isPreOrder() {
+                if (!this.selectedVariant) return false;
+                return this.selectedVariant.stock_quantity <= 0;
+            },
+
             get canAddToCart() {
                 if (!this.product) return false;
                 if (this.product.variants && this.product.variants.length > 0) {
                     if (!this.selectedVariant) return false;
-                    if (this.selectedVariant.stock_quantity <= 0) return false;
                 }
                 return true;
             },
 
             get isOutOfStock() {
-                if (!this.product) return false;
-                if (this.selectedVariant && this.selectedVariant.stock_quantity <= 0) return true;
-                if (this.product.variants && this.product.variants.length > 0) {
-                    const totalStock = this.product.variants.reduce((acc, v) => acc + (v.stock_quantity || 0), 0);
-                    return totalStock <= 0;
-                }
                 return false;
             },
 

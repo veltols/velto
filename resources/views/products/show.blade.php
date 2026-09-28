@@ -341,6 +341,37 @@
                                     </button>
                                 </template>
                             </div>
+
+                            <!-- Pre-Order Notice Banner -->
+                            <div x-show="isPreOrder" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 -translate-y-1"
+                                 class="mt-3.5 p-3.5 sm:p-4 rounded-lg bg-amber-50/90 border border-amber-200/90 text-amber-950 shadow-sm">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-amber-100 border border-amber-300/80 flex items-center justify-center flex-shrink-0 text-amber-800 mt-0.5">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="inline-block px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-amber-200/80 text-amber-900 rounded">
+                                                Pre-Order
+                                            </span>
+                                            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-950">
+                                                Crafted On Demand
+                                            </h4>
+                                        </div>
+                                        <p class="text-xs text-amber-900 leading-relaxed font-normal">
+                                            This size is currently made to order. Please allow <strong class="font-bold text-amber-950">2 to 4 working days</strong> for our master artisans to handcraft and finish your dream shoes before dispatch.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Actions Container -->
@@ -362,7 +393,7 @@
                                         :disabled="loading || buyLoading || !canAddToCart"
                                         class="bg-white border-2 border-black text-black h-11 sm:h-12 px-2 sm:px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider hover:bg-black hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-1.5 rounded-md shadow-xs active:scale-[0.98]">
                                     <svg x-show="!loading" class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                                    <span class="truncate" x-text="loading ? 'Adding...' : (selectedVariant && selectedVariant.stock_quantity <= 0 ? 'Pre-Order' : 'Add to Bag')"></span>
+                                    <span class="truncate" x-text="loading ? 'Adding...' : (isPreOrder ? 'Pre-Order' : 'Add to Bag')"></span>
                                 </button>
 
                                 <!-- Buy Now Button -->
@@ -370,7 +401,7 @@
                                         @click="buyNow()"
                                         :disabled="loading || buyLoading || !canAddToCart"
                                         class="bg-black border-2 border-black text-white h-11 sm:h-12 px-2 sm:px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-1.5 rounded-md shadow-sm active:scale-[0.98]">
-                                    <span class="truncate" x-text="buyLoading ? 'Redirecting...' : (selectedVariant && selectedVariant.stock_quantity <= 0 ? 'Pre-Order' : 'Buy Now')"></span>
+                                    <span class="truncate" x-text="buyLoading ? 'Redirecting...' : (isPreOrder ? 'Pre-Order' : 'Buy Now')"></span>
                                     <svg x-show="!buyLoading" class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                     </svg>
@@ -1166,6 +1197,16 @@
                         return 'PRE-ORDER';
                     }
                     return '';
+                },
+
+                get isPreOrder() {
+                    if (this.selectedVariant) {
+                        return (this.selectedVariant.stock_quantity <= 0 || !!this.selectedVariant.is_preorder);
+                    }
+                    if (this.product && (!this.variants || this.variants.length === 0)) {
+                        return (this.product.stock_quantity <= 0);
+                    }
+                    return false;
                 },
                 
                 get currentPrice() {
