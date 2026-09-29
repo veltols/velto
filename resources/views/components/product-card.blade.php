@@ -145,10 +145,10 @@
             </div>
         @endif
 
-        {{-- Top Left Badge: Sold Out --}}
+        {{-- Top Left Badge: Pre-Order --}}
         @if(!$isInStock)
             <div class="absolute top-0 left-0 bg-gray-900/90 text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 tracking-widest uppercase z-20 pointer-events-none">
-                SOLD OUT
+                PRE-ORDER
             </div>
         @endif
 
@@ -177,7 +177,7 @@
             </button>
 
             {{-- Slider Pagination Dots (Rests at bottom, smoothly shifts up when Quick View hovers on desktop) --}}
-            <div class="absolute inset-x-0 bottom-2.5 z-20 flex justify-center items-center gap-1 sm:gap-1.5 pointer-events-none group-hover:bottom-14 transition-all duration-300">
+            <div class="absolute inset-x-0 bottom-2.5 z-20 flex justify-center items-center gap-1 sm:gap-1.5 pointer-events-none group-hover:bottom-10 sm:group-hover:bottom-14 transition-all duration-300">
                 @foreach($cardImages as $idx => $img)
                     <button 
                         type="button" 
@@ -191,17 +191,17 @@
         @endif
 
         {{-- Quick View Button (Floats at bottom of image on hover) --}}
-        <div class="absolute inset-x-3 bottom-3 z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+        <div class="absolute inset-x-2 sm:inset-x-3 bottom-2 sm:bottom-3 z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
             <button 
                 type="button" 
                 @click.stop="$dispatch('open-quick-view', { id: {{ $product->id }} })"
-                class="w-full bg-white/95 hover:bg-black text-gray-900 hover:text-white text-[11px] font-bold uppercase tracking-[0.14em] py-2.5 px-3 shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-xs border border-gray-100"
+                class="w-full bg-white/95 hover:bg-black text-gray-900 hover:text-white text-[9.5px] sm:text-[11px] font-bold uppercase tracking-wider sm:tracking-[0.14em] py-1.5 sm:py-2.5 px-1.5 sm:px-3 shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 backdrop-blur-xs border border-gray-100 whitespace-nowrap active:scale-95"
             >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                 </svg>
-                <span>Quick View</span>
+                <span class="whitespace-nowrap">Quick View</span>
             </button>
         </div>
     </div>
