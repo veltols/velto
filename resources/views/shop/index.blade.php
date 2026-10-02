@@ -40,7 +40,7 @@
                 </ol>
             </nav>
 
-            <div class="flex flex-col lg:flex-row gap-8" x-data="{ mobileFiltersOpen: false }">
+            <div class="flex flex-col lg:flex-row gap-8" x-data="{ mobileFiltersOpen: false, gridView: localStorage.getItem('velto_shop_grid') || '2' }">
                 
                 <!-- MOBILE FILTER SECTION (Button + Drawer) -->
                 <div class="mobile-filter-force lg:hidden">
@@ -247,15 +247,64 @@
 
                 <!-- Product Grid -->
                 <div class="w-full lg:w-3/4">
-                    <div class="mb-4 flex justify-between items-center">
-                        <h1 class="text-2xl font-serif font-bold text-gray-900">
-                            {{ isset($category) ? $category->name : 'All Products' }}
-                        </h1>
-                        <span class="text-sm text-gray-500">{{ $products->total() }} Products</span>
+                    <div class="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200/80 pb-4">
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-serif font-bold text-gray-900">
+                                @if(request('search'))
+                                    Search: "{{ request('search') }}"
+                                @elseif(isset($category))
+                                    {{ $category->name }}
+                                @else
+                                    All Products
+                                @endif
+                            </h1>
+                            <span class="text-xs text-gray-500 font-medium">{{ $products->total() }} Products</span>
+                        </div>
+
+                        <!-- Grid View Toggle Controls -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:inline">View:</span>
+                            <div class="flex items-center bg-gray-100 p-0.5 rounded border border-gray-200">
+                                <!-- 2-Column Grid (Default on mobile, matching Related section) -->
+                                <button 
+                                    type="button" 
+                                    @click="gridView = '2'; localStorage.setItem('velto_shop_grid', '2')" 
+                                    class="p-1.5 rounded transition-all duration-150 focus:outline-none flex items-center justify-center cursor-pointer"
+                                    :class="gridView === '2' ? 'bg-white text-black shadow-xs' : 'text-gray-400 hover:text-gray-700'"
+                                    title="2 Columns Grid View"
+                                    aria-label="2 Columns Grid View"
+                                >
+                                    <!-- 2 Column Grid Icon -->
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+                                    </svg>
+                                </button>
+
+                                <!-- 1-Column Single View -->
+                                <button 
+                                    type="button" 
+                                    @click="gridView = '1'; localStorage.setItem('velto_shop_grid', '1')" 
+                                    class="p-1.5 rounded transition-all duration-150 focus:outline-none flex items-center justify-center cursor-pointer"
+                                    :class="gridView === '1' ? 'bg-white text-black shadow-xs' : 'text-gray-400 hover:text-gray-700'"
+                                    title="1 Column View"
+                                    aria-label="1 Column View"
+                                >
+                                    <!-- 1 Column Stack Icon -->
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M2.5 2A1.5 1.5 0 0 0 1 3.5v2A1.5 1.5 0 0 0 2.5 7h11A1.5 1.5 0 0 0 15 5.5v-2A1.5 1.5 0 0 0 13.5 2h-11zM2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-2zm0 6A1.5 1.5 0 0 1 2.5 8h11a1.5 1.5 0 0 1 1.5 1.5v2a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 11.5v-2zm1.5-.5a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-11z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     @if($products->count() > 0)
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+                        <div 
+                            class="grid gap-y-6 sm:gap-y-10 transition-all duration-200"
+                            :class="gridView === '1' 
+                                ? 'grid-cols-1 gap-x-6' 
+                                : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-3 sm:gap-x-6'"
+                        >
                             @foreach($products as $product)
                                 <x-product-card :product="$product" />
                             @endforeach
