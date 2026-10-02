@@ -1,13 +1,12 @@
 <x-app-layout>
     @section('title', "Men's Leather Shoes in Pakistan | Premium Loafers & Formal Shoes")
     @section('meta_description', "Shop premium men's leather shoes in Pakistan from Velto. Explore leather loafers, suede loafers and formal shoes crafted for comfort, style and everyday elegance. Cash on delivery available.")
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
     <!-- Hero Slider Section -->
     @if($sliderBanners->isNotEmpty())
     <section class="relative w-full overflow-hidden hero-slider-section">
-
-        <!-- Swiper CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
         <div class="swiper hero-swiper w-full">
             <div class="swiper-wrapper">
                 @foreach($sliderBanners as $index => $slide)
@@ -233,43 +232,6 @@
                 }
             }
         </style>
-
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                if (typeof Swiper !== 'undefined') {
-                    initHeroSwiper();
-                } else {
-                    window.addEventListener('load', initHeroSwiper);
-                }
-
-                function initHeroSwiper() {
-                    const swiperEl = document.querySelector('.hero-swiper');
-                    if (!swiperEl) return;
-
-                    const heroSwiper = new Swiper('.hero-swiper', {
-                        loop: {{ $sliderBanners->count() > 1 ? 'true' : 'false' }},
-                        speed: 800,
-                        observer: true,
-                        observeParents: true,
-                        autoplay: {
-                            delay: 5000,
-                            disableOnInteraction: false,
-                        },
-                        effect: 'fade',
-                        fadeEffect: { crossFade: true },
-                        navigation: {
-                            nextEl: '.hero-swiper-next',
-                            prevEl: '.hero-swiper-prev',
-                        },
-                        pagination: {
-                            el: '.hero-swiper-pagination',
-                            clickable: true,
-                        },
-                    });
-                }
-            });
-        </script>
     </section>
     @else
     {{-- Fallback: Static hero when no slider banners configured --}}
@@ -301,79 +263,98 @@
     @endif
 
     <!-- Categories Section -->
-    <section class="py-20 bg-white border-b border-gray-100">
+    <section class="py-16 sm:py-20 bg-white border-b border-gray-100">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
             
             {{-- Section Header --}}
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 md:gap-0">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 sm:mb-12 gap-4 md:gap-0">
                 <div>
                     <span class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-2 block">Categories</span>
-                    <h2 class="text-4xl font-serif font-bold text-gray-900">Shop Men's Shoes by Category</h2>
+                    <h2 class="text-3xl sm:text-4xl font-serif font-bold text-gray-900">Shop Men's Shoes by Category</h2>
                 </div>
-                <a href="{{ route('shop.index') }}" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition flex items-center group">
-                    View All Categories
-                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
+                <div class="flex items-center justify-between w-full md:w-auto gap-4 sm:gap-6">
+                    <a href="{{ route('shop.index') }}" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition flex items-center group">
+                        <span>View All Categories</span>
+                        <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </a>
+
+                    <!-- Navigation Arrows for Category Slider (Mobile & Desktop) -->
+                    <div class="flex items-center gap-2">
+                        <button type="button" aria-label="Previous categories" class="category-swiper-prev w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all duration-200 flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer focus:outline-none shadow-xs active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button type="button" aria-label="Next categories" class="category-swiper-next w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all duration-200 flex items-center justify-center text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer focus:outline-none shadow-xs active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {{-- Categories Grid (Matches Featured & New Arrivals layout) --}}
+            {{-- Categories Slider (Swiper) --}}
             @if($categories->isNotEmpty())
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-                @foreach($categories as $category)
-                    @php
-                        $imageUrl = null;
-                        
-                        // 1. Primary: Use 'image' column from categories table
-                        if (!empty($category->image)) {
-                            if (\Illuminate\Support\Str::startsWith($category->image, ['http://', 'https://'])) {
-                                $imageUrl = $category->image;
-                            } else {
-                                $imageUrl = asset('storage/' . $category->image);
+            <div class="swiper category-swiper w-full overflow-hidden pb-2 select-none">
+                <div class="swiper-wrapper">
+                    @foreach($categories as $category)
+                        @php
+                            $imageUrl = null;
+                            
+                            // 1. Primary: Use 'image' column from categories table
+                            if (!empty($category->image)) {
+                                if (\Illuminate\Support\Str::startsWith($category->image, ['http://', 'https://'])) {
+                                    $imageUrl = $category->image;
+                                } else {
+                                    $imageUrl = asset('storage/' . $category->image);
+                                }
+                            } 
+                            // 2. Secondary: Fallback to first product image in this category
+                            elseif ($category->products->isNotEmpty() && $category->products->first()->primaryImage) {
+                                $imageUrl = asset('storage/' . $category->products->first()->primaryImage->image_path);
+                            } 
+                            // 3. Fallback default
+                            else {
+                                $imageUrl = asset('images/hero-shoes.png');
                             }
-                        } 
-                        // 2. Secondary: Fallback to first product image in this category
-                        elseif ($category->products->isNotEmpty() && $category->products->first()->primaryImage) {
-                            $imageUrl = asset('storage/' . $category->products->first()->primaryImage->image_path);
-                        } 
-                        // 3. Fallback default
-                        else {
-                            $imageUrl = asset('images/hero-shoes.png');
-                        }
-                    @endphp
+                        @endphp
 
-                    <div class="group cursor-pointer">
-                        <div class="relative overflow-hidden bg-gray-100 aspect-[4/5] mb-4 rounded-none">
-                            <a href="{{ route('shop.category', $category->slug) }}" class="block w-full h-full">
-                                <img src="{{ $imageUrl }}" 
-                                     alt="{{ $category->name }} for Men - Velto" 
-                                     class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
-                                     onerror="this.onerror=null;this.src='{{ asset('images/hero-shoes.png') }}';">
-                                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition duration-300"></div>
-                                
-                                {{-- Item Count Badge matching Product Badges --}}
-                                <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md" style="font-size: 9px; padding: 8px 12px; line-height: 1; letter-spacing: 0.1em; z-index: 10;">
-                                    {{ $category->products_count }} {{ \Illuminate\Support\Str::plural('item', $category->products_count) }}
+                        <div class="swiper-slide h-auto">
+                            <div class="group cursor-pointer flex flex-col h-full bg-white p-2.5 sm:p-3 rounded-sm border border-gray-100/90 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                                <div class="relative overflow-hidden bg-gray-100 aspect-[4/5] mb-4 rounded-none">
+                                    <a href="{{ route('shop.category', $category->slug) }}" class="block w-full h-full">
+                                        <img src="{{ $imageUrl }}" 
+                                             alt="{{ $category->name }} for Men - Velto" 
+                                             class="w-full h-full object-cover object-center transition duration-700 ease-out group-hover:scale-105"
+                                             onerror="this.onerror=null;this.src='{{ asset('images/hero-shoes.png') }}';">
+                                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition duration-300"></div>
+                                        
+                                        {{-- Item Count Badge matching Product Badges --}}
+                                        <div class="absolute top-0 right-0 bg-black text-white font-extrabold uppercase shadow-md text-[9px] px-2.5 py-1.5 leading-none tracking-wider z-10 pointer-events-none">
+                                            {{ $category->products_count }} {{ \Illuminate\Support\Str::plural('item', $category->products_count) }}
+                                        </div>
+                                    </a>
                                 </div>
-                            </a>
+                                <div class="flex flex-col flex-grow text-center items-center">
+                                    <span class="text-[10px] sm:text-[11px] font-bold text-gray-400 tracking-[0.2em] uppercase block mb-1">COLLECTION</span>
+                                    <h3 class="text-lg sm:text-2xl font-serif font-bold text-gray-900 mb-2 group-hover:text-black transition-colors leading-tight">
+                                        <a href="{{ route('shop.category', $category->slug) }}">{{ $category->name }}</a>
+                                    </h3>
+                                    <a href="{{ route('shop.category', $category->slug) }}" class="inline-flex items-center text-xs font-bold uppercase tracking-[0.2em] text-gray-800 hover:text-black transition group/btn mt-auto pt-1">
+                                        <span class="leading-tight text-center">SHOP COLLECTION</span>
+                                        <svg class="w-5 h-5 ml-2 transform group-hover/btn:translate-x-1.5 transition-transform duration-300 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <span class="text-[11px] font-bold text-gray-400 tracking-[0.2em] uppercase block mb-1">COLLECTION</span>
-                            <h3 class="text-xl sm:text-2xl font-serif font-bold text-gray-900 mb-2 group-hover:text-black transition-colors">
-                                <a href="{{ route('shop.category', $category->slug) }}">{{ $category->name }}</a>
-                            </h3>
-                            <a href="{{ route('shop.category', $category->slug) }}" class="inline-flex items-center text-xs font-bold uppercase tracking-[0.2em] text-gray-800 hover:text-black transition group/btn mt-1">
-                                <span class="leading-tight text-left">SHOP<br>COLLECTION</span>
-                                <svg class="w-6 h-6 ml-3 transform group-hover/btn:translate-x-1.5 transition-transform duration-300 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"></path>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
+
+                {{-- Pagination Dots --}}
+                <div class="category-swiper-pagination flex justify-center items-center gap-1.5 mt-8"></div>
             </div>
 
             {{-- Centered Solid Black VIEW ALL Button for Categories --}}
-            <div class="mt-14 text-center">
+            <div class="mt-10 sm:mt-14 text-center">
                 <a href="{{ route('shop.index') }}" class="inline-block bg-black text-white px-12 py-4 text-xs sm:text-sm font-bold uppercase tracking-[0.25em] hover:bg-gray-800 transition duration-300 rounded-none shadow-sm">
                     VIEW ALL
                 </a>
@@ -393,7 +374,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 sm:gap-x-8 gap-y-6 sm:gap-y-12">
                 @foreach($newArrivals as $product)
                     <x-product-card :product="$product" />
                 @endforeach
@@ -465,7 +446,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-8 gap-y-6 sm:gap-y-12">
                 @foreach($featured as $product)
                     <x-product-card :product="$product" />
                 @endforeach
@@ -726,4 +707,107 @@
         </div>
     </section>
 
+    <style>
+        .category-swiper-pagination .swiper-pagination-bullet {
+            width: 8px;
+            height: 8px;
+            background: #000;
+            opacity: 0.25;
+            transition: all 0.3s ease;
+            border-radius: 9999px;
+            cursor: pointer;
+        }
+        .category-swiper-pagination .swiper-pagination-bullet-active {
+            opacity: 1;
+            width: 24px;
+            background: #000;
+        }
+        .category-swiper .swiper-slide {
+            height: auto;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function initAllSwipers() {
+                if (typeof Swiper === 'undefined') {
+                    setTimeout(initAllSwipers, 50);
+                    return;
+                }
+
+                // 1. Hero Swiper
+                const heroEl = document.querySelector('.hero-swiper');
+                if (heroEl && !heroEl.swiper) {
+                    new Swiper('.hero-swiper', {
+                        loop: heroEl.querySelectorAll('.swiper-slide').length > 1,
+                        speed: 800,
+                        observer: true,
+                        observeParents: true,
+                        autoplay: {
+                            delay: 5000,
+                            disableOnInteraction: false,
+                        },
+                        effect: 'fade',
+                        fadeEffect: { crossFade: true },
+                        navigation: {
+                            nextEl: '.hero-swiper-next',
+                            prevEl: '.hero-swiper-prev',
+                        },
+                        pagination: {
+                            el: '.hero-swiper-pagination',
+                            clickable: true,
+                        },
+                    });
+                }
+
+                // 2. Category Swiper (Slider on Mobile & Desktop)
+                const categoryEl = document.querySelector('.category-swiper');
+                if (categoryEl && !categoryEl.swiper) {
+                    new Swiper('.category-swiper', {
+                        slidesPerView: 1.25,
+                        spaceBetween: 14,
+                        grabCursor: true,
+                        watchSlidesProgress: true,
+                        observer: true,
+                        observeParents: true,
+                        navigation: {
+                            nextEl: '.category-swiper-next',
+                            prevEl: '.category-swiper-prev',
+                        },
+                        pagination: {
+                            el: '.category-swiper-pagination',
+                            clickable: true,
+                            dynamicBullets: true,
+                        },
+                        breakpoints: {
+                            480: {
+                                slidesPerView: 1.75,
+                                spaceBetween: 16,
+                            },
+                            640: {
+                                slidesPerView: 2.3,
+                                spaceBetween: 20,
+                            },
+                            768: {
+                                slidesPerView: 3,
+                                spaceBetween: 24,
+                            },
+                            1024: {
+                                slidesPerView: 3.5,
+                                spaceBetween: 28,
+                            },
+                            1280: {
+                                slidesPerView: 4,
+                                spaceBetween: 32,
+                            },
+                        },
+                    });
+                }
+            }
+
+            initAllSwipers();
+            window.addEventListener('load', initAllSwipers);
+        });
+    </script>
 </x-app-layout>
