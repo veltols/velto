@@ -1,6 +1,6 @@
 <x-app-layout>
-    <!-- intl-tel-input CSS -->
-    <link rel="stylesheet" href="{{ asset('vendor/intl-tel-input/css/intlTelInput.min.css') }}">
+    <!-- intl-tel-input CSS with CDN fallback for live server -->
+    <link rel="stylesheet" href="{{ asset('vendor/intl-tel-input/css/intlTelInput.min.css') }}" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.0/build/css/intlTelInput.min.css';">
     <style>
         .iti {
             width: 100% !important;
@@ -51,6 +51,15 @@
         .iti__country-name {
             font-size: 0.8125rem !important;
         }
+
+        /* Spinner animation fallback */
+        @keyframes custom-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-custom-spin {
+            animation: custom-spin 0.8s linear infinite !important;
+        }
     </style>
 
     <div class="bg-gray-50 py-12">
@@ -94,13 +103,16 @@
                             </label>
                             <div class="mt-1 relative">
                                 <input type="tel" 
-                                       name="phone"
+                                       name="phone" 
                                        id="phone" 
                                        value="{{ old('phone', auth()->user() ? auth()->user()->phone : '') }}" 
                                        required 
                                        autocomplete="tel"
+                                       minlength="10"
                                        maxlength="11"
+                                       pattern="^(03[0-9]{9}|3[0-9]{9})$"
                                        placeholder="0300 1234567"
+                                       title="Please enter a complete 11-digit Pakistani mobile number starting with 03 (e.g. 0300 1234567)"
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black sm:text-sm">
                             </div>
                             
@@ -236,8 +248,14 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full bg-black border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-black">
-                                Place Order (Rs. {{ number_format($total) }})
+                            <button type="submit" id="submit-order-btn" class="w-full bg-black border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-black disabled:opacity-75 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition duration-150">
+                                <span id="submit-spinner" class="hidden animate-custom-spin" style="display: none;">
+                                    <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                    </svg>
+                                </span>
+                                <span id="submit-text">Place Order (Rs. {{ number_format($total) }})</span>
                             </button>
                         </div>
                     </div>
@@ -246,8 +264,13 @@
         </div>
     </div>
 
-    <!-- intl-tel-input JS with built-in utils/libphonenumber -->
+    <!-- intl-tel-input JS with built-in utils/libphonenumber and CDN fallback -->
     <script src="{{ asset('vendor/intl-tel-input/js/intlTelInputWithUtils.min.js') }}"></script>
+    <script>
+        if (typeof intlTelInput === 'undefined' && typeof window.intlTelInput === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.0/build/js/intlTelInputWithUtils.min.js"><\/script>');
+        }
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const phoneInput = document.querySelector('#phone');
@@ -258,27 +281,29 @@
 
             if (!phoneInput) return;
 
-            // Resolve factory from window or local scope
+            // Resolve factory from window or local scope (optional enhancement)
             const itiFactory = window.intlTelInput || (typeof intlTelInput !== 'undefined' ? intlTelInput : null);
-            if (!itiFactory) {
-                console.error('intl-tel-input library is not available.');
-                return;
-            }
+            let iti = null;
 
-            // Initialize plugin with default country: Pakistan (pk)
-            const iti = itiFactory(phoneInput, {
-                initialCountry: "pk",
-                preferredCountries: ["pk", "ae", "sa", "gb", "us"],
-                separateDialCode: true,
-                strictMode: false,
-                countrySearch: true,
-                autoPlaceholder: "aggressive",
-                formatOnDisplay: false
-            });
+            if (itiFactory) {
+                try {
+                    iti = itiFactory(phoneInput, {
+                        initialCountry: "pk",
+                        preferredCountries: ["pk", "ae", "sa", "gb", "us"],
+                        separateDialCode: true,
+                        strictMode: false,
+                        countrySearch: true,
+                        autoPlaceholder: "aggressive",
+                        formatOnDisplay: false
+                    });
+                } catch (e) {
+                    console.warn('iti initialization notice:', e);
+                }
+            }
 
             // Adjust input max length based on selected country and current value
             function getMaxDigits() {
-                const countryData = iti.getSelectedCountryData();
+                const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
                 if (countryData && countryData.iso2 === 'pk') {
                     const raw = phoneInput.value.replace(/\D/g, '');
                     // Pakistani numbers: 11 digits if starting with 0 (03001234567), 10 digits if starting with 3 (3001234567)
@@ -321,7 +346,7 @@
             // 2. Filter input in real-time
             phoneInput.addEventListener('input', function() {
                 let digits = phoneInput.value.replace(/\D/g, '');
-                const countryData = iti.getSelectedCountryData();
+                const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
 
                 if (countryData && countryData.iso2 === 'pk') {
                     // Convert 923... to 03... if someone types/pastes 923
@@ -350,7 +375,7 @@
                 e.preventDefault();
                 const pasted = (e.clipboardData || window.clipboardData).getData('text') || '';
                 let digits = pasted.replace(/\D/g, '');
-                const countryData = iti.getSelectedCountryData();
+                const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
 
                 if (countryData && countryData.iso2 === 'pk') {
                     if (digits.startsWith('923')) {
@@ -382,10 +407,10 @@
                     return false;
                 }
 
-                const countryData = iti.getSelectedCountryData();
+                const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
 
                 // Specific validation for Pakistan (pk / +92)
-                if (countryData && countryData.iso2 === 'pk') {
+                if (!countryData || countryData.iso2 === 'pk') {
                     if (digits.startsWith('0')) {
                         if (digits.length < 11) {
                             phoneErrorText.textContent = `Please enter complete 11 digits (${digits.length}/11 entered)`;
@@ -425,7 +450,7 @@
                     return true;
                 } else {
                     // International validation
-                    if (iti.isValidNumber()) {
+                    if (iti && typeof iti.isValidNumber === 'function' ? iti.isValidNumber() : digits.length >= 8) {
                         phoneValid.classList.remove('hidden');
                         phoneInput.classList.add('iti__input-valid');
                         return true;
@@ -451,6 +476,10 @@
 
             // 5. Form submission guard
             if (checkoutForm) {
+                const submitBtn = document.querySelector('#submit-order-btn');
+                const submitSpinner = document.querySelector('#submit-spinner');
+                const submitText = document.querySelector('#submit-text');
+
                 checkoutForm.addEventListener('submit', function (e) {
                     if (!validatePhone()) {
                         e.preventDefault();
@@ -461,14 +490,31 @@
                     }
 
                     // Normalize value right before submit so it's always in standard format
-                    const countryData = iti.getSelectedCountryData();
+                    const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
                     const digits = phoneInput.value.replace(/\D/g, '');
-                    if (countryData && countryData.iso2 === 'pk') {
+                    if (!countryData || countryData.iso2 === 'pk') {
                         // Standardize Pakistani number to 03XXXXXXXXX (11 digits)
                         phoneInput.value = digits.startsWith('0') ? digits : ('0' + digits);
-                    } else {
+                    } else if (iti && typeof iti.getNumber === 'function') {
                         // International format
                         phoneInput.value = iti.getNumber() || phoneInput.value;
+                    }
+
+                    // Show spinner and change text immediately
+                    if (submitSpinner) {
+                        submitSpinner.classList.remove('hidden');
+                        submitSpinner.style.display = 'inline-block';
+                    }
+                    if (submitText) {
+                        submitText.textContent = 'Placing Order... Please wait';
+                    }
+                    if (submitBtn) {
+                        // Use pointer-events and opacity to avoid cancelling the submit event in some browsers
+                        submitBtn.style.pointerEvents = 'none';
+                        submitBtn.style.opacity = '0.75';
+                        setTimeout(function () {
+                            submitBtn.disabled = true;
+                        }, 50);
                     }
                 });
             }

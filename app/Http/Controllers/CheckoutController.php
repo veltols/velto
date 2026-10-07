@@ -57,15 +57,31 @@ class CheckoutController extends Controller
     {
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'phone' => ['required', 'string', 'max:25', 'regex:/^(\+?[0-9]{1,4}[\s\-]?)?(\([0-9]{1,4}\)[\s\-]?)?[0-9\s\-]{7,15}$/'],
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^(03\d{9}|3\d{9}|923\d{9}|\+923\d{9}|\+[1-9]\d{9,14})$/',
+            ],
             'email' => 'required|email|max:255',
             'country' => 'sometimes|nullable|string|max:100',
             'shipping_address' => 'required|string',
             'city' => 'required|string|max:100',
             'postal_code' => 'sometimes|nullable|string|max:20',
         ], [
-            'phone.regex' => 'Please enter a valid phone number (e.g. 0300 1234567).',
+            'phone.required' => 'Phone number is required.',
+            'phone.regex' => 'Please enter a complete 11-digit mobile number (e.g. 0300 1234567).',
         ]);
+
+        // Standardize Pakistani numbers to 03XXXXXXXXX (11 digits)
+        $cleanPhone = preg_replace('/[^\d+]/', '', $validated['phone']);
+        if (str_starts_with($cleanPhone, '+923')) {
+            $cleanPhone = '03' . substr($cleanPhone, 4);
+        } elseif (str_starts_with($cleanPhone, '923')) {
+            $cleanPhone = '03' . substr($cleanPhone, 3);
+        } elseif (str_starts_with($cleanPhone, '3') && strlen($cleanPhone) === 10) {
+            $cleanPhone = '0' . $cleanPhone;
+        }
+        $validated['phone'] = $cleanPhone;
 
         // Determine user (Guest or Auth)
         $user = auth()->user();
