@@ -64,6 +64,21 @@
         .nav-link:hover::after {
             width: 100%;
         }
+
+        /* Top Header Announcement Marquee */
+        @keyframes headerMarquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        .header-marquee-track {
+            display: inline-flex;
+            width: max-content;
+            will-change: transform;
+            animation: headerMarquee 42s linear infinite;
+        }
+        .header-marquee-container:hover .header-marquee-track {
+            animation-play-state: paused;
+        }
     </style>
     @if(config('app.env') == 'production')
 <!-- TikTok Pixel Code Start -->
@@ -100,12 +115,38 @@ src="https://www.facebook.com/tr?id=2259213124835399&ev=PageView&noscript=1"
 </head>
 <body class="antialiased bg-white text-gray-900 flex flex-col min-h-screen" x-data="{ mobileMenuOpen: false, cartOpen: false }">
     
-    <!-- Top Utility Bar -->
-    <div class="bg-black text-white py-2 px-4 text-xs font-medium tracking-wide">
-        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 flex justify-center items-center">
-             <div>
-                 <span class="text-white">Welcome to Velto Leather Shoes</span>
-             </div>
+    <!-- Top Announcement Marquee Bar -->
+    @php
+        $shippingRateAmount = isset($defaultShippingRate) && $defaultShippingRate ? number_format($defaultShippingRate->rate, 0) : '200';
+    @endphp
+    <div class="header-marquee-container bg-black text-white py-2 overflow-hidden text-[11px] sm:text-xs font-semibold tracking-wider uppercase border-b border-white/10 select-none">
+        <div class="header-marquee-track flex items-center whitespace-nowrap">
+            @for($m = 0; $m < 2; $m++)
+                <div class="flex items-center space-x-12 sm:space-x-20 pr-12 sm:pr-20" aria-hidden="{{ $m > 0 ? 'true' : 'false' }}">
+                    <span class="inline-flex items-center gap-3">
+                        <span class="text-amber-400">✨</span>
+                        <span>Welcome to Velto Leather Shoes</span>
+                    </span>
+                    <span class="text-white/30 text-sm select-none">•</span>
+                    <span class="inline-flex items-center gap-3">
+                        <span class="text-blue-400">🚚</span>
+                        <span>{{ $shippingRateAmount }} PKR standard shipping rate for Cash On Delivery</span>
+                    </span>
+                    <span class="text-white/30 text-sm select-none">•</span>
+                    <span class="inline-flex items-center gap-3">
+                        <span class="text-red-500">🔥</span>
+                        <span class="text-amber-300 font-bold tracking-widest">THE MEGA SALE - LIVE NOW</span>
+                    </span>
+                    @if(!empty($freeShippingText))
+                        <span class="text-white/30 text-sm select-none">•</span>
+                        <span class="inline-flex items-center gap-3">
+                            <span class="text-emerald-400">📦</span>
+                            <span>{{ $freeShippingText }}</span>
+                        </span>
+                    @endif
+                    <span class="text-white/30 text-sm select-none">•</span>
+                </div>
+            @endfor
         </div>
     </div>
 
