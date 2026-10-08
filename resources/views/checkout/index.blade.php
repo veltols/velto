@@ -215,12 +215,26 @@
                                 <dd class="text-sm font-medium text-gray-900">Rs. {{ number_format($subtotal) }}</dd>
                             </div>
                             <div class="flex items-center justify-between pt-4">
-                                <dt class="text-sm text-gray-600">Shipping</dt>
-                                <dd class="text-sm font-medium text-gray-900">Rs. {{ number_format($shipping) }}</dd>
+                                <dt class="text-sm text-gray-600 flex flex-col">
+                                    <span>Shipping</span>
+                                    <span id="shipping-method-name" class="text-[11px] text-gray-400 font-normal">
+                                        {{ $shippingData['name'] ?? 'Standard Delivery' }}
+                                        @if(!empty($shippingData['notes']))
+                                            ({{ $shippingData['notes'] }})
+                                        @endif
+                                    </span>
+                                </dt>
+                                <dd class="text-sm font-medium text-gray-900" id="shipping-display">
+                                    @if($shipping <= 0)
+                                        <span class="text-emerald-600 font-bold">FREE</span>
+                                    @else
+                                        Rs. {{ number_format($shipping) }}
+                                    @endif
+                                </dd>
                             </div>
                             <div class="flex items-center justify-between border-t border-gray-200 pt-4 mt-4">
                                 <dt class="text-base font-medium text-gray-900">Order Total</dt>
-                                <dd class="text-base font-medium text-gray-900">Rs. {{ number_format($total) }}</dd>
+                                <dd class="text-base font-bold text-gray-900" id="total-display">Rs. {{ number_format($total) }}</dd>
                             </div>
                         </div>
 
@@ -255,7 +269,7 @@
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                                     </svg>
                                 </span>
-                                <span id="submit-text">Place Order (Rs. {{ number_format($total) }})</span>
+                                <span id="submit-text">Place Order (<span id="submit-total">Rs. {{ number_format($total) }}</span>)</span>
                             </button>
                         </div>
                     </div>
@@ -523,6 +537,49 @@
             updateMaxLength();
             if (phoneInput.value.trim()) {
                 validatePhone();
+            }
+
+            // Real-time Shipping Rate update on City change
+            const cityInput = document.getElementById('city');
+            let cityDebounceTimer = null;
+            if (cityInput) {
+                cityInput.addEventListener('input', function() {
+                    clearTimeout(cityDebounceTimer);
+                    cityDebounceTimer = setTimeout(function() {
+                        const cityName = cityInput.value.trim();
+                        fetch('{{ route("checkout.shipping-rate") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                city: cityName,
+                                subtotal: {{ (float)$subtotal }}
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.success) {
+                                const shippingEl = document.getElementById('shipping-display');
+                                const totalEl = document.getElementById('total-display');
+                                const submitTotalEl = document.getElementById('submit-total');
+                                const shippingMethodEl = document.getElementById('shipping-method-name');
+
+                                if (shippingEl) shippingEl.textContent = data.formatted_cost;
+                                if (totalEl) totalEl.textContent = data.formatted_total;
+                                if (submitTotalEl) submitTotalEl.textContent = data.formatted_total;
+                                if (shippingMethodEl) {
+                                    shippingMethodEl.textContent = data.name + (data.notes ? ' (' + data.notes + ')' : '');
+                                }
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error fetching dynamic shipping rate:', err);
+                        });
+                    }, 400);
+                });
             }
         });
     </script>

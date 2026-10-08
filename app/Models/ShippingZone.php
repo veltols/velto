@@ -2,27 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class ShippingZone extends Model
+/**
+ * Class ShippingZone
+ * Kept for backwards compatibility with legacy references.
+ * Inherits all features from ShippingRate.
+ */
+class ShippingZone extends ShippingRate
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'rate',
-        'is_active',
-        'cities',
-    ];
-
-    protected $casts = [
-        'rate' => 'decimal:2',
-        'is_active' => 'boolean',
-    ];
-
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
 }

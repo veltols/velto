@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\ShippingZone;
+use App\Models\ShippingRate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -46,11 +46,12 @@ class CheckoutController extends Controller
             return $price * $item->quantity;
         });
         
-        // Simple shipping calculation (flat rate for now or fetch default)
-        $shipping = 200; // Default flat rate
+        $userCity = auth()->user() ? auth()->user()->city : null;
+        $shippingData = ShippingRate::resolveRate($userCity, (float)$subtotal);
+        $shipping = (float)$shippingData['cost'];
         $total = $subtotal + $shipping;
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total'));
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'shippingData'));
     }
 
     public function store(Request $request)
@@ -129,8 +130,9 @@ class CheckoutController extends Controller
             return $price * $item->quantity;
         });
 
-        // Determine shipping cost based on city/zone if logic existed, using flat rate for now
-        $shippingCost = 200; 
+        // Determine shipping cost dynamically based on city and subtotal from configured Shipping Rates
+        $resolvedShipping = ShippingRate::resolveRate($validated['city'], (float)$subtotal);
+        $shippingCost = (float)$resolvedShipping['cost']; 
         
         try {
             DB::beginTransaction();
@@ -219,5 +221,28 @@ class CheckoutController extends Controller
         $order->load('items');
 
         return view('checkout.success', compact('order'));
+    }
+
+    /**
+     * Get dynamic shipping rate via AJAX based on city and subtotal.
+     */
+    public function getShippingRate(Request $request)
+    {
+        $city = $request->input('city');
+        $subtotal = (float) $request->input('subtotal', 0);
+
+        $resolved = ShippingRate::resolveRate($city, $subtotal);
+        $cost = (float) $resolved['cost'];
+        $total = $subtotal + $cost;
+
+        return response()->json([
+            'success' => true,
+            'cost' => $cost,
+            'formatted_cost' => $cost <= 0 ? 'FREE' : 'Rs. ' . number_format($cost),
+            'name' => $resolved['name'],
+            'notes' => $resolved['notes'],
+            'total' => $total,
+            'formatted_total' => 'Rs. ' . number_format($total),
+        ]);
     }
 }

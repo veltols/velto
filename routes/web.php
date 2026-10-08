@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\ShippingRateController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -41,6 +42,7 @@ Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear
 Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/shipping-rate', [CheckoutController::class, 'getShippingRate'])->name('checkout.shipping-rate');
 Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/preview/order-email/{id?}', function ($id = null) {
     $order = $id ? \App\Models\Order::with(['items.product.primaryImage', 'items.product.images'])->find($id) 
@@ -71,6 +73,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('banners', BannerController::class);
         Route::resource('reviews', AdminReviewController::class);
         Route::patch('reviews/{review}/toggle-status', [AdminReviewController::class, 'toggleStatus'])->name('reviews.toggle-status');
+        Route::resource('shipping-rates', ShippingRateController::class);
+        Route::patch('shipping-rates/{shipping_rate}/toggle-status', [ShippingRateController::class, 'toggleStatus'])->name('shipping-rates.toggle-status');
+        Route::post('shipping-rates/{shipping_rate}/set-default', [ShippingRateController::class, 'setDefault'])->name('shipping-rates.set-default');
         
         // Product Images
         Route::delete('/products/{product}/images/{image}', [AdminProductController::class, 'destroyImage'])->name('products.images.destroy');

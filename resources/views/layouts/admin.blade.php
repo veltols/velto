@@ -100,6 +100,14 @@
                                             @endif
                                         </a>
                                     </li>
+                                    <li>
+                                        <a href="{{ route('admin.shipping-rates.index') }}" class="{{ request()->routeIs('admin.shipping-rates.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                                            <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                                            </svg>
+                                            Shipping Rates
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="mt-auto">
@@ -178,8 +186,14 @@
                                     @endif
                                 </a>
                             </li>
-
-
+                            <li>
+                                <a href="{{ route('admin.shipping-rates.index') }}" class="{{ request()->routeIs('admin.shipping-rates.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                                    <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                                    </svg>
+                                    Shipping Rates
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li class="mt-auto">
