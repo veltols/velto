@@ -66,7 +66,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 class="text-3xl font-serif font-bold text-gray-900 mb-8 text-center">Checkout</h1>
             
-            <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form" class="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
+            <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form" novalidate class="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
                 @csrf
                 
                 <!-- Contact & Shipping Info -->
@@ -98,9 +98,12 @@
 
                         <!-- Phone Number Field with intl-tel-input -->
                         <div class="sm:col-span-2">
-                            <label for="phone" class="block text-sm font-medium text-gray-700">
-                                Phone Number <span class="text-xs text-gray-500 font-normal">(WhatsApp Active)</span>
-                            </label>
+                            <div class="flex items-center justify-between">
+                                <label for="phone" class="block text-sm font-medium text-gray-700">
+                                    Phone Number <span class="text-xs text-gray-500 font-normal">(WhatsApp Active)</span>
+                                </label>
+                                <span id="phone-digit-counter" class="text-xs font-mono text-gray-400">0/11 digits</span>
+                            </div>
                             <div class="mt-1 relative">
                                 <input type="tel" 
                                        name="phone" 
@@ -108,38 +111,49 @@
                                        value="{{ old('phone', auth()->user() ? auth()->user()->phone : '') }}" 
                                        required 
                                        autocomplete="tel"
-                                       minlength="10"
+                                       inputmode="numeric"
                                        maxlength="11"
-                                       pattern="^(03[0-9]{9}|3[0-9]{9})$"
                                        placeholder="0300 1234567"
-                                       title="Please enter a complete 11-digit Pakistani mobile number starting with 03 (e.g. 0300 1234567)"
+                                       aria-describedby="phone-format-hint phone-error"
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black sm:text-sm">
                             </div>
                             
-                            <!-- Validation Feedback Messages -->
-                            <div id="phone-feedback" class="mt-1.5 min-h-[18px]">
-                                <p id="phone-error" class="hidden text-red-600 text-xs font-semibold flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span id="phone-error-text">Please enter a valid phone number</span>
-                                </p>
-                                <p id="phone-valid" class="hidden text-emerald-600 text-xs font-semibold flex items-center gap-1.5">
+                            <!-- Helpful format pattern hint visible upfront -->
+                            <p id="phone-format-hint" class="text-xs text-gray-500 mt-1 flex items-center justify-between">
+                                <span><strong class="font-medium text-gray-700">Format:</strong> 0303 1234567 (11 digits) or 303 1234567 (10 digits)</span>
+                            </p>
+
+                            <!-- Validation Feedback Messages & Prominent Error Box -->
+                            <div id="phone-feedback" class="mt-2 min-h-[18px]">
+                                <div id="phone-error" class="hidden bg-red-50 border border-red-200 rounded-md p-2.5 text-red-700 text-xs shadow-sm">
+                                    <div class="flex items-start gap-2">
+                                        <svg class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <div class="flex-1">
+                                            <p id="phone-error-text" class="font-bold text-red-800">Invalid phone number</p>
+                                            <p id="phone-error-subtext" class="text-red-700 mt-0.5">Please enter 11 digits starting with 03 (e.g. 0300 1234567)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p id="phone-valid" class="hidden text-emerald-600 text-xs font-semibold flex items-center gap-1.5 pt-0.5">
                                     <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
-                                    <span>Valid phone number</span>
+                                    <span>Valid Pakistani phone number</span>
                                 </p>
                                 @error('phone') 
-                                    <p class="text-red-600 text-xs font-semibold flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                        </svg>
-                                        <span>{{ $message }}</span>
-                                    </p> 
+                                    <div class="bg-red-50 border border-red-200 rounded-md p-2.5 text-red-700 text-xs mt-1.5">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="font-semibold">{{ $message }}</span>
+                                        </div>
+                                    </div>
                                 @enderror
                             </div>
-                            <p class="text-gray-400 text-[11px] mt-0.5">We will send your order confirmation and dispatch updates to this number.</p>
+                            <p class="text-gray-400 text-[11px] mt-1">We will send your order confirmation and dispatch updates to this number.</p>
                         </div>
 
                         <div class="sm:col-span-2">
@@ -162,81 +176,113 @@
                 </div>
 
                 <!-- Order Summary -->
-                <div class="mt-10 lg:mt-0">
-                    <div class="bg-white p-6 rounded-lg shadow-sm sticky top-24">
-                        <h2 class="text-lg font-medium text-gray-900 mb-6">Order Summary</h2>
+                <div class="mt-8 lg:mt-0">
+                    <div class="bg-white rounded-lg shadow-sm lg:p-6 sticky top-24 overflow-hidden border border-gray-100 lg:border-transparent">
+                        
+                        <!-- Mobile Accordion Trigger Header (Visible on Mobile only) -->
+                        <button type="button" 
+                                id="order-summary-toggle" 
+                                class="w-full flex lg:hidden items-center justify-between p-4 bg-gray-50/80 hover:bg-gray-100/80 transition-colors text-left border-b border-gray-200"
+                                aria-expanded="false" 
+                                aria-controls="order-summary-content">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                                <span class="text-sm font-semibold text-gray-900">
+                                    <span id="order-summary-toggle-text">Show order summary</span>
+                                    <span class="text-xs text-gray-500 font-normal">({{ $cartItems->sum('quantity') }} {{ Str::plural('item', $cartItems->sum('quantity')) }})</span>
+                                </span>
+                                <svg id="order-summary-chevron" class="w-4 h-4 text-gray-500 transition-transform duration-200 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-bold text-gray-900" id="mobile-summary-total">Rs. {{ number_format($total) }}</span>
+                        </button>
 
-                        <ul role="list" class="divide-y divide-gray-200">
-                            @foreach($cartItems as $item)
-                                <li class="flex py-6">
-                                     <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                        @if($item->product->primaryImage)
-                                            @php 
-                                                $path = $item->product->primaryImage->image_path;
-                                                $url = Str::startsWith($path, 'http') ? $path : asset('storage/' . $path);
-                                            @endphp
-                                             <img src="{{ $url }}" 
-                                                  class="h-full w-full object-cover object-center"
-                                                  onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=Error';">
-                                        @else
-                                            <div class="h-full w-full bg-gray-100 flex items-center justify-center text-xs">No Img</div>
-                                        @endif
-                                    </div>
+                        <!-- Desktop Header (Always visible on lg screens) -->
+                        <div class="hidden lg:flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-medium text-gray-900">Order Summary</h2>
+                            <span class="text-xs text-gray-500">({{ $cartItems->sum('quantity') }} {{ Str::plural('item', $cartItems->sum('quantity')) }})</span>
+                        </div>
 
-                                    <div class="ml-6 flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div class="flex justify-between text-base font-medium text-gray-900">
-                                                <h3>{{ $item->product->name }}</h3>
-                                                <div class="flex flex-col items-end">
-                                                    @php
-                                                        $onSale = $item->variant ? $item->variant->isOnSale() : $item->product->isOnSale();
-                                                        $currentPrice = $item->variant ? $item->variant->final_price : $item->product->price;
-                                                        $originalPrice = $item->variant ? ($item->variant->price ?: $item->product->base_price) : $item->product->base_price;
-                                                    @endphp
-                                                    <p class="ml-4 font-bold text-black">Rs. {{ number_format($currentPrice * $item->quantity) }}</p>
-                                                    @if($onSale)
-                                                        <p class="ml-4 text-xs text-gray-400 line-through text-right">Rs. {{ number_format($originalPrice * $item->quantity) }}</p>
-                                                    @endif
+                        <!-- Accordion Content Container (Collapsed by default on mobile, always visible on desktop) -->
+                        <div id="order-summary-content" class="hidden lg:block p-4 lg:p-0">
+                            <ul role="list" class="divide-y divide-gray-200">
+                                @foreach($cartItems as $item)
+                                    <li class="flex py-5 lg:py-6">
+                                         <div class="h-20 w-20 lg:h-24 lg:w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                            @if($item->product->primaryImage)
+                                                @php 
+                                                    $path = $item->product->primaryImage->image_path;
+                                                    $url = Str::startsWith($path, 'http') ? $path : asset('storage/' . $path);
+                                                @endphp
+                                                 <img src="{{ $url }}" 
+                                                      class="h-full w-full object-cover object-center"
+                                                      onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=Error';">
+                                            @else
+                                                <div class="h-full w-full bg-gray-100 flex items-center justify-center text-xs">No Img</div>
+                                            @endif
+                                        </div>
+
+                                        <div class="ml-4 lg:ml-6 flex-1 flex flex-col justify-between">
+                                            <div>
+                                                <div class="flex justify-between text-sm lg:text-base font-medium text-gray-900">
+                                                    <h3 class="pr-2">{{ $item->product->name }}</h3>
+                                                    <div class="flex flex-col items-end flex-shrink-0">
+                                                        @php
+                                                            $onSale = $item->variant ? $item->variant->isOnSale() : $item->product->isOnSale();
+                                                            $currentPrice = $item->variant ? $item->variant->final_price : $item->product->price;
+                                                            $originalPrice = $item->variant ? ($item->variant->price ?: $item->product->base_price) : $item->product->base_price;
+                                                        @endphp
+                                                        <p class="font-bold text-black">Rs. {{ number_format($currentPrice * $item->quantity) }}</p>
+                                                        @if($onSale)
+                                                            <p class="text-xs text-gray-400 line-through text-right">Rs. {{ number_format($originalPrice * $item->quantity) }}</p>
+                                                        @endif
+                                                    </div>
                                                 </div>
+                                                <p class="mt-1 text-xs lg:text-sm text-gray-500">{{ $item->variant ? $item->variant->size . ' | ' . $item->variant->color : '' }}</p>
                                             </div>
-                                            <p class="mt-1 text-sm text-gray-500">{{ $item->variant ? $item->variant->size . ' | ' . $item->variant->color : '' }}</p>
+                                            <div class="flex items-end justify-between text-xs lg:text-sm pt-2">
+                                                <p class="text-gray-500">Qty {{ $item->quantity }}</p>
+                                            </div>
                                         </div>
-                                        <div class="flex items-end justify-between text-sm pt-2">
-                                            <p class="text-gray-500">Qty {{ $item->quantity }}</p>
-                                        </div>
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
+                                    </li>
+                                @endforeach
+                            </ul>
 
-                        <div class="border-t border-gray-200 pt-6 mt-6">
-                            <div class="flex items-center justify-between">
-                                <dt class="text-sm text-gray-600">Subtotal</dt>
-                                <dd class="text-sm font-medium text-gray-900">Rs. {{ number_format($subtotal) }}</dd>
-                            </div>
-                            <div class="flex items-center justify-between pt-4">
-                                <dt class="text-sm text-gray-600 flex flex-col">
-                                    <span>Shipping</span>
-                                    <span id="shipping-method-name" class="text-[11px] text-gray-400 font-normal">
-                                        {{ $shippingData['name'] ?? 'Standard Delivery' }}
-                                        @if(!empty($shippingData['notes']))
-                                            ({{ $shippingData['notes'] }})
+                            <div class="border-t border-gray-200 pt-5 lg:pt-6 mt-4 lg:mt-6 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <dt class="text-sm text-gray-600">Subtotal</dt>
+                                    <dd class="text-sm font-medium text-gray-900">Rs. {{ number_format($subtotal) }}</dd>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <dt class="text-sm text-gray-600 flex flex-col">
+                                        <span>Shipping</span>
+                                        <span id="shipping-method-name" class="text-[11px] text-gray-400 font-normal">
+                                            {{ $shippingData['name'] ?? 'Standard Delivery' }}
+                                            @if(!empty($shippingData['notes']))
+                                                ({{ $shippingData['notes'] }})
+                                            @endif
+                                        </span>
+                                    </dt>
+                                    <dd class="text-sm font-medium text-gray-900" id="shipping-display">
+                                        @if($shipping <= 0)
+                                            <span class="text-emerald-600 font-bold">FREE</span>
+                                        @else
+                                            Rs. {{ number_format($shipping) }}
                                         @endif
-                                    </span>
-                                </dt>
-                                <dd class="text-sm font-medium text-gray-900" id="shipping-display">
-                                    @if($shipping <= 0)
-                                        <span class="text-emerald-600 font-bold">FREE</span>
-                                    @else
-                                        Rs. {{ number_format($shipping) }}
-                                    @endif
-                                </dd>
-                            </div>
-                            <div class="flex items-center justify-between border-t border-gray-200 pt-4 mt-4">
-                                <dt class="text-base font-medium text-gray-900">Order Total</dt>
-                                <dd class="text-base font-bold text-gray-900" id="total-display">Rs. {{ number_format($total) }}</dd>
+                                    </dd>
+                                </div>
+                                <div class="flex items-center justify-between border-t border-gray-200 pt-3 mt-3">
+                                    <dt class="text-base font-medium text-gray-900">Order Total</dt>
+                                    <dd class="text-base font-bold text-gray-900" id="total-display">Rs. {{ number_format($total) }}</dd>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Payment & Checkout Actions (Always accessible) -->
+                        <div class="p-4 lg:p-0">
 
                         <div class="mt-6 border-t border-gray-200 pt-6">
                              <div class="flex items-center mb-4">
@@ -315,9 +361,28 @@
                 }
             }
 
+            const phoneDigitCounter = document.querySelector('#phone-digit-counter');
+            const phoneErrorSubtext = document.querySelector('#phone-error-subtext');
+
+            // Safe helper to get country data across different intl-tel-input versions (v24: getSelectedCountryData(), v29+: getSelectedCountry())
+            function getSelectedCountryDataSafe() {
+                if (!iti) return { iso2: 'pk' };
+                try {
+                    if (typeof iti.getSelectedCountryData === 'function') {
+                        return iti.getSelectedCountryData() || { iso2: 'pk' };
+                    }
+                    if (typeof iti.getSelectedCountry === 'function') {
+                        return iti.getSelectedCountry() || { iso2: 'pk' };
+                    }
+                } catch (e) {
+                    // Fallback to default
+                }
+                return { iso2: 'pk' };
+            }
+
             // Adjust input max length based on selected country and current value
             function getMaxDigits() {
-                const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
+                const countryData = getSelectedCountryDataSafe();
                 if (countryData && countryData.iso2 === 'pk') {
                     const raw = phoneInput.value.replace(/\D/g, '');
                     // Pakistani numbers: 11 digits if starting with 0 (03001234567), 10 digits if starting with 3 (3001234567)
@@ -329,6 +394,24 @@
             function updateMaxLength() {
                 const max = getMaxDigits();
                 phoneInput.setAttribute('maxlength', String(max));
+            }
+
+            function updateDigitCounter() {
+                if (!phoneDigitCounter) return;
+                const countryData = getSelectedCountryDataSafe();
+                const digits = phoneInput.value.replace(/\D/g, '');
+                if (!countryData || countryData.iso2 === 'pk') {
+                    const target = digits.startsWith('0') ? 11 : (digits.startsWith('3') ? 10 : 11);
+                    phoneDigitCounter.textContent = `${digits.length}/${target} digits`;
+                    if (digits.length === target) {
+                        phoneDigitCounter.className = "text-xs font-mono font-semibold text-emerald-600";
+                    } else {
+                        phoneDigitCounter.className = "text-xs font-mono text-gray-400";
+                    }
+                } else {
+                    phoneDigitCounter.textContent = `${digits.length} digits`;
+                    phoneDigitCounter.className = "text-xs font-mono text-gray-400";
+                }
             }
 
             // 1. Prevent entering more than allowed digits & block non-numeric characters
@@ -360,7 +443,7 @@
             // 2. Filter input in real-time
             phoneInput.addEventListener('input', function() {
                 let digits = phoneInput.value.replace(/\D/g, '');
-                const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
+                const countryData = getSelectedCountryDataSafe();
 
                 if (countryData && countryData.iso2 === 'pk') {
                     // Convert 923... to 03... if someone types/pastes 923
@@ -381,7 +464,8 @@
                     phoneInput.value = digits;
                 }
                 updateMaxLength();
-                validatePhone();
+                updateDigitCounter();
+                validatePhone(false);
             });
 
             // 3. Handle paste cleanly
@@ -389,7 +473,7 @@
                 e.preventDefault();
                 const pasted = (e.clipboardData || window.clipboardData).getData('text') || '';
                 let digits = pasted.replace(/\D/g, '');
-                const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
+                const countryData = getSelectedCountryDataSafe();
 
                 if (countryData && countryData.iso2 === 'pk') {
                     if (digits.startsWith('923')) {
@@ -403,88 +487,131 @@
 
                 phoneInput.value = digits;
                 updateMaxLength();
-                validatePhone();
+                updateDigitCounter();
+                validatePhone(false);
             });
 
             // 4. Validation logic
-            function validatePhone() {
+            function showPhoneError(title, subtitle) {
+                if (phoneErrorText) phoneErrorText.textContent = title;
+                if (phoneErrorSubtext) phoneErrorSubtext.textContent = subtitle;
+                if (phoneError) phoneError.classList.remove('hidden');
+                if (phoneValid) phoneValid.classList.add('hidden');
+                phoneInput.classList.remove('iti__input-valid');
+                phoneInput.classList.add('iti__input-error');
+            }
+
+            function clearPhoneFeedback() {
+                if (phoneError) phoneError.classList.add('hidden');
+                if (phoneValid) phoneValid.classList.add('hidden');
+                phoneInput.classList.remove('iti__input-error', 'iti__input-valid');
+            }
+
+            function validatePhone(showError = true) {
                 const val = phoneInput.value.trim();
                 const digits = val.replace(/\D/g, '');
-                phoneError.classList.add('hidden');
-                phoneValid.classList.add('hidden');
-                phoneInput.classList.remove('iti__input-error', 'iti__input-valid');
+                
+                clearPhoneFeedback();
 
                 if (!digits) {
-                    phoneErrorText.textContent = "Phone number is required";
-                    phoneError.classList.remove('hidden');
-                    phoneInput.classList.add('iti__input-error');
+                    if (showError) {
+                        showPhoneError(
+                            "Phone number is required", 
+                            "Please enter your 11-digit mobile number starting with 03 (e.g. 0300 1234567)"
+                        );
+                    }
                     return false;
                 }
 
-                const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
+                const countryData = getSelectedCountryDataSafe();
 
                 // Specific validation for Pakistan (pk / +92)
                 if (!countryData || countryData.iso2 === 'pk') {
                     if (digits.startsWith('0')) {
                         if (digits.length < 11) {
-                            phoneErrorText.textContent = `Please enter complete 11 digits (${digits.length}/11 entered)`;
-                            phoneError.classList.remove('hidden');
-                            phoneInput.classList.add('iti__input-error');
+                            if (showError) {
+                                showPhoneError(
+                                    `Incomplete phone number (${digits.length}/11 digits)`, 
+                                    `Pakistani mobile numbers must be 11 digits starting with 03 (e.g. 0300 1234567). Please add ${11 - digits.length} more digit(s).`
+                                );
+                            }
                             return false;
                         }
                         if (!/^03[0-9]{9}$/.test(digits)) {
-                            phoneErrorText.textContent = "Pakistani mobile numbers must start with 03 (e.g. 0300 1234567)";
-                            phoneError.classList.remove('hidden');
-                            phoneInput.classList.add('iti__input-error');
+                            if (showError) {
+                                showPhoneError(
+                                    "Invalid prefix - must start with 03", 
+                                    "Pakistani mobile numbers start with 03 (e.g. 0300, 0301, 0312, 0321, 0333, 0345...)"
+                                );
+                            }
                             return false;
                         }
                     } else if (digits.startsWith('3')) {
                         if (digits.length < 10) {
-                            phoneErrorText.textContent = `Please enter complete 10 digits (${digits.length}/10 entered)`;
-                            phoneError.classList.remove('hidden');
-                            phoneInput.classList.add('iti__input-error');
+                            if (showError) {
+                                showPhoneError(
+                                    `Incomplete phone number (${digits.length}/10 digits)`, 
+                                    `Please enter 10 digits without leading 0 (e.g. 300 1234567) or 11 digits starting with 03.`
+                                );
+                            }
                             return false;
                         }
                         if (!/^3[0-9]{9}$/.test(digits)) {
-                            phoneErrorText.textContent = "Must start with 3 (e.g. 300 1234567)";
-                            phoneError.classList.remove('hidden');
-                            phoneInput.classList.add('iti__input-error');
+                            if (showError) {
+                                showPhoneError(
+                                    "Invalid mobile number format", 
+                                    "Pakistani mobile numbers start with 3 (e.g. 300 1234567) or 03."
+                                );
+                            }
                             return false;
                         }
                     } else {
-                        phoneErrorText.textContent = "Mobile numbers in Pakistan start with 03 (e.g. 0300 1234567)";
-                        phoneError.classList.remove('hidden');
-                        phoneInput.classList.add('iti__input-error');
+                        if (showError) {
+                            showPhoneError(
+                                "Invalid Pakistani mobile number", 
+                                "Mobile numbers in Pakistan start with 03 (e.g. 0300 1234567). Landline numbers are not accepted."
+                            );
+                        }
                         return false;
                     }
 
                     // Valid Pakistani number!
-                    phoneValid.classList.remove('hidden');
+                    if (phoneValid) phoneValid.classList.remove('hidden');
                     phoneInput.classList.add('iti__input-valid');
                     return true;
                 } else {
                     // International validation
                     if (iti && typeof iti.isValidNumber === 'function' ? iti.isValidNumber() : digits.length >= 8) {
-                        phoneValid.classList.remove('hidden');
+                        if (phoneValid) phoneValid.classList.remove('hidden');
                         phoneInput.classList.add('iti__input-valid');
                         return true;
                     } else {
-                        phoneErrorText.textContent = "Please enter a valid phone number";
-                        phoneError.classList.remove('hidden');
-                        phoneInput.classList.add('iti__input-error');
+                        if (showError) {
+                            showPhoneError(
+                                "Invalid phone number", 
+                                "Please enter a valid international mobile phone number for the selected country."
+                            );
+                        }
                         return false;
                     }
                 }
             }
 
-            phoneInput.addEventListener('blur', validatePhone);
+            phoneInput.addEventListener('blur', function() {
+                validatePhone(true);
+            });
+
+            // Prevent native browser tooltip suppression and show our custom error box instead
+            phoneInput.addEventListener('invalid', function(e) {
+                e.preventDefault();
+                validatePhone(true);
+            });
 
             phoneInput.addEventListener('countrychange', function () {
                 phoneInput.value = '';
-                phoneError.classList.add('hidden');
-                phoneValid.classList.add('hidden');
-                phoneInput.classList.remove('iti__input-error', 'iti__input-valid');
+                clearPhoneFeedback();
                 updateMaxLength();
+                updateDigitCounter();
                 phoneInput.focus();
             });
 
@@ -495,16 +622,33 @@
                 const submitText = document.querySelector('#submit-text');
 
                 checkoutForm.addEventListener('submit', function (e) {
-                    if (!validatePhone()) {
+                    // First check standard HTML5 required fields if any are empty
+                    const requiredInputs = checkoutForm.querySelectorAll('input[required], textarea[required], select[required]');
+                    for (let el of requiredInputs) {
+                        if (!el.value.trim()) {
+                            e.preventDefault();
+                            el.focus();
+                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            return false;
+                        }
+                    }
+
+                    // Explicit phone validation
+                    const isPhoneValid = validatePhone(true);
+                    if (!isPhoneValid) {
                         e.preventDefault();
                         e.stopPropagation();
-                        phoneInput.focus();
+                        
+                        // Scroll smoothly to the phone input and focus it
                         phoneInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(function() {
+                            phoneInput.focus();
+                        }, 250);
                         return false;
                     }
 
                     // Normalize value right before submit so it's always in standard format
-                    const countryData = iti ? iti.getSelectedCountryData() : { iso2: 'pk' };
+                    const countryData = getSelectedCountryDataSafe();
                     const digits = phoneInput.value.replace(/\D/g, '');
                     if (!countryData || countryData.iso2 === 'pk') {
                         // Standardize Pakistani number to 03XXXXXXXXX (11 digits)
@@ -535,8 +679,32 @@
 
             // Initial check and setup
             updateMaxLength();
+            updateDigitCounter();
             if (phoneInput.value.trim()) {
-                validatePhone();
+                validatePhone(false);
+            }
+
+            // Accordion Toggle for Mobile Order Summary
+            const summaryToggle = document.getElementById('order-summary-toggle');
+            const summaryContent = document.getElementById('order-summary-content');
+            const summaryToggleText = document.getElementById('order-summary-toggle-text');
+            const summaryChevron = document.getElementById('order-summary-chevron');
+
+            if (summaryToggle && summaryContent) {
+                summaryToggle.addEventListener('click', function() {
+                    const isExpanded = summaryToggle.getAttribute('aria-expanded') === 'true';
+                    if (isExpanded) {
+                        summaryContent.classList.add('hidden');
+                        summaryToggle.setAttribute('aria-expanded', 'false');
+                        if (summaryToggleText) summaryToggleText.textContent = 'Show order summary';
+                        if (summaryChevron) summaryChevron.classList.remove('rotate-180');
+                    } else {
+                        summaryContent.classList.remove('hidden');
+                        summaryToggle.setAttribute('aria-expanded', 'true');
+                        if (summaryToggleText) summaryToggleText.textContent = 'Hide order summary';
+                        if (summaryChevron) summaryChevron.classList.add('rotate-180');
+                    }
+                });
             }
 
             // Real-time Shipping Rate update on City change
@@ -565,11 +733,13 @@
                                 const shippingEl = document.getElementById('shipping-display');
                                 const totalEl = document.getElementById('total-display');
                                 const submitTotalEl = document.getElementById('submit-total');
+                                const mobileSummaryTotalEl = document.getElementById('mobile-summary-total');
                                 const shippingMethodEl = document.getElementById('shipping-method-name');
 
                                 if (shippingEl) shippingEl.textContent = data.formatted_cost;
                                 if (totalEl) totalEl.textContent = data.formatted_total;
                                 if (submitTotalEl) submitTotalEl.textContent = data.formatted_total;
+                                if (mobileSummaryTotalEl) mobileSummaryTotalEl.textContent = data.formatted_total;
                                 if (shippingMethodEl) {
                                     shippingMethodEl.textContent = data.name + (data.notes ? ' (' + data.notes + ')' : '');
                                 }

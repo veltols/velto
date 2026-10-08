@@ -56,6 +56,13 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        // Pre-sanitize phone input (remove spaces, dashes, parentheses) so formatted inputs like "303 1234567" or " 3031234567 " never fail
+        if ($request->has('phone')) {
+            $rawPhone = (string) $request->input('phone');
+            $sanitizedPhone = preg_replace('/[^\d+]/', '', trim($rawPhone));
+            $request->merge(['phone' => $sanitizedPhone]);
+        }
+
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'phone' => [
@@ -70,7 +77,7 @@ class CheckoutController extends Controller
             'postal_code' => 'sometimes|nullable|string|max:20',
         ], [
             'phone.required' => 'Phone number is required.',
-            'phone.regex' => 'Please enter a complete 11-digit mobile number (e.g. 0300 1234567).',
+            'phone.regex' => 'Please enter a complete 11-digit mobile number (e.g. 0300 1234567 or 300 1234567).',
         ]);
 
         // Standardize Pakistani numbers to 03XXXXXXXXX (11 digits)
