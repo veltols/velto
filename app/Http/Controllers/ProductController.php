@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ShippingRate;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -28,7 +29,17 @@ class ProductController extends Controller
         $ratingBreakdown = $product->ratingBreakdown();
         $reviewsCount = $reviews->count();
 
-        return view('products.show', compact('product', 'relatedProducts', 'reviews', 'averageRating', 'ratingBreakdown', 'reviewsCount'));
+        $shippingRate = ShippingRate::where('is_active', true)->where('is_default', true)->first()
+            ?? ShippingRate::where('is_active', true)->first();
+
+        $shippingConfig = [
+            'name' => $shippingRate ? $shippingRate->name : 'Standard Delivery',
+            'rate' => $shippingRate ? (float)$shippingRate->rate : 200.0,
+            'min_order_amount' => $shippingRate && $shippingRate->min_order_amount !== null ? (float)$shippingRate->min_order_amount : null,
+            'notes' => $shippingRate ? $shippingRate->notes : 'Delivery within 3-5 business days',
+        ];
+
+        return view('products.show', compact('product', 'relatedProducts', 'reviews', 'averageRating', 'ratingBreakdown', 'reviewsCount', 'shippingConfig'));
     }
 
     public function storeReview(Request $request, Product $product)

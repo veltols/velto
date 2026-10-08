@@ -1,4 +1,12 @@
 <x-app-layout>
+    @php
+        $shippingConfig = $shippingConfig ?? [
+            'name' => 'Standard Delivery',
+            'rate' => 200,
+            'min_order_amount' => 3000,
+            'notes' => 'Delivery within 3-5 business days'
+        ];
+    @endphp
     @section('title', $product->name . ' | Velto Leather Shoes')
     @section('meta_description', $product->name .' Buy premium quality men shoes from Velto Leather Shoes. Cash on delivery available across Pakistan.')
     @section('og_type', 'product')
@@ -1014,6 +1022,7 @@
                 product: @json($product),
                 variants: @json($product->variants),
                 allImages: @json($productImagesData),
+                shippingConfig: @json($shippingConfig),
                 mainSwiperInstance: null,
                 thumbSwiperInstance: null,
                 
@@ -1337,25 +1346,57 @@
                     }
                 },
 
+                get subtotal() {
+                    const price = Number(this.currentPrice.onSale ? this.currentPrice.sale : this.currentPrice.regular);
+                    return price * this.quantity;
+                },
+
+                get shippingCost() {
+                    if (!this.shippingConfig) return 200;
+                    const subtotal = this.subtotal;
+                    if (this.shippingConfig.min_order_amount !== null && Number(this.shippingConfig.min_order_amount) > 0 && subtotal >= Number(this.shippingConfig.min_order_amount)) {
+                        return 0;
+                    }
+                    return Number(this.shippingConfig.rate || 0);
+                },
+
+                get grandTotal() {
+                    return this.subtotal + this.shippingCost;
+                },
+
                 generateWhatsAppLink() {
                     let text = `Hello! I would like to order the following product:\n\n`;
+                    text += `*Product:* ${this.product.name}\n`;
                     if (this.selectedColor) {
-                        text += `Color: ${this.selectedColor}\n`;
+                        text += `*Color:* ${this.selectedColor}\n`;
                     }
                     if (this.selectedVariant && this.selectedVariant.size) {
-                        text += `Size: ${this.formatSizeLabel(this.selectedVariant.size)}`;
+                        text += `*Size:* ${this.formatSizeLabel(this.selectedVariant.size)}`;
                         if (this.getVariantStatus(this.selectedVariant)) {
                             text += ` (${this.getVariantStatus(this.selectedVariant)})`;
                         }
                         text += `\n`;
                     }
                     
-                    text += `Quantity: ${this.quantity}\n`;
+                    text += `*Quantity:* ${this.quantity}\n`;
                     
-                    const price = this.currentPrice.onSale ? this.currentPrice.sale : this.currentPrice.regular;
-                    text += `Price: Rs. ${Number(price).toLocaleString()}\n`;
-                    text += `Total: Rs. ${Number(price * this.quantity).toLocaleString()}\n\n`;
-                    text += `Product Link: ${window.location.href}`;
+                    const unitPrice = Number(this.currentPrice.onSale ? this.currentPrice.sale : this.currentPrice.regular);
+                    const subtotal = this.subtotal;
+                    const shipping = this.shippingCost;
+                    const total = this.grandTotal;
+                    
+                    text += `*Price:* Rs. ${unitPrice.toLocaleString()}\n`;
+                    text += `*Subtotal:* Rs. ${subtotal.toLocaleString()}\n`;
+                    
+                    if (shipping <= 0) {
+                        text += `*Shipping:* FREE\n`;
+                    } else {
+                        const methodName = (this.shippingConfig && this.shippingConfig.name) ? this.shippingConfig.name : 'Standard Delivery';
+                        text += `*Shipping (${methodName}):* Rs. ${shipping.toLocaleString()}\n`;
+                    }
+                    
+                    text += `*Total Amount:* Rs. ${total.toLocaleString()}\n\n`;
+                    text += `*Product Link:* ${window.location.href}`;
                     
                     const encodedText = encodeURIComponent(text);
                     // Use WhatsApp phone number
