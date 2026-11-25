@@ -1236,7 +1236,11 @@
                 get availableSizes() {
                     if (!this.variants || this.variants.length === 0) return [];
                     
-                    let list = this.variants;
+                    // Only show sizes greater than 39 (non-numeric sizes are kept)
+                    let list = this.variants.filter(v => {
+                        const n = parseInt(String(v.size).replace(/\D/g, ''), 10);
+                        return isNaN(n) || n > 39;
+                    });
                     if (this.selectedColor && this.uniqueColors.length > 1) {
                         list = list.filter(v => v.color === this.selectedColor);
                     }
